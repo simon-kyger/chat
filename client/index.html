@@ -1,0 +1,151 @@
+<head>
+<style>
+.chat{
+    position:absolute !important;
+    width: 50%;
+    height: 50%;
+    overflow:hidden;
+    font-family: 'Lucida Console';
+    font-size: 14px;
+    margin-left: 4px;
+}
+
+.chat .messages{
+    overflow:hidden;
+    width:100%;
+    height:90%;
+}
+.chat .messages:hover{
+    overflow-y:scroll;
+}
+#chatinput{
+    resize: vertical;
+    width: 99%;
+    height: 9%;
+    bottom: 0px;
+    font-family: 'Lucida Console';
+    font-size: 14px;
+    margin-left: 4px;
+    position: absolute !important;
+}
+.resizer {
+    width: 14px;
+    height: 14px;
+    background-color: #333333;
+    border: 1px solid #000000;
+    top: 0px;
+    right: 0px;
+    position: absolute !important;
+    z-index:;
+}
+.onlineusers{
+	top: 0px;
+    right: 17px;
+    position: absolute !important;
+    background-color: white;
+}
+</style>
+</head>
+<body>
+	<div id="chat" class="chat"">
+	    <div class="messages">
+	        <div><b>Welcome to the proper lunch chat channel. No Nirmilla's or Walner's allowed.</b></br></div>
+	        <div><i>Command List:</i></br></div>
+	        <div>&nbsp &nbsp <b>/name</b> <i>name</i>  :: gives you a name for current session. 10 char limit</br></div>
+	        <div>&nbsp &nbsp <b>/color</b> <i>color</i>  :: changes color of your socket messages</br></div>
+	        <div>&nbsp &nbsp <b>/theme</b> dark  :: changes theme to dark (only one atm)</br></div>
+	    </div>
+	    <input id="chatinput" class="chatinput"></input>
+	    <div id="chatresizer" class="resizer ui-resizable-handl ui-resizable-ne"></div>
+		<div id="onlineusers" class="onlineusers"></div>
+	</div>
+</body>
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+    var socket = io();
+    var chat = $('.chat');
+    var onlineusers = $('.onlineusers');
+    chat.printer = $('.messages', chat);
+    chat.chatinput = $('.chatinput', chat);
+    chat.height = chat.printer.height();
+    chat.preventNewScroll = false;
+    chat.scrollBottom = function() {
+        if (!chat.preventNewScroll) { // if mouse is not over printer
+            chat.printer.stop().animate({ 
+            	scrollTop: chat.printer[0].scrollHeight - chat.printer.height()
+            }, 600); // SET SCROLLER TO BOTTOM
+        }
+    }
+    chat.scrollBottom();
+    chat.postMessage = function(e) {
+        // after hitting enter but allowing new lines using shift+enter
+        if (e.which == 13 && !e.shiftKey) {
+            e.preventDefault();
+            var msg = chat.chatinput.val(); 
+            
+            //commandlookup
+            if (msg.substr(0, 1) == '/') {
+                socket.emit('command', msg);
+                chat.chatinput[0].value = '';
+                return;
+            }
+            if ($.trim(msg)) {
+                socket.emit('chatMsg', msg);
+                chat.chatinput[0].value = ''; // CLEAR TEXTAREA
+            }
+        }
+    }
+    chat.chatinput.keyup(chat.postMessage);
+    // prevent scrolling when reading past messages
+    chat.printer.hover(function (e) {
+        chat.preventNewScroll = e.type === 'mouseenter';
+        if (!chat.preventNewScroll) { chat.scrollBottom(); } // On mouseleave go to bottom
+    });
+    chat.resizable({
+        handles: {
+            'ne': '#chatresizer'
+        }
+    });
+    chat.draggable({
+        containment: "body"
+    });
+
+    //net
+    socket.on('addToChat', function (data) {
+        chat.printer.append(
+        	'<div style ="color:'+data.color+'">'
+        	+ data.date + ' ' + '<b>'
+        	+ data.name + ': ' + '</b>'
+        	+ data.msg.replace(/\n/g, '<br>') + '</div>');
+        chat.scrollBottom();
+    });
+    socket.on('updateUsers', function (data){
+    	onlineusers.empty();
+    	onlineusers.append('<div>Online Users: &nbsp</div>');
+    	for (var i=0; i<data.length; i++){
+    		if (isNaN(data[i]))
+    			data[i] = data[i].replace(/\n/g, '<br>');
+    		onlineusers.append('<div style ="color:'+data[i].color+'">' + data[i] + '</div>');
+    	}
+    });
+
+    socket.on('changeInputFontColor', function (data){
+    	chat.chatinput.css("color", data);
+    });
+
+    socket.on('changeTheme', function (data){
+    	data = data.trim();
+    	if (data == 'dark'){
+    		$('body').css("background-color", "rgb(70,70,70)");
+    		chat.chatinput.css("background-color", "rgb(50,50,50)");
+    		onlineusers.css("background-color", "rgb(70,70,70)");
+    	}
+    	else{
+    		$(document.body).css("background-color", "rgb(255,255,255)");
+    		chat.chatinput.css("background-color", "rgb(255,255,255)");
+    		onlineusers.css("background-color", "rgb(255,255,255)");
+    	}
+    });
+</script>
