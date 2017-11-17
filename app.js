@@ -38,7 +38,6 @@ function disconnects(socket){
 
 function init(socket){
     var start = new moment();
-    socket.lastsentmsg = [];
     SOCKET_CONNECTIONS.push(socket);
     for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
         SOCKET_CONNECTIONS[i].emit('addToChat', {
@@ -53,7 +52,6 @@ function init(socket){
 
 function chatMsg(socket, message){ 
     var now = new moment();     
-    socket.lastsentmsg.push(message);
     if (message.indexOf('<') > -1)
         message = message.replace(new RegExp(/</, 'g'), '&lt');
     var container = message.split(' ');
