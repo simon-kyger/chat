@@ -68,6 +68,8 @@
     var socket = io();
     var chat = $('.chat');
     var onlineusers = $('.onlineusers');
+    chat.posts = [];
+    chat.position = 0;
     chat.printer = $('.messages', chat);
     chat.chatinput = $('.chatinput', chat);
     chat.height = chat.printer.height();
@@ -81,7 +83,22 @@
     }
     chat.scrollBottom();
     chat.postMessage = function(e) {
-        // after hitting enter but allowing new lines using shift+enter
+        //down
+        if (e.which == 40){
+        	chat.position--;
+    		if (chat.position < 0)
+    			chat.position = -1;
+        	chat.chatinput[0].value = chat.posts[chat.position] || '';
+        }
+        //up
+        if (e.which == 38){
+        	chat.position++;
+        	if (chat.position > chat.posts.length)
+    			chat.position = chat.posts.length-1;
+        	chat.chatinput[0].value = chat.posts[chat.position] || '';
+        }
+
+        //enter
         if (e.which == 13 && !e.shiftKey) {
             e.preventDefault();
             var msg = chat.chatinput.val(); 
@@ -89,11 +106,16 @@
             //commandlookup
             if (msg.substr(0, 1) == '/') {
                 socket.emit('command', msg);
+                chat.posts.push(msg);
+                chat.position = chat.posts.length;
                 chat.chatinput[0].value = '';
+                chat.scrollBottom();
                 return;
             }
             if ($.trim(msg)) {
                 socket.emit('chatMsg', msg);
+                chat.posts.push(msg);
+                chat.position = chat.posts.length;
                 chat.chatinput[0].value = ''; // CLEAR TEXTAREA
                 chat.scrollBottom();
             }

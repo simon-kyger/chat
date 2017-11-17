@@ -10,12 +10,12 @@ var io = require('socket.io')(server);
 var SOCKET_CONNECTIONS = [];
 io.sockets.on('connection', function (socket) {
     init(socket);
-    socket.on('disconnect', () => userDisconnects(socket));
+    socket.on('disconnect', () => disconnects(socket));
     socket.on('chatMsg', (message) => chatMsg(socket, message));
     socket.on('command', (message) => command(socket, message));
 });
 
-function userDisconnects(socket){
+function disconnects(socket){
     var now = new moment();
     var temp; //storing disconnected user
     for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
@@ -38,6 +38,7 @@ function userDisconnects(socket){
 
 function init(socket){
     var start = new moment();
+    socket.lastsentmsg = [];
     SOCKET_CONNECTIONS.push(socket);
     for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
         SOCKET_CONNECTIONS[i].emit('addToChat', {
@@ -52,6 +53,7 @@ function init(socket){
 
 function chatMsg(socket, message){ 
     var now = new moment();     
+    socket.lastsentmsg.push(message);
     if (message.indexOf('<') > -1)
         message = message.replace(new RegExp(/</, 'g'), '&lt');
     var container = message.split(' ');
