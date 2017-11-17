@@ -50,8 +50,9 @@
 	<div id="chat" class="chat"">
 	    <div class="messages">
 	        <div><b>Welcome to the proper lunch chat channel. No Nirmilla's or Walner's allowed.</b></br></div>
+	        <div><b>Welcome to the proper lunch chat channel. No Nirmilla's or Walner's allowed.</b></br></div>
 	        <div><i>Command List:</i></br></div>
-	        <div>&nbsp &nbsp <b>/name</b> <i>name</i>  :: gives you a name for current session. 10 char limit</br></div>
+	        <div>&nbsp &nbsp <b>/name</b> <i>name</i>  :: gives you a name for current session. 20 char limit</br></div>
 	        <div>&nbsp &nbsp <b>/color</b> <i>color</i>  :: changes color of your socket messages</br></div>
 	        <div>&nbsp &nbsp <b>/theme</b> dark  :: changes theme to dark (only one atm)</br></div>
 	    </div>
@@ -94,6 +95,7 @@
             if ($.trim(msg)) {
                 socket.emit('chatMsg', msg);
                 chat.chatinput[0].value = ''; // CLEAR TEXTAREA
+                chat.scrollBottom();
             }
         }
     }
@@ -115,19 +117,19 @@
     //net
     socket.on('addToChat', function (data) {
         chat.printer.append(
-        	'<div style ="color:'+data.color+'">'
-        	+ data.date + ' ' + '<b>'
-        	+ data.name + ': ' + '</b>'
-        	+ data.msg.replace(/\n/g, '<br>') + '</div>');
+			'<div style ="color:'+data.color+'">'
+			+ data.date + ' ' + '<b>'
+			+ data.name + ': ' + '</b>'
+			+ data.msg.replace(/\n/g, '<br>') + '</div>');
         chat.scrollBottom();
     });
     socket.on('updateUsers', function (data){
     	onlineusers.empty();
     	onlineusers.append('<div>Online Users: &nbsp</div>');
     	for (var i=0; i<data.length; i++){
-    		if (isNaN(data[i]))
-    			data[i] = data[i].replace(/\n/g, '<br>');
-    		onlineusers.append('<div style ="color:'+data[i].color+'">' + data[i] + '</div>');
+			if (isNaN(data[i]))
+				data[i] = data[i].replace(/\n/g, '<br>');
+			onlineusers.append('<div style ="color:'+data[i].color+'">' + data[i] + '</div>');
     	}
     });
 
@@ -138,14 +140,14 @@
     socket.on('changeTheme', function (data){
     	data = data.trim();
     	if (data == 'dark'){
-    		$('body').css("background-color", "rgb(70,70,70)");
-    		chat.chatinput.css("background-color", "rgb(50,50,50)");
-    		onlineusers.css("background-color", "rgb(70,70,70)");
+			$('body').css("background-color", "rgb(70,70,70)");
+			chat.chatinput.css("background-color", "rgb(50,50,50)");
+			onlineusers.css("background-color", "rgb(70,70,70)");
     	}
     	else{
-    		$(document.body).css("background-color", "rgb(255,255,255)");
-    		chat.chatinput.css("background-color", "rgb(255,255,255)");
-    		onlineusers.css("background-color", "rgb(255,255,255)");
+			$(document.body).css("background-color", "rgb(255,255,255)");
+			chat.chatinput.css("background-color", "rgb(255,255,255)");
+			onlineusers.css("background-color", "rgb(255,255,255)");
     	}
     });
 </script>
