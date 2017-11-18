@@ -8,13 +8,36 @@ app.get('/', function (req, res) {
 server.listen(80);
 var io = require('socket.io')(server);
 var SOCKET_CONNECTIONS = [];
+
+//socket: object
+//description: consider this as a looping system, since sockets are persistant, 
+//the contents inside are always being evaluated.  this is the main loop of the program.
 io.sockets.on('connection', function (socket) {
     init(socket);
     socket.on('disconnect', () => disconnects(socket));
-    socket.on('chatMsg', (message) => chatMsg(socket, message));
-    socket.on('command', (message) => command(socket, message));
+    socket.on('chatMsg', (msg) => chatMsg(socket, msg));
 });
 
+//socket: object
+//returns: void
+//description: static method that only occurs once per connection to server is establish
+function init(socket){
+    var now = new moment();
+    SOCKET_CONNECTIONS.push(socket);
+    for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
+        SOCKET_CONNECTIONS[i].emit('addToChat', {
+            date: now.format("HH:mm:ss"),
+            name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+            msg:  'User ' + SOCKET_CONNECTIONS.indexOf(socket) + ' has connected.',
+            color: socket.color
+        });
+        SOCKET_CONNECTIONS[i].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
+    }
+}
+
+//socket: object
+//returns: void
+//description: events that occur after a user disconnects from the server
 function disconnects(socket){
     var now = new moment();
     var temp; //storing disconnected user
@@ -36,25 +59,18 @@ function disconnects(socket){
     }
 }
 
-function init(socket){
-    var start = new moment();
-    SOCKET_CONNECTIONS.push(socket);
-    for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
-        SOCKET_CONNECTIONS[i].emit('addToChat', {
-            date: start.format("HH:mm:ss"),
-            name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-            msg:  'User ' + SOCKET_CONNECTIONS.indexOf(socket) + ' has connected.',
-            color: socket.color
-        });
-        SOCKET_CONNECTIONS[i].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
+//socket: object
+//msg: string
+//returns: void
+function chatMsg(socket, msg){ 
+    var now = new moment();
+    if (msg.indexOf('<') > -1)
+        msg = msg.replace(new RegExp(/</, 'g'), '&lt');
+    if (msg.substr(0, 1) == '/'){
+        command(socket, msg);
+        return;
     }
-}
-
-function chatMsg(socket, message){ 
-    var now = new moment();     
-    if (message.indexOf('<') > -1)
-        message = message.replace(new RegExp(/</, 'g'), '&lt');
-    var container = message.split(' ');
+    var container = msg.split(' ');
     for (var i=0; i<container.length; i++){
         if ((container[i].substr(0, 8)) == 'https://' || (container[i].substr(0, 7)) == 'http://'){
             var ext = container[i].substr(container[i].length-3, 3);
@@ -65,24 +81,26 @@ function chatMsg(socket, message){
             }
         }
     }
-    message = container.join(' ');
+    msg = container.join(' ');
     for (var i = 0; i < SOCKET_CONNECTIONS.length; i++) {
         SOCKET_CONNECTIONS[i].emit('addToChat', {
             date: now.format("HH:mm:ss"),
             name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-            msg:  message, 
+            msg:  msg, 
             color: socket.color
         });
     }
 }
 
-function command(socket, message){
+
+//socket: object
+//msg: string
+//returns: void
+//description: directs commands sent to server by client.
+function command(socket, msg){
     var now = new moment();
-    if (message.indexOf('<') > -1){
-        message = message.replace(new RegExp(/</, 'g'), '&lt');
-    }
-    var command = message.substr(0, message.indexOf(' ')) || message;
-    var mod = message.substr(command.length);
+    var command = msg.substr(0, msg.indexOf(' ')) || msg;
+    var mod = msg.substr(command.length);
     if (command === '/color'){
         socket.color = mod;
         socket.emit('changeInputFontColor', socket.color);
@@ -120,7 +138,10 @@ function command(socket, message){
     }
 }
 
-//UTILITY OR REFACTORING
+//arg: array
+//returns: array
+//description: basically how to get the names of all connected clients 
+//even if they are still an array index
 function getNames(arg){
     var ret =[];
     for(var i=0; i<arg.length; i++){

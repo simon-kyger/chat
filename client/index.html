@@ -10,12 +10,12 @@
     margin-left: 4px;
 }
 
-.chat .messages{
+.chat .msgs{
     overflow:hidden;
     width:100%;
     height:90%;
 }
-.chat .messages:hover{
+.chat .msgs:hover{
     overflow-y:scroll;
 }
 #chatinput{
@@ -48,12 +48,12 @@
 </head>
 <body>
 	<div id="chat" class="chat"">
-	    <div class="messages">
+	    <div class="msgs">
 	        <div><b>Welcome to the proper lunch chat channel. No Nirmilla's or Walner's allowed.</b></br></div>
 	        <div>github for this app: <a href ="https://github.com/simon-kyger/chat" target="_blank">https://github.com/simon-kyger/chat</a></br></div>
 	        <div><i>Command List:</i></br></div>
 	        <div>&nbsp &nbsp <b>/name</b> <i>name</i>  :: gives you a name for current session. 20 char limit</br></div>
-	        <div>&nbsp &nbsp <b>/color</b> <i>color</i>  :: changes color of your socket messages</br></div>
+	        <div>&nbsp &nbsp <b>/color</b> <i>color</i>  :: changes color of your socket msgs</br></div>
 	        <div>&nbsp &nbsp <b>/theme</b> dark  :: changes theme to dark (only one atm)</br></div>
 	    </div>
 	    <input id="chatinput" class="chatinput"></input>
@@ -70,7 +70,7 @@
     var onlineusers = $('.onlineusers');
     chat.posts = [];
     chat.position = 0;
-    chat.printer = $('.messages', chat);
+    chat.printer = $('.msgs', chat);
     chat.chatinput = $('.chatinput', chat);
     chat.height = chat.printer.height();
     chat.preventNewScroll = false;
@@ -82,7 +82,7 @@
         }
     }
     chat.scrollBottom();
-    chat.postMessage = function(e) {
+    chat.postmsg = function(e) {
         //down
         if (e.which == 40){
         	chat.position--;
@@ -103,15 +103,6 @@
             e.preventDefault();
             var msg = chat.chatinput.val(); 
             
-            //commandlookup
-            if (msg.substr(0, 1) == '/') {
-                socket.emit('command', msg);
-                chat.posts.push(msg);
-                chat.position = chat.posts.length;
-                chat.chatinput[0].value = '';
-                chat.scrollBottom();
-                return;
-            }
             if ($.trim(msg)) {
                 socket.emit('chatMsg', msg);
                 chat.posts.push(msg);
@@ -121,8 +112,8 @@
             }
         }
     }
-    chat.chatinput.keyup(chat.postMessage);
-    // prevent scrolling when reading past messages
+    chat.chatinput.keyup(chat.postmsg);
+    // prevent scrolling when reading past msgs
     chat.printer.hover(function (e) {
         chat.preventNewScroll = e.type === 'mouseenter';
         if (!chat.preventNewScroll) { chat.scrollBottom(); } // On mouseleave go to bottom
