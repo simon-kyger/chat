@@ -11,12 +11,9 @@
 }
 
 .chat .msgs{
-    overflow:hidden;
+    overflow-y:scroll;
     width:100%;
     height:90%;
-}
-.chat .msgs:hover{
-    overflow-y:scroll;
 }
 #chatinput{
     resize: vertical;
@@ -29,8 +26,8 @@
     position: absolute !important;
 }
 .resizer {
-    width: 14px;
-    height: 14px;
+    width: 15px;
+    height: 15px;
     background-color: #333333;
     border: 1px solid #000000;
     top: 0px;
@@ -55,6 +52,7 @@
 	        <div>&nbsp &nbsp <b>/name</b> <i>name</i>  :: gives you a name for current session. 20 char limit</br></div>
 	        <div>&nbsp &nbsp <b>/color</b> <i>color</i>  :: changes color of your socket msgs</br></div>
 	        <div>&nbsp &nbsp <b>/theme</b> dark  :: changes theme to dark (only one atm)</br></div>
+	        <div>&nbsp &nbsp <b>/gif</b> <i>searchterm</i>  :: searches giphy for a gif based upon searchterm</br></div>
 	    </div>
 	    <input id="chatinput" class="chatinput"></input>
 	    <div id="chatresizer" class="resizer ui-resizable-handl ui-resizable-ne"></div>

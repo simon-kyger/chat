@@ -1,12 +1,14 @@
 var app = require('express')();
 var server = require('http').Server(app);
 var moment = require('moment');
+var request = require('request');
+var io = require('socket.io')(server);
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/client/index.html');
 });
 server.listen(80);
-var io = require('socket.io')(server);
+
 var SOCKET_CONNECTIONS = [];
 
 //socket: object
@@ -128,6 +130,13 @@ function command(socket, msg){
     } else if (command === '/theme'){
         socket.theme = mod;
         socket.emit('changeTheme', socket.theme);
+    } else if (command === '/gif') {
+        request('http://api.giphy.com/v1/gifs/search?q='+mod+'&api_key=mIXP4ZfFAYQ1feYwdQhvbJOsvmwY3qB2&limit=1', function (error, response, body) {
+            var ret = JSON.parse(body);
+            ret = ret.data[0].images.original.url;
+            chatMsg(socket, mod);
+            chatMsg(socket, ret);
+        });
     } else {
         socket.emit('addToChat', {
             date: now.format("HH:mm:ss"),

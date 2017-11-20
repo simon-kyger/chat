@@ -1,0 +1,32 @@
+{
+  "name": "chat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.16.2",
+    "http": "0.0.0",
+    "jquery": "^3.2.1",
+    "jsdom": "^11.4.0",
+    "moment": "^2.19.2",
+    "request": "^2.83.0",
+    "socket-io": "^1.0.0",
+    "socket.io": "^2.0.4",
+    "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simon-kyger/chat.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/simon-kyger/chat/issues"
+  },
+  "homepage": "https://github.com/simon-kyger/chat#readme"
+}
