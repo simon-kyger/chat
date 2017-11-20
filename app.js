@@ -103,47 +103,51 @@ function command(socket, msg){
     var now = new moment();
     var command = msg.substr(0, msg.indexOf(' ')) || msg;
     var mod = msg.substr(command.length);
-    if (command === '/color'){
-        socket.color = mod;
-        socket.emit('changeInputFontColor', socket.color);
-    } else if (command === '/name'){
-        if(mod.length > 20){
-            socket.emit('addToChat', { 
+    switch(command){     
+        case '/color':
+            socket.color = mod;
+            socket.emit('changeInputFontColor', socket.color);
+            break;
+        case '/gif':
+            request('http://api.giphy.com/v1/gifs/search?q='+mod+'&api_key=mIXP4ZfFAYQ1feYwdQhvbJOsvmwY3qB2&limit=1', function (error, response, body) {
+                var ret = JSON.parse(body).data[0].images.original.url;
+                chatMsg(socket, 'Search: '+mod);
+                chatMsg(socket, ret);
+            });
+            break;
+        case '/name':
+            if(mod.length > 20){
+                socket.emit('addToChat', { 
+                    date: now.format("HH:mm:ss"),
+                    name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                    msg:  'Use <20 characters for name plz.',
+                    color: 'red'
+                });
+                return;
+            }
+            var oldname = socket.name || SOCKET_CONNECTIONS.indexOf(socket);
+            socket.name = mod || SOCKET_CONNECTIONS.indexOf(socket);
+            for (var i = 0; i < SOCKET_CONNECTIONS.length; i++) {
+                SOCKET_CONNECTIONS[i].emit('addToChat', {
+                    date: now.format("HH:mm:ss"),
+                    name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                    msg: oldname + ' is now known as: ' + socket.name, 
+                    color: 'red'
+                });
+                SOCKET_CONNECTIONS[i].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
+            }
+            break;
+        case '/theme':
+            socket.theme = mod;
+            socket.emit('changeTheme', socket.theme);
+            break;
+        default:
+            socket.emit('addToChat', {
                 date: now.format("HH:mm:ss"),
                 name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                msg:  'Use <20 characters for name plz.',
+                msg: 'Unknown command: '+command,
                 color: 'red'
             });
-            return;
-        }
-        var oldname = socket.name || SOCKET_CONNECTIONS.indexOf(socket);
-        socket.name = mod || SOCKET_CONNECTIONS.indexOf(socket);
-        for (var i = 0; i < SOCKET_CONNECTIONS.length; i++) {
-            SOCKET_CONNECTIONS[i].emit('addToChat', {
-                date: now.format("HH:mm:ss"),
-                name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                msg: oldname + ' is now known as: ' + socket.name, 
-                color: 'darkred'
-            });
-            SOCKET_CONNECTIONS[i].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
-        }
-    } else if (command === '/theme'){
-        socket.theme = mod;
-        socket.emit('changeTheme', socket.theme);
-    } else if (command === '/gif') {
-        request('http://api.giphy.com/v1/gifs/search?q='+mod+'&api_key=mIXP4ZfFAYQ1feYwdQhvbJOsvmwY3qB2&limit=1', function (error, response, body) {
-            var ret = JSON.parse(body);
-            ret = ret.data[0].images.original.url;
-            chatMsg(socket, mod);
-            chatMsg(socket, ret);
-        });
-    } else {
-        socket.emit('addToChat', {
-            date: now.format("HH:mm:ss"),
-            name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-            msg: 'Unknown command: '+command,
-            color: 'red'
-        });
     }
 }
 
