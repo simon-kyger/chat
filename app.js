@@ -73,7 +73,7 @@ function chatMsg(socket, msg){
         return;
     }
     var container = msg.split(' ');
-    for (var i=0; i<container.length; i++){
+    for (let i=0; i<container.length; i++){
         if ((container[i].substr(0, 8)) == 'https://' || (container[i].substr(0, 7)) == 'http://'){
             var ext = container[i].substr(container[i].length-3, 3);
             if (ext == 'gif' || ext == 'jpg' || ext == 'png' || ext == 'mp4' || ext == 'tif'){
@@ -84,7 +84,7 @@ function chatMsg(socket, msg){
         }
     }
     msg = container.join(' ');
-    for (var i = 0; i < SOCKET_CONNECTIONS.length; i++) {
+    for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
         SOCKET_CONNECTIONS[i].emit('addToChat', {
             date: now.format("HH:mm:ss"),
             name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
@@ -111,7 +111,7 @@ function command(socket, msg){
         case '/gif':
             request('http://api.giphy.com/v1/gifs/search?q='+mod+'&api_key=mIXP4ZfFAYQ1feYwdQhvbJOsvmwY3qB2&limit=1', function (error, response, body) {
                 var ret = JSON.parse(body).data[0].images.original.url;
-                chatMsg(socket, 'Search: '+mod);
+                chatMsg(socket, 'Search->'+mod);
                 chatMsg(socket, ret);
             });
             break;
@@ -125,9 +125,9 @@ function command(socket, msg){
                 });
                 return;
             }
-            var oldname = socket.name || SOCKET_CONNECTIONS.indexOf(socket);
+            let oldname = socket.name || SOCKET_CONNECTIONS.indexOf(socket);
             socket.name = mod || SOCKET_CONNECTIONS.indexOf(socket);
-            for (var i = 0; i < SOCKET_CONNECTIONS.length; i++) {
+            for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
                 SOCKET_CONNECTIONS[i].emit('addToChat', {
                     date: now.format("HH:mm:ss"),
                     name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
@@ -157,7 +157,7 @@ function command(socket, msg){
 //even if they are still an array index
 function getNames(arg){
     var ret =[];
-    for(var i=0; i<arg.length; i++){
+    for(let i=0; i<arg.length; i++){
         if(arg[i].name)
             temp = arg[i].name.trim();
         else
