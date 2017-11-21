@@ -8,6 +8,7 @@
     font-family: 'Lucida Console';
     font-size: 14px;
     margin-left: 4px;
+    box-shadow: 10px 10px 5px #888888;
 }
 
 .chat .msgs{
@@ -18,7 +19,7 @@
 #chatinput{
     resize: vertical;
     width: 99%;
-    height: 9%;
+    height: 10%;
     bottom: 0px;
     font-family: 'Lucida Console';
     font-size: 14px;
@@ -33,13 +34,14 @@
     top: 0px;
     right: 0px;
     position: absolute !important;
-    z-index:;
+    z-index:9999;
 }
 .onlineusers{
 	top: 0px;
     right: 17px;
     position: absolute !important;
     background-color: white;
+    box-shadow: 10px 10px 5px #888888;
 }
 </style>
 </head>
@@ -54,7 +56,7 @@
 	        <div>&nbsp &nbsp <b>/theme</b> dark  :: changes theme to dark (only one atm)</br></div>
 	        <div>&nbsp &nbsp <b>/gif</b> <i>searchterm</i>  :: searches giphy for a gif based upon searchterm</br></div>
 	    </div>
-	    <input id="chatinput" class="chatinput"></input>
+	    <input id="chatinput" class="chatinput" placeholder="Chat here!" autofocus="autofocus"></input>
 	    <div id="chatresizer" class="resizer ui-resizable-handl ui-resizable-ne"></div>
 		<div id="onlineusers" class="onlineusers"></div>
 	</div>
@@ -70,14 +72,20 @@
     chat.position = 0;
     chat.printer = $('.msgs', chat);
     chat.chatinput = $('.chatinput', chat);
-    chat.height = chat.printer.height();
-    chat.preventNewScroll = false;
-    chat.scrollBottom = function() {
-        if (!chat.preventNewScroll) { // if mouse is not over printer
-            chat.printer.stop().animate({ 
-            	scrollTop: chat.printer[0].scrollHeight - chat.printer.height()
-            }, 600); // SET SCROLLER TO BOTTOM
+    
+//events
+    chat.resizable({
+        handles: {
+            'ne': '#chatresizer'
         }
+    });
+    chat.draggable({
+        containment: "body"
+    });
+    chat.scrollBottom = function() {
+        chat.printer.stop().animate({ 
+        	scrollTop: chat.printer[0].scrollHeight
+        }, 1000); // SET SCROLLER TO BOTTOM
     }
     chat.scrollBottom();
     chat.postmsg = function(e) {
@@ -106,41 +114,28 @@
                 chat.posts.push(msg);
                 chat.position = chat.posts.length;
                 chat.chatinput[0].value = ''; // CLEAR TEXTAREA
-                chat.scrollBottom();
             }
         }
     }
     chat.chatinput.keyup(chat.postmsg);
-    // prevent scrolling when reading past msgs
-    chat.printer.hover(function (e) {
-        chat.preventNewScroll = e.type === 'mouseenter';
-        if (!chat.preventNewScroll) { chat.scrollBottom(); } // On mouseleave go to bottom
-    });
-    chat.resizable({
-        handles: {
-            'ne': '#chatresizer'
-        }
-    });
-    chat.draggable({
-        containment: "body"
-    });
 
     //net
     socket.on('addToChat', function (data) {
-        chat.printer.append(
-			'<div style ="color:'+data.color+'">'
-			+ data.date + ' ' + '<b>'
-			+ data.name + ': ' + '</b>'
-			+ data.msg.replace(/\n/g, '<br>') + '</div>');
+        if(chat.printer.scrollTop() < chat.printer[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight){
+        	chat.printer.append(`<div style ="color:${data.color}">${data.date}<b> ${data.name}:</b> ${data.msg.replace(/\n/g, '<br>')} </div>`);
+        	return;
+        }
+		chat.printer.append(`<div style ="color:${data.color}">${data.date}<b> ${data.name}:</b> ${data.msg.replace(/\n/g, '<br>')} </div>`);
         chat.scrollBottom();
     });
+
     socket.on('updateUsers', function (data){
     	onlineusers.empty();
     	onlineusers.append('<div>Online Users: &nbsp</div>');
     	for (var i=0; i<data.length; i++){
 			if (isNaN(data[i]))
 				data[i] = data[i].replace(/\n/g, '<br>');
-			onlineusers.append('<div style ="color:'+data[i].color+'">' + data[i] + '</div>');
+			onlineusers.append(`<div style="color:${data[i].color}">${data[i]}</div>`);
     	}
     });
 

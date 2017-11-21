@@ -3,6 +3,7 @@ var server = require('http').Server(app);
 var moment = require('moment');
 var request = require('request');
 var io = require('socket.io')(server);
+var giphyapikey = 'mIXP4ZfFAYQ1feYwdQhvbJOsvmwY3qB2';
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/client/index.html');
@@ -30,7 +31,7 @@ function init(socket){
         SOCKET_CONNECTIONS[i].emit('addToChat', {
             date: now.format("HH:mm:ss"),
             name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-            msg:  'User ' + SOCKET_CONNECTIONS.indexOf(socket) + ' has connected.',
+            msg:  `User ${SOCKET_CONNECTIONS.indexOf(socket)} has connected.`,
             color: socket.color
         });
         SOCKET_CONNECTIONS[i].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
@@ -51,7 +52,7 @@ function disconnects(socket){
         SOCKET_CONNECTIONS[i].emit('addToChat', {
             date: now.format("HH:mm:ss"),
             name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-            msg:  ' has disconnected.', 
+            msg:  ` has disconnected.`, 
             color: socket.color
         });
     }
@@ -77,9 +78,9 @@ function chatMsg(socket, msg){
         if ((container[i].substr(0, 8)) == 'https://' || (container[i].substr(0, 7)) == 'http://'){
             var ext = container[i].substr(container[i].length-3, 3);
             if (ext == 'gif' || ext == 'jpg' || ext == 'png' || ext == 'mp4' || ext == 'tif'){
-                container[i] = '<img src="'+container[i]+'" target="_blank" style="width: auto; max-height: 300px; max-width: 300px;">';
+                container[i] = `<a href="${container[i]}" target="_blank"><img src="${container[i]}" target="_blank" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></a>`;
             } else {
-                container[i] = '<a href="'+container[i]+'" target="_blank">'+container[i]+'</a>';
+                container[i] = `<a href="${container[i]}" target="_blank">${container[i]}</a>`;
             }
         }
     }
@@ -102,17 +103,47 @@ function chatMsg(socket, msg){
 function command(socket, msg){
     var now = new moment();
     var command = msg.substr(0, msg.indexOf(' ')) || msg;
-    var mod = msg.substr(command.length);
+    var mod = msg.substr(command.length+1);
     switch(command){     
         case '/color':
             socket.color = mod;
             socket.emit('changeInputFontColor', socket.color);
             break;
         case '/gif':
-            request('http://api.giphy.com/v1/gifs/search?q='+mod+'&api_key=mIXP4ZfFAYQ1feYwdQhvbJOsvmwY3qB2&limit=1', function (error, response, body) {
-                var ret = JSON.parse(body).data[0].images.original.url;
-                chatMsg(socket, 'Search->'+mod);
-                chatMsg(socket, ret);
+            var link = `http://api.giphy.com/v1/gifs/search?q=${mod}&api_key=${giphyapikey}&limit=1`;
+            request(link, function (error, response, body) {
+                var ret = JSON.parse(body).data[0];
+                if(ret){
+                    var ret = ret.images.original.url;
+                    chatMsg(socket, ret);
+                    for (let i =0; i<SOCKET_CONNECTIONS.length; i++){
+                        SOCKET_CONNECTIONS[i].emit('addToChat', {
+                            date: now.format("HH:mm:ss"),
+                            name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                            msg: `<a href="${ret}" target="_blank">${ret}</a>`, 
+                            color: socket.color
+                        });
+                    }
+                } else {
+                    socket.emit('addToChat', { 
+                        date: now.format("HH:mm:ss"),
+                        name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                        msg:  `Giphy failed to return anything for search->'${mod}'`,
+                        color: 'red'
+                    });
+                    socket.emit('addToChat', { 
+                        date: now.format("HH:mm:ss"),
+                        name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                        msg:  `Sorry about that, here's a sad puppy instead:`,
+                        color: 'red'
+                    });
+                    var sadpuppy = `<img src="http://www.lovethispic.com/uploaded_images/274129-Sad-Puppy.jpg" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img>`;
+                    socket.emit('addToChat', { 
+                        date: now.format("HH:mm:ss"),
+                        name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                        msg:  sadpuppy,
+                    });
+                }
             });
             break;
         case '/name':
@@ -131,7 +162,7 @@ function command(socket, msg){
                 SOCKET_CONNECTIONS[i].emit('addToChat', {
                     date: now.format("HH:mm:ss"),
                     name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                    msg: oldname + ' is now known as: ' + socket.name, 
+                    msg: `${oldname} is now known as: ${socket.name}`, 
                     color: 'red'
                 });
                 SOCKET_CONNECTIONS[i].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
@@ -145,7 +176,7 @@ function command(socket, msg){
             socket.emit('addToChat', {
                 date: now.format("HH:mm:ss"),
                 name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                msg: 'Unknown command: '+command,
+                msg: `Unknown command: ${command}`,
                 color: 'red'
             });
     }
