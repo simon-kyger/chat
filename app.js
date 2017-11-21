@@ -111,10 +111,21 @@ function command(socket, msg){
             break;
         case '/gif':
             var link = `http://api.giphy.com/v1/gifs/search?q=${mod}&api_key=${giphyapikey}&limit=1`;
-            request(link, function (error, response, body) {
+            request.get(link, function (error, response, body) {
+                //giphy is down
+                if (error){
+                    socket.emit('addToChat', { 
+                        date: now.format("HH:mm:ss"),
+                        name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                        msg:  `Giphy appears to be down? Try again later`,
+                        color: 'red'
+                    });
+                    return;
+                }
                 var ret = JSON.parse(body).data[0];
                 if(ret){
-                    var ret = ret.images.original.url;
+                    //giphy is up, and images came back
+                    ret = ret.images.original.url;
                     chatMsg(socket, ret);
                     for (let i =0; i<SOCKET_CONNECTIONS.length; i++){
                         SOCKET_CONNECTIONS[i].emit('addToChat', {
@@ -125,6 +136,7 @@ function command(socket, msg){
                         });
                     }
                 } else {
+                    //giphy is up, but no images came back or query was shit
                     socket.emit('addToChat', { 
                         date: now.format("HH:mm:ss"),
                         name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
