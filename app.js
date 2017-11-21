@@ -1,9 +1,9 @@
-var app = require('express')();
-var server = require('http').Server(app);
-var moment = require('moment');
-var request = require('request');
-var io = require('socket.io')(server);
-var giphyapikey = 'mIXP4ZfFAYQ1feYwdQhvbJOsvmwY3qB2';
+const app = require('express')();
+const server = require('http').Server(app);
+const moment = require('moment');
+const request = require('request');
+const io = require('socket.io')(server);
+const giphyapikey = 'mIXP4ZfFAYQ1feYwdQhvbJOsvmwY3qB2';
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/client/index.html');
@@ -25,7 +25,7 @@ io.sockets.on('connection', function (socket) {
 //returns: void
 //description: static method that only occurs once per connection to server is establish
 function init(socket){
-    var now = new moment();
+    const now = new moment();
     SOCKET_CONNECTIONS.push(socket);
     for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
         SOCKET_CONNECTIONS[i].emit('addToChat', {
@@ -42,8 +42,8 @@ function init(socket){
 //returns: void
 //description: events that occur after a user disconnects from the server
 function disconnects(socket){
-    var now = new moment();
-    var temp; //storing disconnected user
+    const now = new moment();
+    let temp; //storing disconnected user
     for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
         if(SOCKET_CONNECTIONS[i].id == socket.id){
             temp = i;
@@ -66,17 +66,17 @@ function disconnects(socket){
 //msg: string
 //returns: void
 function chatMsg(socket, msg){ 
-    var now = new moment();
+    const now = new moment();
     if (msg.indexOf('<') > -1)
         msg = msg.replace(new RegExp(/</, 'g'), '&lt');
     if (msg.substr(0, 1) == '/'){
         command(socket, msg);
         return;
     }
-    var container = msg.split(' ');
+    let container = msg.split(' ');
     for (let i=0; i<container.length; i++){
         if ((container[i].substr(0, 8)) == 'https://' || (container[i].substr(0, 7)) == 'http://'){
-            var ext = container[i].substr(container[i].length-3, 3);
+            let ext = container[i].substr(container[i].length-3, 3);
             if (ext == 'gif' || ext == 'jpg' || ext == 'png' || ext == 'mp4' || ext == 'tif'){
                 container[i] = `<a href="${container[i]}" target="_blank"><img src="${container[i]}" target="_blank" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></a>`;
             } else {
@@ -101,16 +101,16 @@ function chatMsg(socket, msg){
 //returns: void
 //description: directs commands sent to server by client.
 function command(socket, msg){
-    var now = new moment();
-    var command = msg.substr(0, msg.indexOf(' ')) || msg;
-    var mod = msg.substr(command.length+1);
+    const now = new moment();
+    let command = msg.substr(0, msg.indexOf(' ')) || msg;
+    let mod = msg.substr(command.length+1);
     switch(command){     
         case '/color':
             socket.color = mod;
             socket.emit('changeInputFontColor', socket.color);
             break;
         case '/gif':
-            var link = `http://api.giphy.com/v1/gifs/search?q=${mod}&api_key=${giphyapikey}&limit=1`;
+            let link = `http://api.giphy.com/v1/gifs/search?q=${mod}&api_key=${giphyapikey}&limit=1`;
             request.get(link, function (error, response, body) {
                 //giphy is down
                 if (error){
@@ -122,7 +122,7 @@ function command(socket, msg){
                     });
                     return;
                 }
-                var ret = JSON.parse(body).data[0];
+                let ret = JSON.parse(body).data[0];
                 if(ret){
                     //giphy is up, and images came back
                     ret = ret.images.original.url;
@@ -149,7 +149,7 @@ function command(socket, msg){
                         msg:  `Sorry about that, here's a sad puppy instead:`,
                         color: 'red'
                     });
-                    var sadpuppy = `<img src="http://www.lovethispic.com/uploaded_images/274129-Sad-Puppy.jpg" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img>`;
+                    let sadpuppy = `<img src="http://www.lovethispic.com/uploaded_images/274129-Sad-Puppy.jpg" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img>`;
                     socket.emit('addToChat', { 
                         date: now.format("HH:mm:ss"),
                         name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
@@ -199,7 +199,7 @@ function command(socket, msg){
 //description: basically how to get the names of all connected clients 
 //even if they are still an array index
 function getNames(arg){
-    var ret =[];
+    let ret =[];
     for(let i=0; i<arg.length; i++){
         if(arg[i].name)
             temp = arg[i].name.trim();
