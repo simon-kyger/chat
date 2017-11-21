@@ -159,11 +159,11 @@ function command(socket, msg){
             });
             break;
         case '/name':
-            if(mod.length > 20){
+            if(mod.length > 20 || mod.length < 1){
                 socket.emit('addToChat', { 
                     date: now.format("HH:mm:ss"),
                     name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                    msg:  'Use <20 characters for name plz.',
+                    msg:  'Use 1-20 characters for your name plz',
                     color: 'red'
                 });
                 return;
