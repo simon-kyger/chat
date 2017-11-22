@@ -65,6 +65,8 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
+	function b64(e){var t="";var n=new Uint8Array(e);var r=n.byteLength;for(var i=0;i<r;i++){t+=String.fromCharCode(n[i])}return window.btoa(t)}
+
     let socket = io();
     let chat = $('.chat');
     let onlineusers = $('.onlineusers');
@@ -156,4 +158,16 @@
 			onlineusers.css("background-color", "rgb(255,255,255)");
     	}
     });
+
+    socket.on('image', function (data){
+    	//only dragons and wizards live in this land.
+    	let img = `<img src="data:image/png;base64,${data.msg}" style="max-height:300px; max-width:300px;"></img>`;
+    	if(chat.printer.scrollTop() < chat.printer[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight){
+        	chat.printer.append(`<div style ="color:${data.color}">${data.date}<b> ${data.name}:</b> ${img} </div>`);
+        	return;
+        }
+		chat.printer.append(`<div style ="color:${data.color}">${data.date}<b> ${data.name}:</b> ${img} </div>`);
+        chat.scrollBottom();
+    });
+
 </script>

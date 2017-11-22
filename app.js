@@ -1,13 +1,17 @@
-const app = require('express')();
+const express = require('express');
+const app = express();  
 const server = require('http').Server(app);
+const fs = require('fs');
+const path = require('path');
 const moment = require('moment');
 const request = require('request');
 const io = require('socket.io')(server);
 const giphyapikey = 'mIXP4ZfFAYQ1feYwdQhvbJOsvmwY3qB2';
 
-app.get('/', function (req, res) {
+app.get('/', (req, res) => {
     res.sendFile(__dirname + '/client/index.html');
 });
+
 server.listen(80);
 
 var SOCKET_CONNECTIONS = [];
@@ -15,7 +19,7 @@ var SOCKET_CONNECTIONS = [];
 //socket: object
 //description: consider this as a looping system, since sockets are persistant, 
 //the contents inside are always being evaluated.  this is the main loop of the program.
-io.sockets.on('connection', function (socket) {
+io.sockets.on('connection', (socket) => {
     init(socket);
     socket.on('disconnect', () => disconnects(socket));
     socket.on('chatMsg', (msg) => chatMsg(socket, msg));
@@ -192,11 +196,14 @@ function giphyrequest(socket, mod, now){
                 msg:  `Sorry about that, here's a sad puppy instead:`,
                 color: 'red'
             });
-            let sadpuppy = `<img src="http://www.lovethispic.com/uploaded_images/274129-Sad-Puppy.jpg" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img>`;
-            socket.emit('addToChat', { 
-                date: now.format("HH:mm:ss"),
-                name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                msg:  sadpuppy,
+
+            //static file send
+            fs.readFile('./img/sadpuppy.jpg', function(err, data){
+                socket.emit('image', { 
+                    date:   now.format("HH:mm:ss"),
+                    name:   (socket.name || SOCKET_CONNECTIONS.indexOf(socket)), 
+                    msg:    data.toString("base64")
+                });
             });
         }
     });
