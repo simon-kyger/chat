@@ -110,53 +110,7 @@ function command(socket, msg){
             socket.emit('changeInputFontColor', socket.color);
             break;
         case '/gif':
-            let link = `http://api.giphy.com/v1/gifs/search?q=${mod}&api_key=${giphyapikey}&limit=1`;
-            request.get(link, function (error, response, body) {
-                //giphy is down
-                if (error){
-                    socket.emit('addToChat', { 
-                        date: now.format("HH:mm:ss"),
-                        name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                        msg:  `Giphy appears to be down? Try again later`,
-                        color: 'red'
-                    });
-                    return;
-                }
-                let ret = JSON.parse(body).data[0];
-                if(ret){
-                    //giphy is up, and images came back
-                    ret = ret.images.original.url;
-                    chatMsg(socket, ret);
-                    for (let i =0; i<SOCKET_CONNECTIONS.length; i++){
-                        SOCKET_CONNECTIONS[i].emit('addToChat', {
-                            date: now.format("HH:mm:ss"),
-                            name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                            msg: `<a href="${ret}" target="_blank">${ret}</a>`, 
-                            color: socket.color
-                        });
-                    }
-                } else {
-                    //giphy is up, but no images came back or query was shit
-                    socket.emit('addToChat', { 
-                        date: now.format("HH:mm:ss"),
-                        name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                        msg:  `Giphy failed to return anything for search->'${mod}'`,
-                        color: 'red'
-                    });
-                    socket.emit('addToChat', { 
-                        date: now.format("HH:mm:ss"),
-                        name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                        msg:  `Sorry about that, here's a sad puppy instead:`,
-                        color: 'red'
-                    });
-                    let sadpuppy = `<img src="http://www.lovethispic.com/uploaded_images/274129-Sad-Puppy.jpg" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img>`;
-                    socket.emit('addToChat', { 
-                        date: now.format("HH:mm:ss"),
-                        name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                        msg:  sadpuppy,
-                    });
-                }
-            });
+            giphyrequest(socket, mod, now);
             break;
         case '/name':
             if(mod.length > 20 || mod.length < 1){
@@ -194,12 +148,67 @@ function command(socket, msg){
     }
 }
 
+//socket: object
+//mod: string
+//now: string 
+//description: part of command lib that will fetch mod from giphy.com
+function giphyrequest(socket, mod, now){
+    let link = `http://api.giphy.com/v1/gifs/search?q=${mod}&api_key=${giphyapikey}&limit=1`;
+    request.get(link, function (error, response, body) {
+        if (error){
+            //giphy is down
+            socket.emit('addToChat', { 
+                date: now.format("HH:mm:ss"),
+                name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                msg:  `Giphy appears to be down? Try again later`,
+                color: 'red'
+            });
+            return;
+        }
+        let ret = JSON.parse(body).data[0];
+        if(ret){
+            //giphy is up, and images came back
+            ret = ret.images.original.url;
+            for (let i =0; i<SOCKET_CONNECTIONS.length; i++){
+                SOCKET_CONNECTIONS[i].emit('addToChat', {
+                    date: now.format("HH:mm:ss"),
+                    name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                    msg: `<a href="${ret}" target="_blank">${ret}</a>`, 
+                    color: socket.color
+                });
+            }
+            chatMsg(socket, ret);
+        } else {
+            //giphy is up, but no images came back or query was shit
+            socket.emit('addToChat', { 
+                date: now.format("HH:mm:ss"),
+                name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                msg:  `Giphy failed to return anything for search->'${mod}'`,
+                color: 'red'
+            });
+            socket.emit('addToChat', { 
+                date: now.format("HH:mm:ss"),
+                name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                msg:  `Sorry about that, here's a sad puppy instead:`,
+                color: 'red'
+            });
+            let sadpuppy = `<img src="http://www.lovethispic.com/uploaded_images/274129-Sad-Puppy.jpg" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img>`;
+            socket.emit('addToChat', { 
+                date: now.format("HH:mm:ss"),
+                name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                msg:  sadpuppy,
+            });
+        }
+    });
+}
+
 //arg: array
 //returns: array
 //description: basically how to get the names of all connected clients 
 //even if they are still an array index
 function getNames(arg){
     let ret =[];
+    let temp;
     for(let i=0; i<arg.length; i++){
         if(arg[i].name)
             temp = arg[i].name.trim();
