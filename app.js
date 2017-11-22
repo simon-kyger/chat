@@ -159,7 +159,8 @@ function command(socket, msg){
 function giphyrequest(socket, mod, now){
     let link = `http://api.giphy.com/v1/gifs/search?q=${mod}&api_key=${giphyapikey}&limit=1`;
     request.get(link, function (error, response, body) {
-        if (error){
+        let ret = JSON.parse(body);
+        if (error || !ret.data){
             //giphy is down
             socket.emit('addToChat', { 
                 date: now.format("HH:mm:ss"),
@@ -169,9 +170,11 @@ function giphyrequest(socket, mod, now){
             });
             return;
         }
-        let ret = JSON.parse(body).data[0];
+        // let {data: collections} = ret;
+        // would assign a new array named as 'collections' with a value of ret.data
+
+        ret = ret.data[0];
         if(ret){
-            //giphy is up, and images came back
             ret = ret.images.original.url;
             for (let i =0; i<SOCKET_CONNECTIONS.length; i++){
                 SOCKET_CONNECTIONS[i].emit('addToChat', {
