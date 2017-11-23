@@ -123,12 +123,17 @@
 
 //net
     socket.on('addToChat', function (data) {
-        if(chat.printer.scrollTop() < chat.printer[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight){
-        	chat.printer.append(`<div style ="color:${data.color}">${data.date}<b> ${data.name}:</b> ${data.msg.replace(/\n/g, '<br>')} </div>`);
-        	return;
+    	var shouldscroll = chat.printer.scrollTop() >= (chat.printer[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
+        var renderobj = new RenderingObject();
+        for (let i=0; i<data.chatmessages.length; i++){
+        	try{
+        		renderobj[data.chatmessages[i].action](data.chatmessages[i]);
+        	}catch(err){
+        		console.log(err);
+        	}
         }
-		chat.printer.append(`<div style ="color:${data.color}">${data.date}<b> ${data.name}:</b> ${data.msg.replace(/\n/g, '<br>')} </div>`);
-        chat.scrollBottom();
+        if (shouldscroll)
+        	chat.scrollBottom();
     });
 
     socket.on('updateUsers', function (data){
@@ -159,15 +164,17 @@
     	}
     });
 
-    socket.on('image', function (data){
-    	//only dragons and wizards live in this land.
-    	let img = `<img src="data:image/png;base64,${data.msg}" style="max-height:300px; max-width:300px;"></img>`;
-    	if(chat.printer.scrollTop() < chat.printer[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight){
-        	chat.printer.append(`<div style ="color:${data.color}">${data.date}<b> ${data.name}:</b> ${img} </div>`);
-        	return;
-        }
-		chat.printer.append(`<div style ="color:${data.color}">${data.date}<b> ${data.name}:</b> ${img} </div>`);
-        chat.scrollBottom();
-    });
+    
+    var RenderingObject = function() {
+	    this.renderText = function(args) {
+	        let div = `<div style ="color:${args.color}">${args.date}<b> ${args.name}:</b> ${args.msg.replace(/\n/g, '<br>')} </div>`;
+	        chat.printer.append(div);
+	    },
+	    this.renderImage = function(args) {
+	    	let img = `<img src="data:image/png;base64,${args.image}" style="max-height:300px; max-width:300px;"></img>`;
+	        let div = `<div style ="color:${args.color}">${args.date}<b> ${args.name}:</b> ${img} </div>`
+	        chat.printer.append(div);
+	    }
+	};
 
 </script>

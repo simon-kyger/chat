@@ -31,13 +31,18 @@ io.sockets.on('connection', (socket) => {
 function init(socket){
     const now = new moment();
     SOCKET_CONNECTIONS.push(socket);
-    for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
-        SOCKET_CONNECTIONS[i].emit('addToChat', {
+    var address = socket.request.connection.remoteAddress;
+    let send = {
+        chatmessages: [{
+            action: 'renderText',
             date: now.format("HH:mm:ss"),
             name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-            msg:  `User ${SOCKET_CONNECTIONS.indexOf(socket)} has connected.`,
+            msg:  `User ${address} has connected.`,
             color: socket.color
-        });
+        }]
+    };
+    for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
+        SOCKET_CONNECTIONS[i].emit('addToChat', send);
         SOCKET_CONNECTIONS[i].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
     }
 }
@@ -48,17 +53,21 @@ function init(socket){
 function disconnects(socket){
     const now = new moment();
     let temp; //storing disconnected user
+    let send = {
+        chatmessages: [{
+            action: 'renderText',
+            date: now.format("HH:mm:ss"),
+            name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+            msg:  `User ${SOCKET_CONNECTIONS.indexOf(socket)} has disconnected.`,
+            color: socket.color
+        }]
+    };
     for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
         if(SOCKET_CONNECTIONS[i].id == socket.id){
             temp = i;
             continue;
         }
-        SOCKET_CONNECTIONS[i].emit('addToChat', {
-            date: now.format("HH:mm:ss"),
-            name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-            msg:  ` has disconnected.`, 
-            color: socket.color
-        });
+        SOCKET_CONNECTIONS[i].emit('addToChat', send);
     }
     SOCKET_CONNECTIONS.splice(temp, 1);
     for (let j =0; j < SOCKET_CONNECTIONS.length; j++){     
@@ -89,13 +98,18 @@ function chatMsg(socket, msg){
         }
     }
     msg = container.join(' ');
-    for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
-        SOCKET_CONNECTIONS[i].emit('addToChat', {
+    let send = {
+        chatmessages: [{
+            action: 'renderText',
             date: now.format("HH:mm:ss"),
             name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-            msg:  msg, 
+            msg:  msg,
             color: socket.color
-        });
+        }]
+    };
+
+    for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
+        SOCKET_CONNECTIONS[i].emit('addToChat', send);
     }
 }
 
@@ -118,24 +132,33 @@ function command(socket, msg){
             break;
         case '/name':
             if(mod.length > 20 || mod.length < 1){
-                socket.emit('addToChat', { 
-                    date: now.format("HH:mm:ss"),
-                    name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                    msg:  'Use 1-20 characters for your name plz',
-                    color: 'red'
-                });
+                let send = {
+                    chatmessages: [{
+                        action: 'renderText',
+                        date: now.format("HH:mm:ss"),
+                        name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                        msg:  `Use 1-20 characters for your name plz`,
+                        color: socket.color
+                    }]
+                };
+                socket.emit('addToChat', send);
                 return;
-            }
-            let oldname = socket.name || SOCKET_CONNECTIONS.indexOf(socket);
-            socket.name = mod || SOCKET_CONNECTIONS.indexOf(socket);
-            for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
-                SOCKET_CONNECTIONS[i].emit('addToChat', {
-                    date: now.format("HH:mm:ss"),
-                    name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                    msg: `${oldname} is now known as: ${socket.name}`, 
-                    color: 'red'
-                });
-                SOCKET_CONNECTIONS[i].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
+            } else {
+                let oldname = socket.name || SOCKET_CONNECTIONS.indexOf(socket);
+                socket.name = mod || SOCKET_CONNECTIONS.indexOf(socket);
+                let send = {
+                    chatmessages: [{
+                        action: 'renderText',
+                        date: now.format("HH:mm:ss"),
+                        name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                        msg:  `${oldname} is now known as: ${socket.name}`, 
+                        color: `red`
+                    }]
+                };
+                for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
+                    SOCKET_CONNECTIONS[i].emit('addToChat', send);
+                    SOCKET_CONNECTIONS[i].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
+                }
             }
             break;
         case '/theme':
@@ -143,12 +166,16 @@ function command(socket, msg){
             socket.emit('changeTheme', socket.theme);
             break;
         default:
-            socket.emit('addToChat', {
-                date: now.format("HH:mm:ss"),
-                name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                msg: `Unknown command: ${command}`,
-                color: 'red'
-            });
+            let send = {
+                chatmessages: [{
+                    action: 'renderText',
+                    date: now.format("HH:mm:ss"),
+                    name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                    msg:  `Unknown command: ${command}`,
+                    color: `red`
+                }]
+            };
+            socket.emit('addToChat', send);
     }
 }
 
@@ -162,12 +189,16 @@ function giphyrequest(socket, mod, now){
         let ret = JSON.parse(body);
         if (error || !ret.data){
             //giphy is down
-            socket.emit('addToChat', { 
-                date: now.format("HH:mm:ss"),
-                name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                msg:  `Giphy appears to be down? Try again later`,
-                color: 'red'
-            });
+            let send = {
+                chatmessages: [{
+                    action: 'renderText',
+                    date: now.format("HH:mm:ss"),
+                    name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                    msg:  `Giphy appears to be down? Try again later`,
+                    color: `red`
+                }]
+            };
+            socket.emit('addToChat', send);
             return;
         }
         // let {data: collections} = ret;
@@ -176,37 +207,44 @@ function giphyrequest(socket, mod, now){
         ret = ret.data[0];
         if(ret){
             ret = ret.images.original.url;
-            for (let i =0; i<SOCKET_CONNECTIONS.length; i++){
-                SOCKET_CONNECTIONS[i].emit('addToChat', {
+            let send = {
+                chatmessages: [{
+                    action: 'renderText',
                     date: now.format("HH:mm:ss"),
                     name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                    msg: `<a href="${ret}" target="_blank">${ret}</a>`, 
+                    msg:  `<a href="${ret}" target="_blank">${ret}</a>`,
                     color: socket.color
-                });
+                }]
+            };
+            for (let i =0; i<SOCKET_CONNECTIONS.length; i++){
+                SOCKET_CONNECTIONS[i].emit('addToChat', send);
             }
             chatMsg(socket, ret);
         } else {
             //giphy is up, but no images came back or query was shit
-            socket.emit('addToChat', { 
-                date: now.format("HH:mm:ss"),
-                name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                msg:  `Giphy failed to return anything for search->'${mod}'`,
-                color: 'red'
-            });
-            socket.emit('addToChat', { 
-                date: now.format("HH:mm:ss"),
-                name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                msg:  `Sorry about that, here's a sad puppy instead:`,
-                color: 'red'
-            });
-
             //static file send
             fs.readFile('./img/sadpuppy.jpg', function(err, data){
-                socket.emit('image', { 
-                    date:   now.format("HH:mm:ss"),
-                    name:   (socket.name || SOCKET_CONNECTIONS.indexOf(socket)), 
-                    msg:    data.toString("base64")
-                });
+                let send = {
+                    chatmessages: [{
+                        action: 'renderText',
+                        date: now.format("HH:mm:ss"),
+                        name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                        msg:  `Giphy failed to return anything for search->'${mod}'`,
+                        color: `red`
+                    },{ 
+                        action: 'renderText',
+                        date: now.format("HH:mm:ss"),
+                        name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
+                        msg:  `Sorry about that, here's a sad puppy instead:`,
+                        color: 'red'
+                    },{ 
+                        action: 'renderImage',
+                        date:   now.format("HH:mm:ss"),
+                        name:   (socket.name || SOCKET_CONNECTIONS.indexOf(socket)), 
+                        image:  data.toString("base64"),
+                    }]
+                };
+                socket.emit('addToChat', send);
             });
         }
     });
