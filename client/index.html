@@ -26,6 +26,8 @@ body{
     font-family: 'Lucida Console';
     font-size: 14px;
     position: absolute !important;
+    white-space: pre-wrap;
+    resize: none;
 }
 .resizer {
     width: 15px;
@@ -57,7 +59,7 @@ body{
 	        <div>&nbsp &nbsp <b>/theme</b> dark  :: changes theme to dark (only one atm)</br></div>
 	        <div>&nbsp &nbsp <b>/gif</b> <i>searchterm</i>  :: searches giphy for a gif based upon searchterm</br></div>
 	    </div>
-	    <input id="chatinput" class="chatinput" placeholder="Chat here!" autofocus="autofocus"></input>
+	    <textarea id="chatinput" class="chatinput" placeholder="Chat here!" autofocus="autofocus"></textarea>
 	    <div id="chatresizer" class="resizer ui-resizable-handl ui-resizable-ne"></div>
 		<div id="onlineusers" class="onlineusers"></div>
 	</div>
@@ -65,9 +67,10 @@ body{
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/monokai-sublime.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>
-	function b64(e){var t="";var n=new Uint8Array(e);var r=n.byteLength;for(var i=0;i<r;i++){t+=String.fromCharCode(n[i])}return window.btoa(t)}
-
+//globals
     let socket = io();
     let chat = $('.chat');
     let onlineusers = $('.onlineusers');
@@ -111,7 +114,6 @@ body{
         if (e.which == 13 && !e.shiftKey) {
             e.preventDefault();
             var msg = chat.chatinput.val(); 
-            
             if ($.trim(msg)) {
                 socket.emit('chatMsg', msg);
                 chat.posts.push(msg);
@@ -123,20 +125,19 @@ body{
     chat.chatinput.keyup(chat.postmsg);
 
 //net
+    //data expects data.chatmessages[].properties
     socket.on('addToChat', function (data) {
     	var shouldscroll = chat.printer.scrollTop() >= (chat.printer[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
         var renderobj = new RenderingObject();
         for (let i=0; i<data.chatmessages.length; i++){
-        	try{
-        		renderobj[data.chatmessages[i].action](data.chatmessages[i]);
-        	}catch(err){
-        		console.log(err);
-        	}
+            //evil dragons be here
+        	renderobj[data.chatmessages[i].action](data.chatmessages[i]);
         }
         if (shouldscroll)
         	chat.scrollBottom();
     });
 
+    //data expects array
     socket.on('updateUsers', function (data){
     	onlineusers.empty();
     	onlineusers.append('<div>Online Users: &nbsp</div>');
@@ -147,10 +148,12 @@ body{
     	}
     });
 
+    //data expects string
     socket.on('changeInputFontColor', function (data){
     	chat.chatinput.css("color", data);
     });
 
+    //data expects string
     socket.on('changeTheme', function (data){
     	data = data.trim();
     	if (data == 'dark'){
@@ -168,14 +171,40 @@ body{
     
     var RenderingObject = function() {
 	    this.renderText = function(args) {
-	        let div = `<div style ="color:${args.color}">${args.date}<b> ${args.name}:</b> ${args.msg.replace(/\n/g, '<br>')} </div>`;
+            let container = args.msg.split(' ');
+            for (let i=0; i<container.length; i++){
+                if ((container[i].substr(0, 8)) == 'https://' || (container[i].substr(0, 7)) == 'http://'){
+                    let ext = container[i].substr(container[i].length-4, 3);
+                    console.log(ext);
+                    if (ext == 'gif' || ext == 'jpg' || ext == 'png' || ext == 'mp4' || ext == 'tif' || 'ebp'){
+                        container[i] = `<a href="${container[i]}" target="_blank"><img src="${container[i]}" target="_blank" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img></a>`;
+                    } else {
+                        container[i] = `<a href="${container[i]}" target="_blank">${container[i]}</a>`;
+                    }
+                }
+            }
+            let msg = container.join(' ');
+	        let div = `<div style="color:${args.color};">${args.date}<b> ${args.name}: </b>${msg}</div>`;
 	        chat.printer.append(div);
 	    },
-	    this.renderImage = function(args) {
-	    	let img = `<img src="data:image/png;base64,${args.image}" style="max-height:300px; max-width:300px;"></img>`;
-	        let div = `<div style ="color:${args.color}">${args.date}<b> ${args.name}:</b> ${img} </div>`
+        this.renderImage = function(args) {
+            let img = `<a href="${args.link}"><img src="${args.link}" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img></a>`;
+            let div = `<div style="color:${args.color};">${args.date}<b> ${args.name}: </b>${img}</div>`
+            chat.printer.append(div);
+        }
+	    this.renderStaticImage = function(args) {
+	    	let img = `<img src="data:image/png;base64,${args.image}" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img>`;
+	        let div = `<div style ="color:${args.color};">${args.date}<b> ${args.name}: </b>${img} </div>`
 	        chat.printer.append(div);
 	    }
+        this.renderCodeBlock = function(args){
+            let div = `<div style="color:${args.color};">${args.date}<b> ${args.name}: CODEBLOCK:</b> 
+                      </div><pre style="white-space: pre-wrap;"><code class="code" style="border-radius: 10px;">${args.msg.replace(/\n/g, '<br>')} </code></pre>`;
+            chat.printer.append(div);
+            $('.code').each(function(i, block) {
+              hljs.highlightBlock(block);
+            });
+        }
 	};
 
 </script>
