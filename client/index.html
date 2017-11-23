@@ -188,7 +188,7 @@ body{
 	        chat.printer.append(div);
 	    },
         this.renderImage = function(args) {
-            let img = `<a href="${args.link}"><img src="${args.link}" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img></a>`;
+            let img = `<a href="${args.link}" target="_blank"><img src="${args.link}" target="_blank" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img></a>`;
             let div = `<div style="color:${args.color};">${args.date}<b> ${args.name}: </b>${img}</div>`
             chat.printer.append(div);
         }

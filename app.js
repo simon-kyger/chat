@@ -154,9 +154,10 @@ function command(socket, msg){
 
 //socket: object
 //mod: string
-//now: string 
 //description: part of command lib that will allow a user to change their name
-function changename(socket, mod, now){
+function changename(socket, mod){
+    const now = new moment();
+    let send;
     if(mod.length > 20 || mod.length < 1){
         send = {
             chatmessages: [{
@@ -190,9 +191,9 @@ function changename(socket, mod, now){
 
 //socket: object
 //mod: string
-//now: string 
 //description: part of command lib that will fetch mod from giphy.com
-function giphyrequest(socket, mod, now){
+function giphyrequest(socket, mod){
+    const now = new moment();
     let send;
     if (mod.indexOf('#') > -1){
         fs.readFile('./img/jackiechanwhat.jpg', function(err, data){
@@ -272,12 +273,13 @@ function giphyrequest(socket, mod, now){
                         date: now.format("HH:mm:ss"),
                         name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
                         msg:  `Sorry about that, here's a sad puppy instead:`,
-                        color: 'red'
+                        color: `red`
                     },{ 
                         action: 'renderStaticImage',
                         date:   now.format("HH:mm:ss"),
                         name:   (socket.name || SOCKET_CONNECTIONS.indexOf(socket)), 
                         image:  data.toString("base64"),
+                        color: `red`
                     }]
                 };
                 socket.emit('addToChat', send);
