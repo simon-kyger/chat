@@ -1,7 +1,7 @@
 <head>
 <style>
 body{
-	margin: 0px;
+    margin: 0px;
 }
 .chat{
     position:absolute !important;
@@ -40,7 +40,7 @@ body{
     z-index:9999;
 }
 .onlineusers{
-	top: 0px;
+    top: 0px;
     right: 17px;
     position: absolute !important;
     background-color: white;
@@ -49,20 +49,20 @@ body{
 </style>
 </head>
 <body>
-	<div id="chat" class="chat"">
-	    <div class="msgs">
-	        <div><b>Welcome to the proper lunch chat channel.</b></br></div>
-	        <div>github for this app: <a href ="https://github.com/simon-kyger/chat" target="_blank">https://github.com/simon-kyger/chat</a></br></div>
-	        <div><i>Command List:</i></br></div>
-	        <div>&nbsp &nbsp <b>/name</b> <i>name</i>  :: gives you a name for current session. 20 char limit</br></div>
-	        <div>&nbsp &nbsp <b>/color</b> <i>color</i>  :: changes color of your socket msgs</br></div>
-	        <div>&nbsp &nbsp <b>/theme</b> dark  :: changes theme to dark (only one atm)</br></div>
-	        <div>&nbsp &nbsp <b>/gif</b> <i>searchterm</i>  :: searches giphy for a gif based upon searchterm</br></div>
-	    </div>
-	    <textarea id="chatinput" class="chatinput" placeholder="Chat here!" autofocus="autofocus"></textarea>
-	    <div id="chatresizer" class="resizer ui-resizable-handl ui-resizable-ne"></div>
-		<div id="onlineusers" class="onlineusers"></div>
-	</div>
+    <div id="chat" class="chat"">
+        <div class="msgs">
+            <div><b>Welcome to the proper lunch chat channel.</b></br></div>
+            <div>github for this app: <a href ="https://github.com/simon-kyger/chat" target="_blank">https://github.com/simon-kyger/chat</a></br></div>
+            <div><i>Command List:</i></br></div>
+            <div>&nbsp &nbsp <b>/name</b> <i>name</i>  :: gives you a name for current session. 20 char limit</br></div>
+            <div>&nbsp &nbsp <b>/color</b> <i>color</i>  :: changes color of your socket msgs</br></div>
+            <div>&nbsp &nbsp <b>/theme</b> dark  :: changes theme to dark (only one atm)</br></div>
+            <div>&nbsp &nbsp <b>/gif</b> <i>searchterm</i>  :: searches giphy for a gif based upon searchterm</br></div>
+        </div>
+        <textarea id="chatinput" class="chatinput" placeholder="Chat here!" autofocus="autofocus"></textarea>
+        <div id="chatresizer" class="resizer ui-resizable-handl ui-resizable-ne"></div>
+        <div id="onlineusers" class="onlineusers"></div>
+    </div>
 </body>
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
@@ -90,24 +90,24 @@ body{
     });
     chat.scrollBottom = function() {
         chat.printer.stop().animate({ 
-        	scrollTop: chat.printer[0].scrollHeight
+            scrollTop: chat.printer[0].scrollHeight
         }, 1000); // SET SCROLLER TO BOTTOM
     }
     chat.scrollBottom();
     chat.postmsg = function(e) {
         //down
         if (e.which == 40){
-        	chat.position--;
-    		if (chat.position < 0)
-    			chat.position = -1;
-        	chat.chatinput[0].value = chat.posts[chat.position] || '';
+            chat.position--;
+            if (chat.position < 0)
+                chat.position = -1;
+            chat.chatinput[0].value = chat.posts[chat.position] || '';
         }
         //up
         if (e.which == 38){
-        	chat.position++;
-        	if (chat.position > chat.posts.length)
-    			chat.position = chat.posts.length-1;
-        	chat.chatinput[0].value = chat.posts[chat.position] || '';
+            chat.position++;
+            if (chat.position > chat.posts.length)
+                chat.position = chat.posts.length-1;
+            chat.chatinput[0].value = chat.posts[chat.position] || '';
         }
 
         //enter
@@ -127,55 +127,54 @@ body{
 //net
     //data expects data.chatmessages[].properties
     socket.on('addToChat', function (data) {
-    	var shouldscroll = chat.printer.scrollTop() >= (chat.printer[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
+        var shouldscroll = chat.printer.scrollTop() >= (chat.printer[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
         var renderobj = new RenderingObject();
         for (let i=0; i<data.chatmessages.length; i++){
             //evil dragons be here
-        	renderobj[data.chatmessages[i].action](data.chatmessages[i]);
+            renderobj[data.chatmessages[i].action](data.chatmessages[i]);
         }
         if (shouldscroll)
-        	chat.scrollBottom();
+            chat.scrollBottom();
     });
 
     //data expects array
     socket.on('updateUsers', function (data){
-    	onlineusers.empty();
-    	onlineusers.append('<div>Online Users: &nbsp</div>');
-    	for (var i=0; i<data.length; i++){
-			if (isNaN(data[i]))
-				data[i] = data[i].replace(/\n/g, '<br>');
-			onlineusers.append(`<div style="color:${data[i].color}">${data[i]}</div>`);
-    	}
+        onlineusers.empty();
+        onlineusers.append('<div>Online Users: &nbsp</div>');
+        for (var i=0; i<data.length; i++){
+            if (isNaN(data[i]))
+                data[i] = data[i].replace(/\n/g, '<br>');
+            onlineusers.append(`<div style="color:${data[i].color}">${data[i]}</div>`);
+        }
     });
 
     //data expects string
     socket.on('changeInputFontColor', function (data){
-    	chat.chatinput.css("color", data);
+        chat.chatinput.css("color", data);
     });
 
     //data expects string
     socket.on('changeTheme', function (data){
-    	data = data.trim();
-    	if (data == 'dark'){
-			$('body').css("background-color", "rgb(70,70,70)");
-			chat.chatinput.css("background-color", "rgb(50,50,50)");
-			onlineusers.css("background-color", "rgb(70,70,70)");
-    	}
-    	else{
-			$(document.body).css("background-color", "rgb(255,255,255)");
-			chat.chatinput.css("background-color", "rgb(255,255,255)");
-			onlineusers.css("background-color", "rgb(255,255,255)");
-    	}
+        data = data.trim();
+        if (data == 'dark'){
+            $('body').css("background-color", "rgb(70,70,70)");
+            chat.chatinput.css("background-color", "rgb(50,50,50)");
+            onlineusers.css("background-color", "rgb(70,70,70)");
+        }
+        else{
+            $(document.body).css("background-color", "rgb(255,255,255)");
+            chat.chatinput.css("background-color", "rgb(255,255,255)");
+            onlineusers.css("background-color", "rgb(255,255,255)");
+        }
     });
 
     
     var RenderingObject = function() {
-	    this.renderText = function(args) {
+        this.renderText = function(args) {
             let container = args.msg.split(' ');
             for (let i=0; i<container.length; i++){
                 if ((container[i].substr(0, 8)) == 'https://' || (container[i].substr(0, 7)) == 'http://'){
                     let ext = container[i].substr(container[i].length-4, 3);
-                    console.log(ext);
                     if (ext == 'gif' || ext == 'jpg' || ext == 'png' || ext == 'mp4' || ext == 'tif' || 'ebp'){
                         container[i] = `<a href="${container[i]}" target="_blank"><img src="${container[i]}" target="_blank" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img></a>`;
                     } else {
@@ -184,19 +183,19 @@ body{
                 }
             }
             let msg = container.join(' ');
-	        let div = `<div style="color:${args.color};">${args.date}<b> ${args.name}: </b>${msg}</div>`;
-	        chat.printer.append(div);
-	    },
+            let div = `<div style="color:${args.color};">${args.date}<b> ${args.name}: </b>${msg}</div>`;
+            chat.printer.append(div);
+        },
         this.renderImage = function(args) {
             let img = `<a href="${args.link}" target="_blank"><img src="${args.link}" target="_blank" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img></a>`;
             let div = `<div style="color:${args.color};">${args.date}<b> ${args.name}: </b>${img}</div>`
             chat.printer.append(div);
         }
-	    this.renderStaticImage = function(args) {
-	    	let img = `<img src="data:image/png;base64,${args.image}" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img>`;
-	        let div = `<div style ="color:${args.color};">${args.date}<b> ${args.name}: </b>${img} </div>`
-	        chat.printer.append(div);
-	    }
+        this.renderStaticImage = function(args) {
+            let img = `<img src="data:image/png;base64,${args.image}" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img>`;
+            let div = `<div style ="color:${args.color};">${args.date}<b> ${args.name}: </b>${img} </div>`
+            chat.printer.append(div);
+        }
         this.renderCodeBlock = function(args){
             let div = `<div style="color:${args.color};">${args.date}<b> ${args.name}: CODEBLOCK:</b> 
                       </div><pre style="white-space: pre-wrap;"><code class="code" style="border-radius: 10px;">${args.msg.replace(/\n/g, '<br>')} </code></pre>`;
@@ -205,6 +204,6 @@ body{
               hljs.highlightBlock(block);
             });
         }
-	};
+    };
 
 </script>
