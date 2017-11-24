@@ -43,23 +43,22 @@ body{
     top: 0px;
     right: 17px;
     position: absolute !important;
-    background-color: white;
-    box-shadow: 10px 10px 5px #888888;
+    box-shadow: 0px 0px 20px #888888;
+}
+.redshadow{
+    text-shadow: 2px 2px 8px #FF0000;
+    font-weight: bold;
 }
 </style>
 </head>
 <body>
     <div id="chat" class="chat"">
         <div class="msgs">
-            <div><b>Welcome to the proper lunch chat channel.</b></br></div>
-            <div>github for this app: <a href ="https://github.com/simon-kyger/chat" target="_blank">https://github.com/simon-kyger/chat</a></br></div>
-            <div><i>Command List:</i></br></div>
-            <div>&nbsp &nbsp <b>/name</b> <i>name</i>  :: gives you a name for current session. 20 char limit</br></div>
-            <div>&nbsp &nbsp <b>/color</b> <i>color</i>  :: changes color of your socket msgs</br></div>
-            <div>&nbsp &nbsp <b>/theme</b> dark  :: changes theme to dark (only one atm)</br></div>
-            <div>&nbsp &nbsp <b>/gif</b> <i>searchterm</i>  :: searches giphy for a gif based upon searchterm</br></div>
+            <div class="redshadow">Welcome to the proper lunch chat channel!</br></div>
+            <div>&nbsp; &nbsp; github --> <a href ="https://github.com/simon-kyger/chat" target="_blank">https://github.com/simon-kyger/chat</a></br></div>
+            <div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>
         </div>
-        <textarea id="chatinput" class="chatinput" placeholder="Chat here!" autofocus="autofocus"></textarea>
+        <textarea id="chatinput" class="chatinput" placeholder="Chat here! or /? for a list of commands." autofocus="autofocus"></textarea>
         <div id="chatresizer" class="resizer ui-resizable-handl ui-resizable-ne"></div>
         <div id="onlineusers" class="onlineusers"></div>
     </div>
@@ -138,7 +137,7 @@ body{
     //data expects array
     socket.on('updateUsers', function (data){
         onlineusers.empty();
-        onlineusers.append('<div>Online Users: &nbsp</div>');
+        onlineusers.append('<div class="redshadow">Online Users: &nbsp</div>');
         for (var i=0; i<data.length; i++){
             if (isNaN(data[i]))
                 data[i] = data[i].replace(/\n/g, '<br>');
@@ -169,21 +168,22 @@ body{
     
     var RenderingObject = function() {
         this.renderText = function(args) {
-            let div = `<div style="color:${args.color};">${args.date}<b> ${args.name}: </b>${args.msg}</div>`;
+            let div = `<div style="color:${args.color}; background-color:${args.bgcolor}; text-shadow: ${args.textshadow};">${args.date}<b> ${args.name} </b>${args.msg}</div>`;
             chat.printer.append(div);
         },
         this.renderImage = function(args) {
             let img = `<a href="${args.msg}" target="_blank"><img src="${args.msg}" target="_blank" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img></a>`;
-            let div = `<div style="color:${args.color};">${args.date}<b> ${args.name}: </b>${img}</div>`
+            let link = `<a href="${args.msg}" target="_blank">${args.msg}</a>`;
+            let div = `<div style="color:${args.color};">${args.date}<b> ${args.name} </b>${link}<br>${img}</div>`
             chat.printer.append(div);
         }
         this.renderStaticImage = function(args) {
             let img = `<img src="data:image/png;base64,${args.image}" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img>`;
-            let div = `<div style ="color:${args.color};">${args.date}<b> ${args.name}: </b>${img} </div>`
+            let div = `<div style ="color:${args.color};">${args.date}<b> ${args.name} </b>${img} </div>`
             chat.printer.append(div);
         }
         this.renderCodeBlock = function(args){
-            let div = `<div style="color:${args.color};">${args.date}<b> ${args.name}: CODEBLOCK:</b> 
+            let div = `<div style="color:${args.color};">${args.date}<b> ${args.name} CODEBLOCK:</b> 
                       </div><pre style="white-space: pre-wrap;"><code class="code" style="border-radius: 10px;">${args.msg.replace(/\n/g, '<br>')} </code></pre>`;
             chat.printer.append(div);
             $('.code').each(function(i, block) {

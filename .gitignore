@@ -1,2 +1,4 @@
 # Dependency directories
 node_modules/
+apikeys/giphykey.txt
+apikeys/youtubekey.txt
