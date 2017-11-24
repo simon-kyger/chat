@@ -7,6 +7,8 @@ const moment = require('moment');
 const request = require('request');
 const io = require('socket.io')(server);
 const giphyapikey = 'mIXP4ZfFAYQ1feYwdQhvbJOsvmwY3qB2';
+const linkifyHtml = require('linkifyjs/html');
+const isImage = require('is-image');
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/client/index.html');
@@ -86,9 +88,19 @@ function chatMsg(socket, msg){
         command(socket, msg);
         return;
     }
+
+    let act = 'renderText';
+    if (isImage(msg)){
+        act = 'renderImage';
+    } else {
+        msg = linkifyHtml(msg, {
+            defaultProtocol: 'https',
+        });
+    }
+
     let send = {
         chatmessages: [{
-            action: 'renderText',
+            action: act,
             date: now.format("HH:mm:ss"),
             name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
             msg:  msg,
@@ -250,7 +262,7 @@ function giphyrequest(socket, mod){
                     action: 'renderImage',
                     date: now.format("HH:mm:ss"),
                     name: (socket.name || SOCKET_CONNECTIONS.indexOf(socket)),
-                    link:  ret,
+                    msg:  ret,
                     color: `red`
                 }]
             };

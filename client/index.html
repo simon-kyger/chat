@@ -68,7 +68,6 @@ body{
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/monokai-sublime.min.css">
-<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>
 //globals
     let socket = io();
@@ -113,13 +112,11 @@ body{
         //enter
         if (e.which == 13 && !e.shiftKey) {
             e.preventDefault();
-            var msg = chat.chatinput.val(); 
-            if ($.trim(msg)) {
-                socket.emit('chatMsg', msg);
-                chat.posts.push(msg);
-                chat.position = chat.posts.length;
-                chat.chatinput[0].value = ''; // CLEAR TEXTAREA
-            }
+            var msg = chat.chatinput.val().trim(); 
+            socket.emit('chatMsg', msg);
+            chat.posts.push(msg);
+            chat.position = chat.posts.length;
+            chat.chatinput[0].value = ''; // CLEAR TEXTAREA
         }
     }
     chat.chatinput.keyup(chat.postmsg);
@@ -171,23 +168,11 @@ body{
     
     var RenderingObject = function() {
         this.renderText = function(args) {
-            let container = args.msg.split(' ');
-            for (let i=0; i<container.length; i++){
-                if ((container[i].substr(0, 8)) == 'https://' || (container[i].substr(0, 7)) == 'http://'){
-                    let ext = container[i].substr(container[i].length-4, 3);
-                    if (ext == 'gif' || ext == 'jpg' || ext == 'png' || ext == 'mp4' || ext == 'tif' || 'ebp'){
-                        container[i] = `<a href="${container[i]}" target="_blank"><img src="${container[i]}" target="_blank" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img></a>`;
-                    } else {
-                        container[i] = `<a href="${container[i]}" target="_blank">${container[i]}</a>`;
-                    }
-                }
-            }
-            let msg = container.join(' ');
-            let div = `<div style="color:${args.color};">${args.date}<b> ${args.name}: </b>${msg}</div>`;
+            let div = `<div style="color:${args.color};">${args.date}<b> ${args.name}: </b>${args.msg}</div>`;
             chat.printer.append(div);
         },
         this.renderImage = function(args) {
-            let img = `<a href="${args.link}" target="_blank"><img src="${args.link}" target="_blank" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img></a>`;
+            let img = `<a href="${args.msg}" target="_blank"><img src="${args.msg}" target="_blank" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img></a>`;
             let div = `<div style="color:${args.color};">${args.date}<b> ${args.name}: </b>${img}</div>`
             chat.printer.append(div);
         }

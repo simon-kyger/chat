@@ -1,0 +1,166 @@
+makeTest	/Users/nick/Development/SoapBox/linkifyjs/test/spec/linkify/core/scanner-test.js	/^	function makeTest(test) {$/;"	function	line:85
+tests	/Users/nick/Development/SoapBox/linkifyjs/test/spec/linkify/core/parser-test.js	/^var tests = [$/;"	variable	line:15
+makeTest	/Users/nick/Development/SoapBox/linkifyjs/test/spec/linkify/core/parser-test.js	/^	function makeTest(test) {$/;"	function	line:184
+expect	/Users/nick/Development/SoapBox/linkifyjs/test/spec/linkify/core/parser-test.js	/^			expect(result.map(function (token) {$/;"	function	line:191
+expect	/Users/nick/Development/SoapBox/linkifyjs/test/spec/linkify/core/parser-test.js	/^			expect(result.map(function (token) {$/;"	function	line:195
+TextToken	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/tokens/text.js	/^const TextToken = createTokenClass();$/;"	class	line:16
+toString	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/tokens/text.js	/^	toString() {$/;"	function	line:18
+inheritsToken	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/tokens/text.js	/^function inheritsToken(value) {$/;"	function	line:24
+inheritsToken	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/tokens/text.js	/^function inheritsToken(value) {$/;"	function	line:24
+isDomainToken	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/tokens/multi.js	/^function isDomainToken(token) {$/;"	function	line:12
+isDomainToken	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/tokens/multi.js	/^function isDomainToken(token) {$/;"	function	line:12
+MultiToken	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/tokens/multi.js	/^const MultiToken = createTokenClass();$/;"	class	line:27
+MultiToken.type	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/tokens/multi.js	/^MultiToken.prototype = {$/;"	property	line:29
+MultiToken.isLink	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/tokens/multi.js	/^	type: 'token',$/;"	property	line:35
+toString	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/tokens/multi.js	/^	toString() {$/;"	function	line:49
+toHref	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/tokens/multi.js	/^	toHref() {$/;"	function	line:64
+toObject	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/tokens/multi.js	/^	toObject(protocol = 'http') {$/;"	function	line:79
+toHref	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/tokens/multi.js	/^	toHref() {$/;"	function	line:106
+toHref	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/tokens/multi.js	/^	toHref(protocol = 'http') {$/;"	function	line:144
+hasProtocol	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/tokens/multi.js	/^	hasProtocol() {$/;"	function	line:186
+run	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/parser.js	/^let run = function (tokens) {$/;"	function	line:317
+let	/Users/nick/Development/SoapBox/linkifyjs/src/linkify/core/parser.js	/^.on(LOCALHOST, S_EMAIL);$/;"	function	line:314
+name	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "name": "linkifyjs",$/;"	function	line:2
+name	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "name": "linkifyjs",$/;"	function	line:2
+version	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "version": "2.1.4",$/;"	function	line:3
+version	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "version": "2.1.4",$/;"	function	line:3
+description	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "description": "Intelligent link recognition, made easy",$/;"	function	line:4
+description	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "description": "Intelligent link recognition, made easy",$/;"	function	line:4
+repository	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "repository": {$/;"	function	line:5
+repository	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "repository": {$/;"	function	line:5
+type	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "type": "git",$/;"	function	line:6
+type	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "type": "git",$/;"	function	line:6
+url	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "url": "https:\/\/github.com\/SoapBox\/linkifyjs.git"$/;"	function	line:7
+url	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "url": "https:\/\/github.com\/SoapBox\/linkifyjs.git"$/;"	function	line:7
+main	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "main": "index.js",$/;"	function	line:9
+main	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "main": "index.js",$/;"	function	line:9
+scripts	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "scripts": {$/;"	function	line:10
+scripts	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "scripts": {$/;"	function	line:10
+prepublish	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "prepublish": "rm -rf lib\/* && node_modules\/.bin\/gulp build",$/;"	function	line:11
+prepublish	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "prepublish": "rm -rf lib\/* && node_modules\/.bin\/gulp build",$/;"	function	line:11
+test	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "test": "node_modules\/.bin\/gulp test",$/;"	function	line:12
+test	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "test": "node_modules\/.bin\/gulp test",$/;"	function	line:12
+test-ci	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "test-ci": "node_modules\/.bin\/gulp test-ci",$/;"	function	line:13
+test-ci	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "test-ci": "node_modules\/.bin\/gulp test-ci",$/;"	function	line:13
+coverage	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "coverage": ".\/node_modules\/coveralls\/bin\/coveralls.js < coverage\/lcov.info"$/;"	function	line:14
+coverage	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "coverage": ".\/node_modules\/coveralls\/bin\/coveralls.js < coverage\/lcov.info"$/;"	function	line:14
+author	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "author": "SoapBox Innovations (@SoapBoxHQ)",$/;"	function	line:16
+author	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "author": "SoapBox Innovations (@SoapBoxHQ)",$/;"	function	line:16
+license	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "license": "MIT",$/;"	function	line:17
+license	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "license": "MIT",$/;"	function	line:17
+keywords	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "keywords": [$/;"	function	line:18
+keywords	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "keywords": [$/;"	function	line:18
+devDependencies	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "devDependencies": {$/;"	function	line:30
+devDependencies	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "devDependencies": {$/;"	function	line:30
+amd-optimize	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "amd-optimize": "^0.6.1",$/;"	function	line:31
+amd-optimize	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "amd-optimize": "^0.6.1",$/;"	function	line:31
+babel-plugin-add-module-exports	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "babel-plugin-add-module-exports": "^0.2.1",$/;"	function	line:32
+babel-plugin-add-module-exports	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "babel-plugin-add-module-exports": "^0.2.1",$/;"	function	line:32
+babel-plugin-transform-es2015-modules-amd	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "babel-plugin-transform-es2015-modules-amd": "^6.6.5",$/;"	function	line:33
+babel-plugin-transform-es2015-modules-amd	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "babel-plugin-transform-es2015-modules-amd": "^6.6.5",$/;"	function	line:33
+babel-preset-es2015	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "babel-preset-es2015": "^6.16.0",$/;"	function	line:34
+babel-preset-es2015	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "babel-preset-es2015": "^6.16.0",$/;"	function	line:34
+chai	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "chai": "^3.5.0",$/;"	function	line:35
+chai	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "chai": "^3.5.0",$/;"	function	line:35
+coveralls	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "coveralls": "^2.11.4",$/;"	function	line:36
+coveralls	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "coveralls": "^2.11.4",$/;"	function	line:36
+glob	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "glob": "^7.0.3",$/;"	function	line:37
+glob	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "glob": "^7.0.3",$/;"	function	line:37
+gulp	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp": "^3.8.11",$/;"	function	line:38
+gulp	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp": "^3.8.11",$/;"	function	line:38
+gulp-babel	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-babel": "^6.1.2",$/;"	function	line:39
+gulp-babel	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-babel": "^6.1.2",$/;"	function	line:39
+gulp-clean	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-clean": "^0.3.2",$/;"	function	line:40
+gulp-clean	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-clean": "^0.3.2",$/;"	function	line:40
+gulp-concat	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-concat": "^2.6.0",$/;"	function	line:41
+gulp-concat	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-concat": "^2.6.0",$/;"	function	line:41
+gulp-eslint	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-eslint": "^3.0.1",$/;"	function	line:42
+gulp-eslint	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-eslint": "^3.0.1",$/;"	function	line:42
+gulp-istanbul	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-istanbul": "^1.0.0",$/;"	function	line:43
+gulp-istanbul	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-istanbul": "^1.0.0",$/;"	function	line:43
+gulp-mocha	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-mocha": "^3.0.1",$/;"	function	line:44
+gulp-mocha	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-mocha": "^3.0.1",$/;"	function	line:44
+gulp-rename	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-rename": "^1.2.0",$/;"	function	line:45
+gulp-rename	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-rename": "^1.2.0",$/;"	function	line:45
+gulp-replace	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-replace": "^0.5.4",$/;"	function	line:46
+gulp-replace	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-replace": "^0.5.4",$/;"	function	line:46
+gulp-uglify	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-uglify": "^1.5.4",$/;"	function	line:47
+gulp-uglify	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-uglify": "^1.5.4",$/;"	function	line:47
+gulp-util	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-util": "^3.0.7",$/;"	function	line:48
+gulp-util	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-util": "^3.0.7",$/;"	function	line:48
+gulp-wrap	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-wrap": "^0.13.0",$/;"	function	line:49
+gulp-wrap	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "gulp-wrap": "^0.13.0",$/;"	function	line:49
+jsdom	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "jsdom": "^9.3.0",$/;"	function	line:50
+jsdom	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "jsdom": "^9.3.0",$/;"	function	line:50
+karma	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "karma": "^1.1.0",$/;"	function	line:51
+karma	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "karma": "^1.1.0",$/;"	function	line:51
+karma-chrome-launcher	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "karma-chrome-launcher": "^2.0.0",$/;"	function	line:52
+karma-chrome-launcher	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "karma-chrome-launcher": "^2.0.0",$/;"	function	line:52
+karma-firefox-launcher	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "karma-firefox-launcher": "^1.0.0",$/;"	function	line:53
+karma-firefox-launcher	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "karma-firefox-launcher": "^1.0.0",$/;"	function	line:53
+karma-phantomjs-launcher	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "karma-phantomjs-launcher": "^1.0.0",$/;"	function	line:54
+karma-phantomjs-launcher	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "karma-phantomjs-launcher": "^1.0.0",$/;"	function	line:54
+karma-qunit	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "karma-qunit": "^1.0.0",$/;"	function	line:55
+karma-qunit	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "karma-qunit": "^1.0.0",$/;"	function	line:55
+karma-sauce-launcher	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "karma-sauce-launcher": "^1.0.0",$/;"	function	line:56
+karma-sauce-launcher	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "karma-sauce-launcher": "^1.0.0",$/;"	function	line:56
+lazypipe	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "lazypipe": "^1.0.1",$/;"	function	line:57
+lazypipe	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "lazypipe": "^1.0.1",$/;"	function	line:57
+lodash	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "lodash": "^4.11.1",$/;"	function	line:58
+lodash	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "lodash": "^4.11.1",$/;"	function	line:58
+merge-stream	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "merge-stream": "^1.0.0",$/;"	function	line:59
+merge-stream	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "merge-stream": "^1.0.0",$/;"	function	line:59
+mocha	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "mocha": "^3.0.2",$/;"	function	line:60
+mocha	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "mocha": "^3.0.2",$/;"	function	line:60
+phantomjs-prebuilt	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "phantomjs-prebuilt": "^2.1.7",$/;"	function	line:61
+phantomjs-prebuilt	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "phantomjs-prebuilt": "^2.1.7",$/;"	function	line:61
+qunitjs	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "qunitjs": "^1.14.0",$/;"	function	line:62
+qunitjs	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "qunitjs": "^1.14.0",$/;"	function	line:62
+requirejs	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "requirejs": "^2.1.22",$/;"	function	line:63
+requirejs	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "requirejs": "^2.1.22",$/;"	function	line:63
+rollup	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "rollup": "~0.40.0",$/;"	function	line:64
+rollup	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "rollup": "~0.40.0",$/;"	function	line:64
+run-sequence	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "run-sequence": "^1.1.5",$/;"	function	line:65
+run-sequence	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "run-sequence": "^1.1.5",$/;"	function	line:65
+simple-html-tokenizer	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "simple-html-tokenizer": "git+https:\/\/github.com\/nfrasser\/simple-html-tokenizer.git#04799f4638ec5ed903a4e5aa6e832269fa59be6b",$/;"	function	line:66
+simple-html-tokenizer	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "simple-html-tokenizer": "git+https:\/\/github.com\/nfrasser\/simple-html-tokenizer.git#04799f4638ec5ed903a4e5aa6e832269fa59be6b",$/;"	function	line:66
+through2	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "through2": "^2.0.1"$/;"	function	line:67
+through2	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "through2": "^2.0.1"$/;"	function	line:67
+optionalDependencies	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "optionalDependencies": {$/;"	function	line:69
+optionalDependencies	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^  "optionalDependencies": {$/;"	function	line:69
+jquery	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "jquery": ">=1.9.0",$/;"	function	line:70
+jquery	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "jquery": ">=1.9.0",$/;"	function	line:70
+react	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "react": ">=0.14.0",$/;"	function	line:71
+react	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "react": ">=0.14.0",$/;"	function	line:71
+react-dom	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "react-dom": ">=0.14.0"$/;"	function	line:72
+react-dom	/Users/nick/Development/SoapBox/linkifyjs/package.json	/^    "react-dom": ">=0.14.0"$/;"	function	line:72
+Linkify Changelog	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^# Linkify Changelog$/;"	function	line:1
+Linkify Changelog	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^# Linkify Changelog$/;"	function	line:1
+v2.1.4	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.4$/;"	function	line:3
+v2.1.4	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.4$/;"	function	line:3
+v2.1.3	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.3$/;"	function	line:12
+v2.1.3	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.3$/;"	function	line:12
+v2.1.2	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.2$/;"	function	line:16
+v2.1.2	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.2$/;"	function	line:16
+v2.1.1	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.1$/;"	function	line:20
+v2.1.1	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.1$/;"	function	line:20
+v2.1.0	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.0$/;"	function	line:24
+v2.1.0	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.0$/;"	function	line:24
+BREAKING CHANGES	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^#### BREAKING CHANGES$/;"	function	line:26
+BREAKING CHANGES	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^#### BREAKING CHANGES$/;"	function	line:26
+Features	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^#### Features$/;"	function	line:34
+Features	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^#### Features$/;"	function	line:34
+Deprecations	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^#### Deprecations$/;"	function	line:43
+Deprecations	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^#### Deprecations$/;"	function	line:43
+All Changes	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^#### All Changes$/;"	function	line:53
+All Changes	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^#### All Changes$/;"	function	line:53
+v2.0.5	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.5$/;"	function	line:65
+v2.0.5	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.5$/;"	function	line:65
+v2.0.4	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.4$/;"	function	line:70
+v2.0.4	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.4$/;"	function	line:70
+v2.0.3	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.3$/;"	function	line:77
+v2.0.3	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.3$/;"	function	line:77
+v2.0.1	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.1$/;"	function	line:81
+v2.0.1	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.1$/;"	function	line:81
+v2.0.0	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.0$/;"	function	line:87
+v2.0.0	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.0$/;"	function	line:87

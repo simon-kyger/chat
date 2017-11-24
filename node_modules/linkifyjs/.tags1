@@ -1,0 +1,36 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	0	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+Linkify Changelog	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^# Linkify Changelog$/;"	function	line:1
+Linkify Changelog	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^# Linkify Changelog$/;"	function	line:1
+v2.1.4	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.4$/;"	function	line:3
+v2.1.4	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.4$/;"	function	line:3
+v2.1.3	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.3$/;"	function	line:12
+v2.1.3	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.3$/;"	function	line:12
+v2.1.2	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.2$/;"	function	line:16
+v2.1.2	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.2$/;"	function	line:16
+v2.1.1	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.1$/;"	function	line:20
+v2.1.1	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.1$/;"	function	line:20
+v2.1.0	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.0$/;"	function	line:24
+v2.1.0	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.1.0$/;"	function	line:24
+BREAKING CHANGES	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^#### BREAKING CHANGES$/;"	function	line:26
+BREAKING CHANGES	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^#### BREAKING CHANGES$/;"	function	line:26
+Features	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^#### Features$/;"	function	line:34
+Features	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^#### Features$/;"	function	line:34
+Deprecations	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^#### Deprecations$/;"	function	line:43
+Deprecations	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^#### Deprecations$/;"	function	line:43
+All Changes	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^#### All Changes$/;"	function	line:53
+All Changes	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^#### All Changes$/;"	function	line:53
+v2.0.5	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.5$/;"	function	line:65
+v2.0.5	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.5$/;"	function	line:65
+v2.0.4	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.4$/;"	function	line:70
+v2.0.4	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.4$/;"	function	line:70
+v2.0.3	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.3$/;"	function	line:77
+v2.0.3	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.3$/;"	function	line:77
+v2.0.1	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.1$/;"	function	line:81
+v2.0.1	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.1$/;"	function	line:81
+v2.0.0	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.0$/;"	function	line:87
+v2.0.0	/Users/nick/Development/SoapBox/linkifyjs/CHANGELOG.md	/^### v2.0.0$/;"	function	line:87
