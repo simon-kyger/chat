@@ -140,7 +140,7 @@ function command(socket, msg){
                 }]
             };
             socket.emit('addToChat', send);
-            return;
+            break;
         case '/color':
             socket.color = mod;
             socket.emit('changeInputFontColor', socket.color);
@@ -161,6 +161,15 @@ function command(socket, msg){
             socket.theme = mod;
             socket.emit('changeTheme', socket.theme);
             break;
+        case '/vid':
+            youtuberequest(socket, mod);
+            break;
+        case '/video':
+            youtuberequest(socket, mod);
+            break;
+        case '/youtube':
+            youtuberequest(socket, mod);
+            break;
         case '/yt':
             youtuberequest(socket, mod);
             break;
@@ -178,6 +187,9 @@ function command(socket, msg){
     }
 }
 
+//socket: object
+//mod: string
+//description: part of command lib that will fetch mod from googlesapi
 function youtuberequest(socket, mod){
     const now = new moment();
     let send;
@@ -199,7 +211,43 @@ function youtuberequest(socket, mod){
             console.log(error);
             return;
         }
-        console.log(JSON.stringify(result, null, 2));
+        if (result.items.length && result.items[0].id.videoId){
+            send = {
+                chatmessages: [{
+                    action: 'renderVideo',
+                    date: now.format("HH:mm:ss"),
+                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    msg:  result.items[0].id.videoId,
+                }]
+            };
+        } else {
+            send = {
+                chatmessages: [{
+                    action: 'renderText',
+                    date: now.format("HH:mm:ss"),
+                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    msg:  `Youtube failed. This can happen easily if you match a channel owner's name.`,
+                    color: `red`
+                },{
+                    action: 'renderText',
+                    date: now.format("HH:mm:ss"),
+                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    msg:  `Search query->'${mod}'.`,
+                    color: `red`
+                },{
+                    action: 'renderText',
+                    date: now.format("HH:mm:ss"),
+                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    msg:  `Try refining your search pattern with more text.`,
+                    color: `red`
+                }]
+            };
+            socket.emit('addToChat', send);
+            return;
+        }
+        for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
+            SOCKET_CONNECTIONS[i].emit('addToChat', send);
+        }
     });
 }
 
@@ -228,8 +276,8 @@ function changename(socket, mod){
             chatmessages: [{
                 action: 'renderText',
                 date: now.format("HH:mm:ss"),
-                name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
-                msg:  `${oldname} is now known as: ${socket.name}`, 
+                name: ``,
+                msg:  `<b>${oldname}</b> is now known as: <b>${socket.name}</b>`, 
                 color: `silver`
             }]
         };
@@ -295,7 +343,13 @@ function giphyrequest(socket, mod){
                     action: 'renderText',
                     date: now.format("HH:mm:ss"),
                     name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
-                    msg:  `Giphy is having issues.`,
+                    msg:  `Giphy is having issues or is down apparently.`,
+                    color: `red`
+                },{
+                    action: 'renderText',
+                    date: now.format("HH:mm:ss"),
+                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    msg:  `Try again later.`,
                     color: `red`
                 }]
             };
@@ -329,7 +383,13 @@ function giphyrequest(socket, mod){
                         action: 'renderText',
                         date: now.format("HH:mm:ss"),
                         name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
-                        msg:  `Giphy failed to return anything for search->'${mod}'`,
+                        msg:  `Giphy failed to return anything!`,
+                        color: `red`
+                    },{
+                        action: 'renderText',
+                        date: now.format("HH:mm:ss"),
+                        name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                        msg:  `Search query->'${mod}'`,
                         color: `red`
                     },{ 
                         action: 'renderText',
@@ -386,17 +446,21 @@ function loadapikeys(){
     });
 }
 
+//socket: object
+//mod: string
+//description: part of the command lib that retrieves all commands from the current build
 function commandlist(socket, mod){
+    //if i had a db, it woudln't be this way, but since i don't want that added layer of bs, this will suffice
     let ret = `<br><b>COMMANDS:</b><br>`;
     ret += `<br><b>&uarr; &darr;</b> with input selected cycles through past posted messages.`;
     let commanddescriptions = {
-        code:   `<i>codeblock</i>          -- Wraps <i>codeblock</i> in a codeblock.`,
-        color:  `<i>color</i>              -- Changes color of your broadcasted messages.`,
-        gif:    `<i>search</i>             -- Retrieves first result from giphy <i>search</i>.`,
-        help:   `<b>/?</b> <i>command</i>  -- Information about singular <i>command</i>. With no command specified, retrieves entire list.`,
-        name:   `<i>identity</i>           -- Changes your current identity to <i>identity</i>.`,
-        theme:  `<i>theme</i>              -- Changes your current theme to <i>theme</i>.`,
-        yt:     `<i>search</i>             -- Retrieves first result from a youtube <i>search</i>.`
+        code:   `<i>codeblock</i>                           -- Wraps <i>codeblock</i> in a codeblock.`,
+        color:  `<i>color</i>                               -- Changes color of your broadcasted messages.`,
+        gif:    `<i>search</i>                              -- Retrieves first result from giphy <i>search</i>.`,
+        help:   `<b>/?</b> <i>command</i>                   -- Information about singular <i>command</i>. With no command specified, retrieves entire list.`,
+        name:   `<i>identity</i>                            -- Changes your current identity to <i>identity</i>.`,
+        theme:  `<i>theme</i>                               -- Changes your current theme to <i>theme</i>.`,
+        yt:     `<b>/vid /video /youtube</b> <i>search</i>   -- Retrieves first result from a youtube <i>search</i>.`
     }
     if (mod){
         if(mod in commanddescriptions)

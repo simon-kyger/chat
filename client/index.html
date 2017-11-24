@@ -45,6 +45,29 @@ body{
     position: absolute !important;
     box-shadow: 0px 0px 20px #888888;
 }
+.cfg{
+    position: absolute !important;
+    bottom: 8px;
+    right: 8px;
+    font-weight: bold;
+    font-size: 28px;
+    color: silver;
+    z-index:999;
+}
+.config{
+    position: absolute !important;
+    bottom: 0px;
+    right: 0px;
+    font-size: 14px;
+    width: 0%;
+    height: 0%;
+    opacity: 0;
+    border-color: rgb(169, 169, 169);
+    font-family: monospace;
+    border-style: solid;
+    border-width: 1px;
+    background-color: lightgray;
+}
 .redshadow{
     text-shadow: 2px 2px 8px #FF0000;
     font-weight: bold;
@@ -61,6 +84,11 @@ body{
         <textarea id="chatinput" class="chatinput" placeholder="Chat here! or /? for a list of commands." autofocus="autofocus"></textarea>
         <div id="chatresizer" class="resizer ui-resizable-handl ui-resizable-ne"></div>
         <div id="onlineusers" class="onlineusers"></div>
+        <div id="cfg" class="cfg">&#x2699;</div>
+        <div id="config" class="config">
+            <input id="videotoggle" class="videotoggle" type="checkbox">Hide Videos<br>
+            <input id="imagetoggle" class="imagetoggle" type="checkbox">Hide Images
+        </div>
     </div>
 </body>
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
@@ -77,6 +105,9 @@ body{
     chat.position = 0;
     chat.printer = $('.msgs', chat);
     chat.chatinput = $('.chatinput', chat);
+    chat.cfg = $('.cfg');
+    chat.cfg.videostoggle = $('.videotoggle');
+    chat.cfg.imagestoggle = $('.imagetoggle');
     
 //events
     chat.resizable({
@@ -117,9 +148,51 @@ body{
             chat.posts.push(msg);
             chat.position = chat.posts.length;
             chat.chatinput[0].value = ''; // CLEAR TEXTAREA
+            chat.scrollBottom();
         }
     }
     chat.chatinput.keyup(chat.postmsg);
+
+
+    chat.cfg.expanded = true;
+    chat.cfg.expand = function(){
+        if (chat.cfg.expanded){
+            $("#config").animate({
+                width: "0%",
+                height: "0%",
+                opacity: 0,
+                fontSize: "0",
+                borderWidth: "0px"
+            }, 500 );
+            chat.cfg.expanded = false;
+        } else {
+            $( "#config" ).animate({
+                width: "20%",
+                height: "30%",
+                opacity: 0.8,
+                fontSize: "14",
+                borderWidth: "6px"
+            }, 500 );
+            chat.cfg.expanded = true;
+        }
+    }
+    chat.cfg.click(chat.cfg.expand);
+    chat.cfg.click();
+
+    chat.cfg.videostoggle.on('change', function(){
+        chat.cfg.videostoggle ? $('.iframe').hide() : $('.iframe').show();
+        chat.cfg.videostoggle = !chat.cfg.videostoggle;
+        chat.printer.stop().animate({ 
+            scrollTop: chat.printer[0].scrollHeight
+        }, 0); 
+    });
+    chat.cfg.imagestoggle.on('change', function(){
+        chat.cfg.imagestoggle ? $('.imgs').hide() : $('.imgs').show();
+        chat.cfg.imagestoggle = !chat.cfg.imagestoggle;
+        chat.printer.stop().animate({ 
+            scrollTop: chat.printer[0].scrollHeight
+        }, 0); 
+    });
 
 //net
     //data expects data.chatmessages[].properties
@@ -172,15 +245,18 @@ body{
             chat.printer.append(div);
         },
         this.renderImage = function(args) {
-            let img = `<a href="${args.msg}" target="_blank"><img src="${args.msg}" target="_blank" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img></a>`;
+            let img = `<a href="${args.msg}" target="_blank"><img class="imgs" src="${args.msg}" target="_blank" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img></a>`;
             let link = `<a href="${args.msg}" target="_blank">${args.msg}</a>`;
             let div = `<div style="color:${args.color};">${args.date}<b> ${args.name} </b>${link}<br>${img}</div>`
             chat.printer.append(div);
+            chat.cfg.imagestoggle ? $('.imgs').show() : $('.imgs').hide();
+            //lolfun $('.imgs').draggable({containment: $('.msgs')});
         }
         this.renderStaticImage = function(args) {
-            let img = `<img src="data:image/png;base64,${args.image}" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img>`;
+            let img = `<img class="imgs" src="data:image/png;base64,${args.image}" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img>`;
             let div = `<div style ="color:${args.color};">${args.date}<b> ${args.name} </b>${img} </div>`
             chat.printer.append(div);
+            chat.cfg.imagestoggle ? $('.imgs').show() : $('.imgs').hide();
         }
         this.renderCodeBlock = function(args){
             let div = `<div style="color:${args.color};">${args.date}<b> ${args.name} CODEBLOCK:</b> 
@@ -190,6 +266,13 @@ body{
               hljs.highlightBlock(block);
             });
         }
+        this.renderVideo = function(args){
+            let url = `https://www.youtube.com/embed/${args.msg}`;
+            let link = `<a href="${url}">${url}</a>`;
+            let iframe = `<iframe class="iframe" style="height: 300px; width: 500px" src="//www.youtube.com/embed/${args.msg}" allowfullscreen></iframe>`; 
+            let div = `<div style="color:${args.color};">${args.date}<b> ${args.name} </b>${link}<br>${iframe}</div>`; 
+            chat.printer.append(div);
+            chat.cfg.videostoggle ? $('.iframe').show() : $('.iframe').hide();
+        }
     };
-
 </script>
