@@ -18,6 +18,7 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/client/index.html');
 });
 
+
 server.listen(port);
 console.log(`Listening on port: ${port}`);
 
