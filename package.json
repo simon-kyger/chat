@@ -13,8 +13,8 @@
     "jsdom": "^11.4.0",
     "linkifyjs": "^2.1.5",
     "moment": "^2.19.2",
+    "npm-install-all": "^1.1.21",
     "request": "^2.83.0",
-    "socket-io": "^1.0.0",
     "socket.io": "^2.0.4",
     "xmlhttprequest": "^1.8.0"
   },
@@ -27,7 +27,7 @@
     "url": "git+https://github.com/simon-kyger/chat.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Simon Kyger",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/simon-kyger/chat/issues"
