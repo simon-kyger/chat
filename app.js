@@ -159,6 +159,13 @@ function command(socket, msg){
             changename(socket, mod);
             break;
         case '/theme':
+            if (mod == 'dark')
+                mod = -100;
+            else if (mod == 'light')
+                mod = 100
+            else if (mod == 'off')
+                mod = 'off'
+            else mod = 0;
             socket.theme = mod;
             socket.emit('changeTheme', socket.theme);
             break;
@@ -460,7 +467,7 @@ function commandlist(socket, mod){
         gif:    `<i>search</i>                              -- Retrieves first result from giphy <i>search</i>.`,
         help:   `<b>/?</b> <i>command</i>                   -- Information about singular <i>command</i>. With no command specified, retrieves entire list.`,
         name:   `<i>identity</i>                            -- Changes your current identity to <i>identity</i>.`,
-        theme:  `<i>theme</i>                               -- Changes your current theme to <i>theme</i>.`,
+        theme:  `<i>dark | light | off |</i>                -- Various theme options. Arguments are optional (will gen randomly).`,
         yt:     `<b>/vid /video /youtube</b> <i>search</i>   -- Retrieves first result from a youtube <i>search</i>.`
     }
     if (mod){

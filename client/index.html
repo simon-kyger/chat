@@ -11,7 +11,7 @@ body{
     overflow:hidden;
     font-family: 'Lucida Console';
     font-size: 14px;
-    box-shadow: 10px 10px 5px #888888;
+    box-shadow: 0px 0px 1px 1px #888888;
 }
 
 .chat .msgs{
@@ -29,6 +29,8 @@ body{
     position: absolute !important;
     white-space: pre-wrap;
     resize: none;
+    background-color: black;
+    color: white;
 }
 .resizer {
     width: 15px;
@@ -46,6 +48,11 @@ body{
     position: absolute !important;
     z-index: 9999;
     opacity: 0;
+    border-left: 1px solid;
+    border-bottom: 1px solid;
+    border-color: black; 
+    padding-left: 1px;
+    padding-bottom: 1px;
 }
 .cfg{
     position: absolute !important;
@@ -198,47 +205,92 @@ body{
         }, 0); 
     });
 
-    chat.randomizedstartinganimation = ()=> {
-        //more dragons about
-        let randomrgb = `rgb(${Math.floor(Math.random()*200)+55}, ${Math.floor(Math.random()*200)+55}, ${Math.floor(Math.random()*200)+55})`;
-        chat.chatinput.animate({
-            backgroundColor: 'black'
-        },0);
-        chat.animate({
+    chat.randomizedstartinganimation = (args)=> {
+        //more dragons be here
+        let bgformatted;
+        let shadow;
+        let text;
+        let cinput;
+        if (args == 'off'){
+            text = `black`;
+            bgformatted = shadow = `rgb(255,255,255)`;
+            chat.stop().animate({
+                boxShadow: shadow,
+                backgroundColor: bgformatted,
+            },200);
+            chat.printer.stop().animate({
+                color: text
+            },200);
+            chat.chatinput.stop().animate({
+                color: text,
+                backgroundColor: bgformatted
+            },200);
+            return;
+        }
+        args = args || 0;
+        if (args >= 0)
+            text = 'black'
+        else
+            text = 'gray';
+
+        let randomrgb = [((Math.floor(Math.random()*150)+55)+args), ((Math.floor(Math.random()*150)+55)+args), ((Math.floor(Math.random()*150)+55)+args)];
+        let darker = [];
+        let darkest = [];
+        for(let i=0; i<randomrgb.length; i++){
+            randomrgb[i] < 0 ? randomrgb[i] = 0 : randomrgb[i];
+            randomrgb[i] > 255 ? randomrgb[i] = 255 : randomrgb[i];
+            randomrgb[i]-50 < 0 ? darker.push(0) : darker.push(randomrgb[i]-50);
+            randomrgb[i]-100 < 0 ? darkest.push(0) : darkest.push(randomrgb[i]-100);
+        }
+        bgformatted = `rgb(${randomrgb[0]},${randomrgb[1]},${randomrgb[2]})`;
+        shadow = `0 0 10px 1000px rgb(${darker[0]},${darker[1]},${darker[2]})`;
+        cinput = `rgb(${darkest[0]},${darkest[1]},${darkest[2]})`;
+
+        chat.stop().animate({
             top: `${Math.floor(Math.random()*99)}%`,
             left: `${Math.floor(Math.random()*99)}%`,
-            width: '1%',
-            height: '1%',
-            opacity: 1.0,
-            backgroundColor: 'black'
+            width: '15px',
+            height: '15px',
+            opacity: '1.0',
         }, 0, null, ()=> {
-            chat.animate({
-                width: '5%',
-                height: '5%',
+            chat.stop().animate({
                 top: `${Math.floor(Math.random()*99)}%`,
                 left: `${Math.floor(Math.random()*99)}%`,
-                backgroundColor: randomrgb,
+                backgroundColor: bgformatted,
             }, 1000, null, ()=> {
-                chat.animate({ 
+                chat.chatinput.stop().animate({
+                    backgroundColor: '#e5e5e5'
+                }, 1500);
+                chat.stop().animate({ 
                     top: '0px',
                     left: '0px',
                     height: '50%',
                     width: '50%',
-                    opacity: .8,
                 }, 1500, null, ()=> {
-                    chat.chatinput.animate({
+                    chat.stop().animate({
+                        boxShadow: `1 1 1000px 100px 'silver'`
+                    },400, null, ()=>{
+                        chat.stop().animate({
+                            boxShadow: shadow
+                        },3000);
+                        chat.printer.stop().animate({
+                            color: text
+                        },2000);
+                    });
+                    chat.chatinput.stop().animate({
                         backgroundColor: 'white'
-                    },200);
-                    chat.animate({
-                        boxShadow: `0 0 100px silver`
-                    },200);
+                    },150, null, ()=>{
+                        chat.chatinput.stop().animate({
+                            backgroundColor: cinput
+                        }, 1500);
+                    });
+                    onlineusers.stop().animate({
+                            opacity: 1
+                    }, 1500);
                 });
-                onlineusers.animate({
-                        opacity: 1
-                }, 1500);
             });
         });
-    };
+    }
 
 //a glorified animation
     $(document).ready(()=> {
@@ -284,20 +336,8 @@ body{
     });
 
     //data expects string
-    socket.on('changeTheme', (data) => {
-        data = data.trim();
-        if (data == 'dark'){
-            $('body').css("background-color", "rgb(70,70,70)");
-            chat.chatinput.css("background-color", "rgb(50,50,50)");
-            chat.chatinput.css("font-color", "rgb(200, 200, 200)")
-            onlineusers.css("background-color", "rgb(70,70,70)");
-        }
-        else{
-            $(document.body).css("background-color", "rgb(255,255,255)");
-            chat.chatinput.css("background-color", "rgb(255,255,255)");
-            chat.chatinput.css("color", "rgb(0, 0, 0)")
-            onlineusers.css("background-color", "rgb(255,255,255)");
-        }
+    socket.on('changeTheme', (data) => {       
+        chat.randomizedstartinganimation(data);
     });
 
     
