@@ -41,6 +41,7 @@ body{
     right: 0px;
     position: absolute !important;
     z-index:9999;
+    cursor: nesw-resize;
 }
 .onlineusers{
     top: 0px;
@@ -62,6 +63,7 @@ body{
     font-size: 28px;
     color: silver;
     z-index:999;
+    cursor:pointer;
 }
 .config{
     position: absolute !important;
@@ -212,26 +214,31 @@ body{
         let text;
         let cinput;
         if (args == 'off'){
-            text = `black`;
+            text = `rgb(0,0,0)`;
             bgformatted = shadow = `rgb(255,255,255)`;
             chat.stop().animate({
                 boxShadow: shadow,
                 backgroundColor: bgformatted,
             },200);
             chat.printer.stop().animate({
-                color: text
+                color: text,
+                backgroundColor: bgformatted
             },200);
             chat.chatinput.stop().animate({
+                color: bgformatted,
+                backgroundColor: text
+            },200);
+            chat.config.stop().animate({
                 color: text,
                 backgroundColor: bgformatted
             },200);
             return;
         }
         args = args || 0;
-        if (args >= 0)
+        if (args > 0)
             text = 'black'
         else
-            text = 'gray';
+            text = 'lightgray';
 
         let randomrgb = [((Math.floor(Math.random()*150)+55)+args), ((Math.floor(Math.random()*150)+55)+args), ((Math.floor(Math.random()*150)+55)+args)];
         let darker = [];
@@ -239,8 +246,8 @@ body{
         for(let i=0; i<randomrgb.length; i++){
             randomrgb[i] < 0 ? randomrgb[i] = 0 : randomrgb[i];
             randomrgb[i] > 255 ? randomrgb[i] = 255 : randomrgb[i];
-            randomrgb[i]-50 < 0 ? darker.push(0) : darker.push(randomrgb[i]-50);
-            randomrgb[i]-100 < 0 ? darkest.push(0) : darkest.push(randomrgb[i]-100);
+            randomrgb[i]-30 < 0 ? darker.push(0) : darker.push(randomrgb[i]-30);
+            randomrgb[i]-50 < 0 ? darkest.push(0) : darkest.push(randomrgb[i]-50);
         }
         bgformatted = `rgb(${randomrgb[0]},${randomrgb[1]},${randomrgb[2]})`;
         shadow = `0 0 10px 1000px rgb(${darker[0]},${darker[1]},${darker[2]})`;
@@ -274,15 +281,21 @@ body{
                             boxShadow: shadow
                         },3000);
                         chat.printer.stop().animate({
-                            color: text
+                            color: text,
+                            backgroundColor: bgformatted
                         },2000);
                     });
                     chat.chatinput.stop().animate({
                         backgroundColor: 'white'
                     },150, null, ()=>{
                         chat.chatinput.stop().animate({
-                            backgroundColor: cinput
+                            backgroundColor: cinput,
+                            color: text
                         }, 1500);
+                    });
+                    chat.config.stop().animate({
+                        backgroundColor: bgformatted,
+                        color: text
                     });
                     onlineusers.stop().animate({
                             opacity: 1
