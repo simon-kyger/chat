@@ -1,3 +1,4 @@
+
 const express = require('express');
 const app = express();  
 const server = require('http').Server(app);
@@ -8,9 +9,11 @@ const request = require('request');
 const io = require('socket.io')(server);
 const linkifyHtml = require('linkifyjs/html');
 const isImage = require('is-image');
-const port = 80;
+const config = require('config');
+const port = config.get('port');
 const youtubenode = require('youtube-node');
 const youtube = new youtubenode();
+
 var apikeys = {};
 loadapikeys();
 
