@@ -52,7 +52,7 @@ body{
     position: absolute;
     right: 2%;
     font-size: 32px;
-    bottom: 15%;
+    bottom: 10%;
     cursor: pointer;
     -webkit-text-size-adjust:none;
 }
@@ -110,20 +110,20 @@ body{
 <script>
 //globals
     let socket = io();
+    var windows = 0;
     var builder = function(args){
         var self = this;
-        console.log(this);
-        this.chat = $(`<div id="chat" class="chat">`);
-        this.inputcontainer = $(`<div id="inputcontainer" class="inputcontainer">`).appendTo(this.chat);
-        this.msgs = $(`<div id="msgs" class="msgs">`).appendTo(this.chat);
-        this.config = $('<div id="config" class="config">').appendTo(this.chat);;
-        this.chatresizer = $(`<div id="chatresizer" class="resizer ui-resizable-handl ui-resizable-ne">`).appendTo(this.chat);
-        this.videotoggle = $(`<input id="videotoggle" class="videotoggle" type="checkbox">Hide Videos<br>`).appendTo(this.config);
-        this.imagetoggle = $(`<input id="imagetoggle" class="imagetoggle" type="checkbox">Hide Images</input>`).appendTo(this.config);        
-        this.cfg = $(`<div id="cfg" class="cfg">&#x2699;</div>`).appendTo(this.inputcontainer);
-        this.textarea = $(`<textarea id="chatinput" class="chatinput" placeholder="Chat here! or /? for a list of commands." autofocus="autofocus"></textarea>`).appendTo(this.inputcontainer);
+        this.chat = $(`<div id="chat${args}" class="chat">`);
+        this.inputcontainer = $(`<div id="inputcontainer${args}" class="inputcontainer">`).appendTo(this.chat);
+        this.msgs = $(`<div id="msgs${args}" class="msgs">`).appendTo(this.chat);
+        this.config = $(`<div id="config${args}" class="config">`).appendTo(this.chat);
+        this.chatresizer = $(`<div id="chatresizer${args}" class="resizer ui-resizable-handl ui-resizable-ne">`).appendTo(this.chat);
+        this.videotoggle = $(`<input id="videotoggle${args}" class="videotoggle" type="checkbox">Hide Videos<br>`).appendTo(this.config);
+        this.imagetoggle = $(`<input id="imagetoggle${args}" class="imagetoggle" type="checkbox">Hide Images</input>`).appendTo(this.config);        
+        this.cfg = $(`<div id="cfg${args}" class="cfg">&#x2699;</div>`).appendTo(this.inputcontainer);
+        this.textarea = $(`<textarea id="chatinput${args}" class="chatinput" placeholder="Chat here! or /? for a list of commands." autofocus="autofocus"></textarea>`).appendTo(this.inputcontainer);
         this.istyping = $(`<div class="istyping"></div>`).appendTo(this.inputcontainer);
-        if (args){
+        if (!args){
             this.welcome = $(`<div class="redshadow">Welcome to the proper lunch chat channel!</br></div>`).appendTo(this.msgs);
             this.githublink = $(`<div>&nbsp; &nbsp; github --> <a href="https://github.com/simon-kyger/chat" target="_blank">https://github.com/simon-kyger/chat</a></br></div>`).appendTo(this.msgs);
             this.commandlist = $(`<div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>`).appendTo(this.msgs);
@@ -137,20 +137,22 @@ body{
                 'ne': this.chatresizer
             }
         });
-        this.textarea.on("change keyup keydown input paste", function(e){
+        this.posts = [];
+        this.position = 0;
+        this.textarea.on("change keydown input paste", function(e){
             //down
             if (e.which == 40){
                 self.position--;
-                if (self.position < 0)
-                    self.position = 0;
-                self.textarea.value = self.posts[self.position] || '';
+                if (self.position < -1)
+                    self.position = -1;
+                this.value = self.posts[self.position] || '';
             }
             //up
             if (e.which == 38){
                 self.position++;
-                if (self.position > self.posts.length)
-                    self.position = self.posts.length-1;
-                self.textarea.value = self.posts[self.position] || '';
+                if (self.position > self.posts.length+1)
+                    self.position = self.posts.length+1;
+                this.value = self.posts[self.position] || '';
             }
             if (e.which == 13 && !e.shiftKey)
                 e.preventDefault();
@@ -209,10 +211,6 @@ body{
                 self.cfg.expanded = true;
             }
         });
-        
-        this.posts = [];
-        this.position = 0;
-
 
         this.chat.appendTo($('body'));
     }
@@ -352,8 +350,9 @@ body{
         }
         chat.user = $('.user');
         chat.getuserinfo = function(){
-            console.log($(this));
-            var im = new builder();
+            //console.log($(this)); //is user id/name
+            windows++;
+            var im = new builder(windows);
         }
         chat.user.click(chat.getuserinfo);
     });
@@ -448,5 +447,5 @@ body{
             self.videotoggle ? $('.iframe').show() : $('.iframe').hide();
         }
     };
-    let chat = new builder(1);
+    let chat = new builder(windows);
 </script>
