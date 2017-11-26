@@ -32,6 +32,7 @@ body{
     position:absolute;
     top: 0%;
     //width: -webkit-calc(100% - 15px);
+    width: 100%;
 }
 .inputcontainer .chatinput{
     position: absolute;
@@ -102,7 +103,7 @@ body{
             <div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>
         </div>
         <div id="inputcontainer" class="inputcontainer">
-            <div class="istyping">TEST</div>
+            <div class="istyping"></div>
             <textarea id="chatinput" class="chatinput" onpaste="chat.postmsg()" placeholder="Chat here! or /? for a list of commands." autofocus="autofocus"></textarea>
             <div id="cfg" class="cfg">&#x2699;</div>
         </div>
@@ -297,7 +298,7 @@ body{
                         chat.istyping.stop().animate({
                             color: args.text,
                             backgroundColor: args.bgformatted
-                        },1500);
+                        },2000);
                     });
                     chat.chatinput.stop().animate({
                         backgroundColor: 'white'
@@ -377,7 +378,7 @@ body{
         } else if (data.length == 1){
             ret = data[0] + ' is typing...'
         } else {
-            ret = '';
+            ret = ' ';
         }
         chat.istyping.html(ret);
     });
