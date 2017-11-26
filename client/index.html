@@ -33,15 +33,18 @@ body{
     top: 0%;
     //width: -webkit-calc(100% - 15px);
     width: 100%;
+    height: 30%;
+    line-height: 1.3;
 }
 .inputcontainer .chatinput{
     position: absolute;
-    top: 20%;
+    top: 30%;
     width: 100%;
-    height: 80%;
+    height: 70%;
     left: 0;
     resize: none;
     overflow: hidden;
+    border: 1px solid black;
 }
 .inputcontainer .cfg{
     z-index: 999;
@@ -103,8 +106,8 @@ body{
             <div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>
         </div>
         <div id="inputcontainer" class="inputcontainer">
-            <div class="istyping"></div>
-            <textarea id="chatinput" class="chatinput" onpaste="chat.postmsg()" placeholder="Chat here! or /? for a list of commands." autofocus="autofocus"></textarea>
+            <div class="istyping"> </div>
+            <textarea id="chatinput" class="chatinput" placeholder="Chat here! or /? for a list of commands." autofocus="autofocus"></textarea>
             <div id="cfg" class="cfg">&#x2699;</div>
         </div>
         <div id="chatresizer" class="resizer ui-resizable-handl ui-resizable-ne"></div>
@@ -166,9 +169,10 @@ body{
                 chat.position = chat.posts.length-1;
             chat.chatinput[0].value = chat.posts[chat.position] || '';
         }
-
+        if (e.which == 13 && !e.shiftKey)
+            e.preventDefault();
         //enter
-        if (e.which == 13 && !e.shiftKey) {
+        if (e.which == 13 && !e.shiftKey && chat.chatinput.val().trim().length>0) {
             e.preventDefault();
             let msg = chat.chatinput.val().trim(); 
             socket.emit('chatMsg', msg);
@@ -185,7 +189,7 @@ body{
             socket.emit('istyping', 0);
         }
     }
-    chat.chatinput.keyup(chat.postmsg);
+    chat.chatinput.on("change keyup keydown input paste", chat.postmsg);
 
 
     chat.cfg.expanded = true;
@@ -366,7 +370,6 @@ body{
     //data expects array
     socket.on('ischattinglist', (data) =>{
         let ret = '';
-        console.log(data);
         if (data.length > 4){
             ret = 'Many people are typing...'
         } else if (data.length < 5 && data.length > 1){

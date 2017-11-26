@@ -87,9 +87,8 @@ function getUsersTyping(){
     var ret = [];
     for (var i=0; i<SOCKET_CONNECTIONS.length; i++){
         if (SOCKET_CONNECTIONS[i].ischatting)
-            ret.push(SOCKET_CONNECTIONS[i]);
+            ret.push(SOCKET_CONNECTIONS[i].name || SOCKET_CONNECTIONS.indexOf(SOCKET_CONNECTIONS[i]));
     }
-    ret = getNames(ret)
     return ret;
 }
 
