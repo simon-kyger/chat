@@ -13,24 +13,57 @@ body{
     font-size: 14px;
     box-shadow: 0px 0px 1px 1px #888888;
 }
-
 .chat .msgs{
     overflow-y:scroll;
     width:100%;
-    height:90%;
+    height:85%;
 }
-#chatinput{
-    resize: vertical;
+.inputcontainer{
     width: 100%;
-    height: 50px;
-    bottom: 0px;
+    height: 15%;
     font-family: 'Lucida Console';
     font-size: 14px;
     position: absolute !important;
     white-space: pre-wrap;
     resize: none;
-    background-color: black;
     color: white;
+}
+.istyping{
+    position:absolute;
+    top: 0%;
+    //width: -webkit-calc(100% - 15px);
+}
+.inputcontainer .chatinput{
+    position: absolute;
+    top: 20%;
+    width: 100%;
+    height: 80%;
+    left: 0;
+    resize: none;
+    overflow: hidden;
+}
+.inputcontainer .cfg{
+    z-index: 999;
+    position: absolute;
+    right: 2%;
+    font-size: 32px;
+    bottom: 15%;
+    cursor: pointer;
+    -webkit-text-size-adjust:none;
+}
+.config{
+    position: absolute !important;
+    bottom: 0px;
+    right: 0px;
+    font-size: 14px;
+    width: 0%;
+    height: 0%;
+    opacity: 0;
+    border-color: rgb(0, 0, 0);
+    font-family: monospace;
+    border-style: solid;
+    border-width: 2px;
+    background-color: rgb(200, 200, 200);
 }
 .resizer {
     width: 15px;
@@ -55,30 +88,6 @@ body{
     padding-left: 1px;
     padding-bottom: 1px;
 }
-.cfg{
-    position: absolute !important;
-    bottom: 8px;
-    right: 8px;
-    font-weight: bold;
-    font-size: 28px;
-    color: silver;
-    z-index:999;
-    cursor:pointer;
-}
-.config{
-    position: absolute !important;
-    bottom: 0px;
-    right: 0px;
-    font-size: 14px;
-    width: 0%;
-    height: 0%;
-    opacity: 0;
-    border-color: rgb(0, 0, 0);
-    font-family: monospace;
-    border-style: solid;
-    border-width: 2px;
-    background-color: rgb(200, 200, 200);
-}
 .redshadow{
     text-shadow: 2px 2px 8px #FF0000;
     font-weight: bold;
@@ -92,10 +101,13 @@ body{
             <div>&nbsp; &nbsp; github --> <a href ="https://github.com/simon-kyger/chat" target="_blank">https://github.com/simon-kyger/chat</a></br></div>
             <div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>
         </div>
-        <textarea id="chatinput" class="chatinput" placeholder="Chat here! or /? for a list of commands." autofocus="autofocus"></textarea>
+        <div id="inputcontainer" class="inputcontainer">
+            <div class="istyping">TEST</div>
+            <textarea id="chatinput" class="chatinput" onpaste="chat.postmsg()" placeholder="Chat here! or /? for a list of commands." autofocus="autofocus"></textarea>
+            <div id="cfg" class="cfg">&#x2699;</div>
+        </div>
         <div id="chatresizer" class="resizer ui-resizable-handl ui-resizable-ne"></div>
-        <div id="onlineusers" class="onlineusers"></div>
-        <div id="cfg" class="cfg">&#x2699;</div>
+        <div id="onlineusers" class="onlineusers"></div>   
         <div id="config" class="config">
             <input id="videotoggle" class="videotoggle" type="checkbox">Hide Videos<br>
             <input id="imagetoggle" class="imagetoggle" type="checkbox">Hide Images
@@ -121,6 +133,7 @@ body{
     chat.config = $('.config');
     chat.cfg.videostoggle = $('.videotoggle');
     chat.cfg.imagestoggle = $('.imagetoggle');
+    chat.istyping = $('.istyping');
     
 //events
     chat.resizable({
@@ -156,12 +169,19 @@ body{
         //enter
         if (e.which == 13 && !e.shiftKey) {
             e.preventDefault();
-            var msg = chat.chatinput.val().trim(); 
+            let msg = chat.chatinput.val().trim(); 
             socket.emit('chatMsg', msg);
             chat.posts.push(msg);
             chat.position = chat.posts.length;
             chat.chatinput[0].value = ''; // CLEAR TEXTAREA
             chat.scrollBottom();
+            socket.chatting = false;
+        }
+        //any other key
+        if (chat.chatinput.val().length){
+            socket.emit('istyping', 1);
+        } else{
+            socket.emit('istyping', 0);
         }
     }
     chat.chatinput.keyup(chat.postmsg);
@@ -207,38 +227,15 @@ body{
         }, 0); 
     });
 
-    chat.randomizedstartinganimation = (args)=> {
-        //more dragons be here
+    chat.getTheme = (args)=> {
         let bgformatted;
         let shadow;
         let text;
         let cinput;
-        if (args == 'off'){
-            text = `rgb(0,0,0)`;
-            bgformatted = shadow = `rgb(255,255,255)`;
-            chat.stop().animate({
-                boxShadow: shadow,
-                backgroundColor: bgformatted,
-            },200);
-            chat.printer.stop().animate({
-                color: text,
-                backgroundColor: bgformatted
-            },200);
-            chat.chatinput.stop().animate({
-                color: bgformatted,
-                backgroundColor: text
-            },200);
-            chat.config.stop().animate({
-                color: text,
-                backgroundColor: bgformatted
-            },200);
-            return;
-        }
-        args = args || 0;
         if (args > 0)
             text = 'black'
         else
-            text = 'lightgray';
+            text = 'white';
 
         let randomrgb = [((Math.floor(Math.random()*150)+55)+args), ((Math.floor(Math.random()*150)+55)+args), ((Math.floor(Math.random()*150)+55)+args)];
         let darker = [];
@@ -252,7 +249,18 @@ body{
         bgformatted = `rgb(${randomrgb[0]},${randomrgb[1]},${randomrgb[2]})`;
         shadow = `0 0 10px 1000px rgb(${darker[0]},${darker[1]},${darker[2]})`;
         cinput = `rgb(${darkest[0]},${darkest[1]},${darkest[2]})`;
+        let ret = {
+            bgformatted: bgformatted,
+            shadow: shadow,
+            cinput: cinput,
+            text: text
+        }
+        return ret;
+    }
 
+    chat.randomizedstartinganimation = (args)=> {
+        //dragons be here
+        args = chat.getTheme(args); 
         chat.stop().animate({
             top: `${Math.floor(Math.random()*99)}%`,
             left: `${Math.floor(Math.random()*99)}%`,
@@ -263,7 +271,7 @@ body{
             chat.stop().animate({
                 top: `${Math.floor(Math.random()*99)}%`,
                 left: `${Math.floor(Math.random()*99)}%`,
-                backgroundColor: bgformatted,
+                backgroundColor: args.bgformatted,
             }, 1000, null, ()=> {
                 chat.chatinput.stop().animate({
                     backgroundColor: '#e5e5e5'
@@ -278,24 +286,30 @@ body{
                         boxShadow: `1 1 1000px 100px 'silver'`
                     },400, null, ()=>{
                         chat.stop().animate({
-                            boxShadow: shadow
+                            boxShadow: args.shadow
                         },3000);
                         chat.printer.stop().animate({
-                            color: text,
-                            backgroundColor: bgformatted
+                            color: args.text,
+                            backgroundColor: args.bgformatted
+                            //doesn't work shamefully
+                            //textShadow: args.shadow
                         },2000);
+                        chat.istyping.stop().animate({
+                            color: args.text,
+                            backgroundColor: args.bgformatted
+                        },1500);
                     });
                     chat.chatinput.stop().animate({
                         backgroundColor: 'white'
                     },150, null, ()=>{
                         chat.chatinput.stop().animate({
-                            backgroundColor: cinput,
-                            color: text
+                            backgroundColor: args.cinput,
+                            color: args.text
                         }, 1500);
                     });
                     chat.config.stop().animate({
-                        backgroundColor: bgformatted,
-                        color: text
+                        backgroundColor: args.bgformatted,
+                        color: args.text
                     });
                     onlineusers.stop().animate({
                             opacity: 1
@@ -307,7 +321,7 @@ body{
 
 //a glorified animation
     $(document).ready(()=> {
-        chat.randomizedstartinganimation();
+        chat.randomizedstartinganimation(0);
         //glowing red text for banner and online users
         setInterval(()=> {
             $('.redshadow').animate({
@@ -322,8 +336,8 @@ body{
 //net
     //data expects data.chatmessages[].properties
     socket.on('addToChat', (data) => {
-        var shouldscroll = chat.printer.scrollTop() >= (chat.printer[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
-        var renderobj = new RenderingObject();
+        let shouldscroll = chat.printer.scrollTop() >= (chat.printer[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
+        let renderobj = new chat.RenderingObject();
         for (let i=0; i<data.chatmessages.length; i++){
             //evil dragons be here
             renderobj[data.chatmessages[i].action](data.chatmessages[i]);
@@ -336,7 +350,7 @@ body{
     socket.on('updateUsers', (data) => {
         onlineusers.empty();
         onlineusers.append('<div class="redshadow">Online Users: &nbsp</div>');
-        for (var i=0; i<data.length; i++){
+        for (let i=0; i<data.length; i++){
             if (isNaN(data[i]))
                 data[i] = data[i].replace(/\n/g, '<br>');
             onlineusers.append(`<div style="color:${data[i].color}">${data[i]}</div>`);
@@ -348,13 +362,57 @@ body{
         chat.chatinput.css("color", data);
     });
 
+    //data expects array
+    socket.on('ischattinglist', (data) =>{
+        let ret = '';
+        console.log(data);
+        if (data.length > 4){
+            ret = 'Many people are typing...'
+        } else if (data.length < 5 && data.length > 1){
+            for(let i=0; i<data.length; i++){
+                ret = ret + data[i] + ' and ';
+            }
+            ret = ret.substring(0, ret.length - 4);
+            ret += 'are typing...'
+        } else if (data.length == 1){
+            ret = data[0] + ' is typing...'
+        } else {
+            ret = '';
+        }
+        chat.istyping.html(ret);
+    });
+
     //data expects string
-    socket.on('changeTheme', (data) => {       
-        chat.randomizedstartinganimation(data);
+    socket.on('changeTheme', (data) => {     
+        if (data == 'off'){
+            chat.stop().animate({
+                boxShadow: `0 0 10px 1000px rgb(255,255,255)`,
+                backgroundColor: 'white',
+            },200);
+            chat.printer.stop().animate({
+                color: 'black',
+                backgroundColor: 'white'
+            },200);
+            chat.chatinput.stop().animate({
+                color: 'white',
+                backgroundColor: 'black'
+            },200);
+            chat.config.stop().animate({
+                color: 'black',
+                backgroundColor: 'white'
+            },200);
+            chat.istyping.stop().animate({
+                color: 'black',
+                backgroundColor: 'white'
+            });
+        } else {
+            let args = chat.getTheme(data); 
+            chat.randomizedstartinganimation(data);
+        }
     });
 
     
-    var RenderingObject = function() {
+    chat.RenderingObject = function() {
         this.renderText = (args) => {
             let div = `<div style="color:${args.color}; background-color:${args.bgcolor}; text-shadow: ${args.textshadow};">${args.date}<b> ${args.name} </b>${args.msg}</div>`;
             chat.printer.append(div);

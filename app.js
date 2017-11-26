@@ -23,7 +23,6 @@ server.listen(port);
 console.log(`Listening on port: ${port}`);
 
 var SOCKET_CONNECTIONS = [];
-
 //socket: object
 //description: consider this as a looping system, since sockets are persistant, 
 //the contents inside are always being evaluated.  this is the main loop of the program.
@@ -31,6 +30,7 @@ io.sockets.on('connection', (socket) => {
     init(socket);
     socket.on('disconnect', () => disconnects(socket));
     socket.on('chatMsg', (msg) => chatMsg(socket, msg));
+    socket.on('istyping', (bools) => istyping(socket, bools));
 });
 
 //socket: object
@@ -80,6 +80,27 @@ function disconnects(socket){
     SOCKET_CONNECTIONS.splice(temp, 1);
     for (let j =0; j < SOCKET_CONNECTIONS.length; j++){     
         SOCKET_CONNECTIONS[j].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
+        SOCKET_CONNECTIONS[j].emit('ischattinglist', getUsersTyping());
+    }
+}
+function getUsersTyping(){
+    var ret = [];
+    for (var i=0; i<SOCKET_CONNECTIONS.length; i++){
+        if (SOCKET_CONNECTIONS[i].ischatting)
+            ret.push(SOCKET_CONNECTIONS[i]);
+    }
+    ret = getNames(ret)
+    return ret;
+}
+
+function istyping(socket, bools){
+    if (bools)
+        socket.ischatting = true;
+    else
+        socket.ischatting = false;
+    let ret = getUsersTyping();
+    for (var i=0; i<SOCKET_CONNECTIONS.length; i++){
+        SOCKET_CONNECTIONS[i].emit('ischattinglist', ret);
     }
 }
 
@@ -429,7 +450,7 @@ function getNames(arg){
         if(arg[i].name)
             temp = arg[i].name.trim();
         else
-            temp = i;
+            temp = String(i);
         ret.push(temp)
     }
     return ret;
