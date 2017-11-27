@@ -384,22 +384,26 @@ body{
     //data expects string
     socket.on('changeTheme', (data) => {     
         if (data == 'off'){
-            chat.stop().animate({
+            chat.chat.stop().animate({
                 boxShadow: `0 0 10px 1000px rgb(255,255,255)`,
                 backgroundColor: 'white',
-            },200);
-            chat.printer.stop().animate({
+            });
+            chat.msgs.stop().animate({
                 color: 'black',
                 backgroundColor: 'white'
-            },200);
-            chat.chatinput.stop().animate({
+            });
+            chat.textarea.stop().animate({
                 color: 'white',
                 backgroundColor: 'black'
-            },200);
+            });
+            chat.inputcontainer.stop().animate({
+                color: 'white',
+                backgroundColor: 'black'
+            });
             chat.config.stop().animate({
                 color: 'black',
                 backgroundColor: 'white'
-            },200);
+            });
             chat.istyping.stop().animate({
                 color: 'black',
                 backgroundColor: 'white'
