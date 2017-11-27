@@ -150,8 +150,8 @@ body{
             //up
             if (e.which == 38){
                 self.position++;
-                if (self.position > self.posts.length+1)
-                    self.position = self.posts.length+1;
+                if (self.position > self.posts.length)
+                    self.position = self.posts.length;
                 this.value = self.posts[self.position] || '';
             }
             if (e.which == 13 && !e.shiftKey)
@@ -161,7 +161,7 @@ body{
             if (e.which == 13 && !e.shiftKey && this.value.trim().length>0) {
                 e.preventDefault();
                 let msg = this.value.trim(); 
-                socket.emit('chatMsg', msg);
+                socket.emit('chatMsg', {msg: msg, id: this.id});
                 self.posts.push(msg);
                 self.position = self.posts.length;
                 this.value = ''; // CLEAR TEXTAREA

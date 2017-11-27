@@ -104,10 +104,13 @@ function istyping(socket, bools){
 }
 
 //socket: object
-//msg: string
+//msg: object
 //returns: void
 function chatMsg(socket, msg){ 
     const now = new moment();
+    var id = msg.id;
+    msg = msg.msg;
+    console.log(msg);
     if (msg.indexOf('<') > -1)
         msg = msg.replace(new RegExp(/</, 'g'), '&lt');
     if (msg.substr(0, 1) == '/'){
