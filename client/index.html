@@ -359,7 +359,7 @@ body{
 
     //data expects string
     socket.on('changeInputFontColor', (data) => {
-        chat.chatinput.css("color", data);
+        chat.textarea.css("color", data);
     });
 
     //data expects array
@@ -417,7 +417,7 @@ body{
     
     builder.RenderingObject = function(self) {
         this.renderText = (args) => {
-            let div = `<div style="color:${args.color}; background-color:${args.bgcolor}; text-shadow: ${args.textshadow};">${args.date}<b> ${args.name} </b>${args.msg}</div>`;
+            let div = `<div background-color:${args.bgcolor}; text-shadow: ${args.textshadow};">${args.date}<b> ${args.name} </b><span style="color:${args.color};">${args.msg}</span></div>`;
             self.msgs.append(div);
         },
         this.renderImage = (args) => {

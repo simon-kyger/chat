@@ -167,6 +167,16 @@ function command(socket, msg){
             break;
         case '/color':
             socket.color = mod;
+            send = {
+                chatmessages: [{
+                    action: 'renderText',
+                    date: now.format("HH:mm:ss"),
+                    name: ``,
+                    msg:  `Your color is now <span style="color: ${mod};">${mod}</span>.`,
+                    color: `black`
+                }]
+            }
+            socket.emit('addToChat', send);
             socket.emit('changeInputFontColor', socket.color);
             break;
         case '/gif':
@@ -309,7 +319,7 @@ function changename(socket, mod){
                 date: now.format("HH:mm:ss"),
                 name: ``,
                 msg:  `<b>${oldname}</b> is now known as: <b>${socket.name}</b>`, 
-                color: `silver`
+                color: `white`
             }]
         };
         for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
