@@ -1,5 +1,5 @@
 const express = require('express');
-const app = express();  
+const app = express();
 const server = require('http').Server(app);
 const fs = require('fs');
 const path = require('path');
@@ -11,20 +11,24 @@ const isImage = require('is-image');
 const port = 80;
 const youtubenode = require('youtube-node');
 const youtube = new youtubenode();
-var apikeys = {};
-loadapikeys();
-
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/client/index.html');
+const apiKeys = require('./apiKeys');
+let keys = {};
+// should really store api keys in .env.
+// right now, api keys are read in asynchronously and may not be available at time of need
+['youtube', 'giphy'].forEach((path) => {
+    apiKeys.getApiKey(path)
+        .then(key => keys[path] = key)
+        .catch(err => console.log(err))
 });
 
+app.get('/', (req, res) => res.sendFile(`${__dirname}/client/index.html`));
 
 server.listen(port);
 console.log(`Listening on port: ${port}`);
 
-var SOCKET_CONNECTIONS = [];
+let SOCKET_CONNECTIONS = [];
 //socket: object
-//description: consider this as a looping system, since sockets are persistant, 
+//description: consider this as a looping system, since sockets are persistant,
 //the contents inside are always being evaluated.  this is the main loop of the program.
 io.sockets.on('connection', (socket) => {
     init(socket);
@@ -37,15 +41,13 @@ io.sockets.on('connection', (socket) => {
 //returns: void
 //description: static method that only occurs once per connection to server is establish
 function init(socket){
-    const now = new moment();
     SOCKET_CONNECTIONS.push(socket);
-    var address = socket.request.connection.remoteAddress;
     let send = {
         chatmessages: [{
             action: 'renderText',
-            date: now.format("HH:mm:ss"),
+            date:  moment().format("HH:mm:ss"),
             name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
-            msg:  `User ${address} has connected.`,
+            msg:  `User ${socket.request.connection.remoteAddress} has connected.`,
             color: socket.color
         }]
     };
@@ -55,16 +57,25 @@ function init(socket){
     }
 }
 
+const getUsersTyping = () => {
+    return SOCKET_CONNECTIONS.reduce((typers, connection) => {
+        if (connection.ischatting) {
+            typers.push(connection.name || SOCKET_CONNECTIONS.indexOf(connection))
+        }
+
+        return typers;
+    }, []);
+};
+
 //socket: object
 //returns: void
 //description: events that occur after a user disconnects from the server
 function disconnects(socket){
-    const now = new moment();
     let temp; //storing disconnected user
     let send = {
         chatmessages: [{
             action: 'renderText',
-            date: now.format("HH:mm:ss"),
+            date: moment().format("HH:mm:ss"),
             name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
             msg:  `User ${SOCKET_CONNECTIONS.indexOf(socket)} has disconnected.`,
             color: socket.color
@@ -78,25 +89,14 @@ function disconnects(socket){
         SOCKET_CONNECTIONS[i].emit('addToChat', send);
     }
     SOCKET_CONNECTIONS.splice(temp, 1);
-    for (let j =0; j < SOCKET_CONNECTIONS.length; j++){     
+    for (let j =0; j < SOCKET_CONNECTIONS.length; j++){
         SOCKET_CONNECTIONS[j].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
         SOCKET_CONNECTIONS[j].emit('ischattinglist', getUsersTyping());
     }
 }
-function getUsersTyping(){
-    var ret = [];
-    for (var i=0; i<SOCKET_CONNECTIONS.length; i++){
-        if (SOCKET_CONNECTIONS[i].ischatting)
-            ret.push(SOCKET_CONNECTIONS[i].name || SOCKET_CONNECTIONS.indexOf(SOCKET_CONNECTIONS[i]));
-    }
-    return ret;
-}
 
 function istyping(socket, bools){
-    if (bools)
-        socket.ischatting = true;
-    else
-        socket.ischatting = false;
+    socket.ischatting = !!bools;
     let ret = getUsersTyping();
     for (var i=0; i<SOCKET_CONNECTIONS.length; i++){
         SOCKET_CONNECTIONS[i].emit('ischattinglist', ret);
@@ -106,7 +106,7 @@ function istyping(socket, bools){
 //socket: object
 //msg: object
 //returns: void
-function chatMsg(socket, msg){ 
+function chatMsg(socket, msg){
     const now = new moment();
     var id = msg.id;
     msg = msg.msg;
@@ -318,7 +318,7 @@ function changename(socket, mod){
                 action: 'renderText',
                 date: now.format("HH:mm:ss"),
                 name: ``,
-                msg:  `<b>${oldname}</b> is now known as: <b>${socket.name}</b>`, 
+                msg:  `<b>${oldname}</b> is now known as: <b>${socket.name}</b>`,
                 color: `white`
             }]
         };
@@ -363,7 +363,7 @@ function giphyrequest(socket, mod){
                     name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
                     msg:  `Search query-> ${mod}`,
                     color: `red`
-                },{ 
+                },{
                     action: 'renderStaticImage',
                     date:   ``,
                     name:   ``,
@@ -432,16 +432,16 @@ function giphyrequest(socket, mod){
                         name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
                         msg:  `Search query->'${mod}'`,
                         color: `red`
-                    },{ 
+                    },{
                         action: 'renderText',
                         date: now.format("HH:mm:ss"),
                         name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
                         msg:  `Sorry about that, here's a sad puppy instead:`,
                         color: `red`
-                    },{ 
+                    },{
                         action: 'renderStaticImage',
                         date:   ``,
-                        name:   ``, 
+                        name:   ``,
                         image:  data.toString("base64"),
                     }]
                 };
@@ -453,7 +453,7 @@ function giphyrequest(socket, mod){
 
 //arg: array
 //returns: array
-//description: basically how to get the names of all connected clients 
+//description: basically how to get the names of all connected clients
 //even if they are still an array index
 function getNames(arg){
     let ret =[];
@@ -466,25 +466,6 @@ function getNames(arg){
         ret.push(temp)
     }
     return ret;
-}
-
-//description: loads api keys from root/apikeys and pushes them onto global apikeys
-function loadapikeys(){
-    fs.readFile('./apikeys/youtubekey.txt', 'utf8', function (err,data) {
-        if (err) {
-            console.log('Could not find /apikeys/youtubekey.txt file in ' + __dirname);
-            console.log('/gif command has been disabled');
-        }
-        apikeys.youtube = data;
-        youtube.setKey(data);
-    });
-    fs.readFile('./apikeys/giphykey.txt', 'utf8', function (err,data) {
-        if (err) {
-            console.log('Could not find /apikeys/giphykey.txt file in ' + __dirname);
-            console.log('/yt command has been disabled');
-        }
-        apikeys.giphy = data
-    });
 }
 
 //socket: object
