@@ -5,32 +5,70 @@ body{
 }
 .chat{
     position:absolute !important;
-    width: 0%;
-    height: 0%;
-    opacity: 0;
+    width: 55%;
+    height: 55%;
+    opacity: 1;
     overflow:hidden;
     font-family: 'Lucida Console';
     font-size: 14px;
     box-shadow: 0px 0px 1px 1px #888888;
 }
-
 .chat .msgs{
     overflow-y:scroll;
     width:100%;
-    height:90%;
+    height:85%;
 }
-#chatinput{
-    resize: vertical;
+.inputcontainer{
     width: 100%;
-    height: 50px;
-    bottom: 0px;
+    height: 15%;
     font-family: 'Lucida Console';
     font-size: 14px;
     position: absolute !important;
     white-space: pre-wrap;
     resize: none;
-    background-color: black;
     color: white;
+    bottom: 0%;
+}
+.istyping{
+    position:absolute;
+    top: 0%;
+    //width: -webkit-calc(100% - 15px);
+    width: 100%;
+    height: 30%;
+    line-height: 1.3;
+}
+.inputcontainer .chatinput{
+    position: absolute;
+    top: 30%;
+    width: 100%;
+    height: 70%;
+    left: 0;
+    resize: none;
+    overflow: hidden;
+    border: 1px solid black;
+}
+.inputcontainer .cfg{
+    z-index: 999;
+    position: absolute;
+    right: 2%;
+    font-size: 32px;
+    bottom: 10%;
+    cursor: pointer;
+    -webkit-text-size-adjust:none;
+}
+.config{
+    position: absolute !important;
+    bottom: 0px;
+    right: 0px;
+    font-size: 14px;
+    width: 0%;
+    height: 0%;
+    opacity: 0;
+    border-color: rgb(0, 0, 0);
+    font-family: monospace;
+    border-style: solid;
+    border-width: 2px;
+    background-color: rgb(200, 200, 200);
 }
 .resizer {
     width: 15px;
@@ -55,30 +93,6 @@ body{
     padding-left: 1px;
     padding-bottom: 1px;
 }
-.cfg{
-    position: absolute !important;
-    bottom: 8px;
-    right: 8px;
-    font-weight: bold;
-    font-size: 28px;
-    color: silver;
-    z-index:999;
-    cursor:pointer;
-}
-.config{
-    position: absolute !important;
-    bottom: 0px;
-    right: 0px;
-    font-size: 14px;
-    width: 0%;
-    height: 0%;
-    opacity: 0;
-    border-color: rgb(0, 0, 0);
-    font-family: monospace;
-    border-style: solid;
-    border-width: 2px;
-    background-color: rgb(200, 200, 200);
-}
 .redshadow{
     text-shadow: 2px 2px 8px #FF0000;
     font-weight: bold;
@@ -86,21 +100,6 @@ body{
 </style>
 </head>
 <body>
-    <div id="chat" class="chat"">
-        <div class="msgs">
-            <div class="redshadow">Welcome to the proper lunch chat channel!</br></div>
-            <div>&nbsp; &nbsp; github --> <a href ="https://github.com/simon-kyger/chat" target="_blank">https://github.com/simon-kyger/chat</a></br></div>
-            <div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>
-        </div>
-        <textarea id="chatinput" class="chatinput" placeholder="Chat here! or /? for a list of commands." autofocus="autofocus"></textarea>
-        <div id="chatresizer" class="resizer ui-resizable-handl ui-resizable-ne"></div>
-        <div id="onlineusers" class="onlineusers"></div>
-        <div id="cfg" class="cfg">&#x2699;</div>
-        <div id="config" class="config">
-            <input id="videotoggle" class="videotoggle" type="checkbox">Hide Videos<br>
-            <input id="imagetoggle" class="imagetoggle" type="checkbox">Hide Images
-        </div>
-    </div>
 </body>
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
@@ -111,134 +110,125 @@ body{
 <script>
 //globals
     let socket = io();
-    let chat = $('.chat');
-    let onlineusers = $('.onlineusers');
-    chat.posts = [];
-    chat.position = 0;
-    chat.printer = $('.msgs', chat);
-    chat.chatinput = $('.chatinput', chat);
-    chat.cfg = $('.cfg');
-    chat.config = $('.config');
-    chat.cfg.videostoggle = $('.videotoggle');
-    chat.cfg.imagestoggle = $('.imagetoggle');
-    
-//events
-    chat.resizable({
-        handles: {
-            'ne': '#chatresizer'
+    var windows = 0;
+    var builder = function(args){
+        var self = this;
+        this.chat = $(`<div id="chat${args}" class="chat">`);
+        this.inputcontainer = $(`<div id="inputcontainer${args}" class="inputcontainer">`).appendTo(this.chat);
+        this.msgs = $(`<div id="msgs${args}" class="msgs">`).appendTo(this.chat);
+        this.config = $(`<div id="config${args}" class="config">`).appendTo(this.chat);
+        this.chatresizer = $(`<div id="chatresizer${args}" class="resizer ui-resizable-handl ui-resizable-ne">`).appendTo(this.chat);
+        this.videotoggle = $(`<input id="videotoggle${args}" class="videotoggle" type="checkbox">Hide Videos<br>`).appendTo(this.config);
+        this.imagetoggle = $(`<input id="imagetoggle${args}" class="imagetoggle" type="checkbox">Hide Images</input>`).appendTo(this.config);        
+        this.cfg = $(`<div id="cfg${args}" class="cfg">&#x2699;</div>`).appendTo(this.inputcontainer);
+        this.textarea = $(`<textarea id="chatinput${args}" class="chatinput" placeholder="Chat here! or /? for a list of commands." autofocus="autofocus"></textarea>`).appendTo(this.inputcontainer);
+        this.istyping = $(`<div class="istyping"></div>`).appendTo(this.inputcontainer);
+        if (!args){
+            this.welcome = $(`<div class="redshadow">Welcome to the proper lunch chat channel!</br></div>`).appendTo(this.msgs);
+            this.githublink = $(`<div>&nbsp; &nbsp; github --> <a href="https://github.com/simon-kyger/chat" target="_blank">https://github.com/simon-kyger/chat</a></br></div>`).appendTo(this.msgs);
+            this.commandlist = $(`<div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>`).appendTo(this.msgs);
+            this.onlineusers = $(`<div id="onlineusers" class="onlineusers"></div>`).appendTo(this.chat);
         }
-    });
-    chat.draggable({
-        containment: "body"
-    });
-    chat.scrollBottom = () => {
-        chat.printer.stop().animate({ 
-            scrollTop: chat.printer[0].scrollHeight
+        this.chat.draggable({
+            containment: "body"
+        });
+        this.chat.resizable({
+            handles: {
+                'ne': this.chatresizer
+            }
+        });
+        this.posts = [];
+        this.position = 0;
+        this.textarea.on("change keydown input paste", function(e){
+            //down
+            if (e.which == 40){
+                self.position--;
+                if (self.position < -1)
+                    self.position = -1;
+                this.value = self.posts[self.position] || '';
+            }
+            //up
+            if (e.which == 38){
+                self.position++;
+                if (self.position > self.posts.length)
+                    self.position = self.posts.length;
+                this.value = self.posts[self.position] || '';
+            }
+            if (e.which == 13 && !e.shiftKey)
+                e.preventDefault();
+            //enter
+
+            if (e.which == 13 && !e.shiftKey && this.value.trim().length>0) {
+                e.preventDefault();
+                let msg = this.value.trim(); 
+                socket.emit('chatMsg', {msg: msg, id: this.id});
+                self.posts.push(msg);
+                self.position = self.posts.length;
+                this.value = ''; // CLEAR TEXTAREA
+                self.scrollBottom();
+                socket.chatting = false;
+            }
+            //any other key
+            if (this.value.length){
+                socket.emit('istyping', 1);
+            } else{
+                socket.emit('istyping', 0);
+            }
+        });
+        this.videotoggle.on('change', function() {
+            self.videotoggle ? $('.iframe').hide() : $('.iframe').show();
+            self.videotoggle = !self.videotoggle;
+            self.msgs.stop().animate({ 
+                scrollTop: self.msgs.scrollHeight
+            }, 0); 
+        });
+        this.imagetoggle.on('change', function(){
+            self.imagetoggle ? $('.imgs').hide() : $('.imgs').show();
+            self.imagetoggle = !self.imagetoggle;
+            self.msgs.stop().animate({ 
+                scrollTop: self.msgs.scrollHeight
+            }, 0); 
+        });
+        this.cfg.expanded = false;
+        this.cfg.click(function(){
+            if (self.cfg.expanded){
+                self.config.animate({
+                    width: "0%",
+                    height: "0%",
+                    opacity: 0,
+                    fontSize: "0",
+                    borderWidth: "20px"
+                }, 500 );
+                self.cfg.expanded = false;
+            } else {
+                self.config.animate({
+                    width: "20%",
+                    height: "30%",
+                    opacity: 0.8,
+                    fontSize: "14",
+                    borderWidth: "2px"
+                }, 500 );
+                self.cfg.expanded = true;
+            }
+        });
+
+        this.chat.appendTo($('body'));
+    }
+    builder.prototype.scrollBottom = function() {
+        this.msgs.stop().animate({ 
+            scrollTop: this.msgs[0].scrollHeight
         }, 1000); // SET SCROLLER TO BOTTOM
     }
-    chat.scrollBottom();
-    chat.postmsg = (e) => {
-        //down
-        if (e.which == 40){
-            chat.position--;
-            if (chat.position < 0)
-                chat.position = -1;
-            chat.chatinput[0].value = chat.posts[chat.position] || '';
-        }
-        //up
-        if (e.which == 38){
-            chat.position++;
-            if (chat.position > chat.posts.length)
-                chat.position = chat.posts.length-1;
-            chat.chatinput[0].value = chat.posts[chat.position] || '';
-        }
 
-        //enter
-        if (e.which == 13 && !e.shiftKey) {
-            e.preventDefault();
-            var msg = chat.chatinput.val().trim(); 
-            socket.emit('chatMsg', msg);
-            chat.posts.push(msg);
-            chat.position = chat.posts.length;
-            chat.chatinput[0].value = ''; // CLEAR TEXTAREA
-            chat.scrollBottom();
-        }
-    }
-    chat.chatinput.keyup(chat.postmsg);
-
-
-    chat.cfg.expanded = true;
-    chat.cfg.expand = () => {
-        if (chat.cfg.expanded){
-            chat.config.animate({
-                width: "0%",
-                height: "0%",
-                opacity: 0,
-                fontSize: "0",
-                borderWidth: "20px"
-            }, 500 );
-            chat.cfg.expanded = false;
-        } else {
-            chat.config.animate({
-                width: "20%",
-                height: "30%",
-                opacity: 0.8,
-                fontSize: "14",
-                borderWidth: "2px"
-            }, 500 );
-            chat.cfg.expanded = true;
-        }
-    }
-    chat.cfg.click(chat.cfg.expand);
-    chat.cfg.click();
-
-    chat.cfg.videostoggle.on('change', ()=> {
-        chat.cfg.videostoggle ? $('.iframe').hide() : $('.iframe').show();
-        chat.cfg.videostoggle = !chat.cfg.videostoggle;
-        chat.printer.stop().animate({ 
-            scrollTop: chat.printer[0].scrollHeight
-        }, 0); 
-    });
-    chat.cfg.imagestoggle.on('change', ()=> {
-        chat.cfg.imagestoggle ? $('.imgs').hide() : $('.imgs').show();
-        chat.cfg.imagestoggle = !chat.cfg.imagestoggle;
-        chat.printer.stop().animate({ 
-            scrollTop: chat.printer[0].scrollHeight
-        }, 0); 
-    });
-
-    chat.randomizedstartinganimation = (args)=> {
-        //more dragons be here
+    builder.prototype.getTheme = function(args) {
         let bgformatted;
         let shadow;
         let text;
         let cinput;
-        if (args == 'off'){
-            text = `rgb(0,0,0)`;
-            bgformatted = shadow = `rgb(255,255,255)`;
-            chat.stop().animate({
-                boxShadow: shadow,
-                backgroundColor: bgformatted,
-            },200);
-            chat.printer.stop().animate({
-                color: text,
-                backgroundColor: bgformatted
-            },200);
-            chat.chatinput.stop().animate({
-                color: bgformatted,
-                backgroundColor: text
-            },200);
-            chat.config.stop().animate({
-                color: text,
-                backgroundColor: bgformatted
-            },200);
-            return;
-        }
-        args = args || 0;
         if (args > 0)
             text = 'black'
         else
-            text = 'lightgray';
+            text = 'white';
 
         let randomrgb = [((Math.floor(Math.random()*150)+55)+args), ((Math.floor(Math.random()*150)+55)+args), ((Math.floor(Math.random()*150)+55)+args)];
         let darker = [];
@@ -252,52 +242,69 @@ body{
         bgformatted = `rgb(${randomrgb[0]},${randomrgb[1]},${randomrgb[2]})`;
         shadow = `0 0 10px 1000px rgb(${darker[0]},${darker[1]},${darker[2]})`;
         cinput = `rgb(${darkest[0]},${darkest[1]},${darkest[2]})`;
+        let ret = {
+            bgformatted: bgformatted,
+            shadow: shadow,
+            cinput: cinput,
+            text: text
+        }
+        return ret;
+    }
 
-        chat.stop().animate({
+    builder.prototype.randomizedstartinganimation = function(args) {
+        //dragons be here
+        args = this.getTheme(args); 
+        this.chat.stop().animate({
             top: `${Math.floor(Math.random()*99)}%`,
             left: `${Math.floor(Math.random()*99)}%`,
             width: '15px',
             height: '15px',
             opacity: '1.0',
         }, 0, null, ()=> {
-            chat.stop().animate({
+            this.chat.stop().animate({
                 top: `${Math.floor(Math.random()*99)}%`,
                 left: `${Math.floor(Math.random()*99)}%`,
-                backgroundColor: bgformatted,
+                backgroundColor: args.bgformatted,
             }, 1000, null, ()=> {
-                chat.chatinput.stop().animate({
+                this.textarea.stop().animate({
                     backgroundColor: '#e5e5e5'
                 }, 1500);
-                chat.stop().animate({ 
+                this.chat.stop().animate({ 
                     top: '0px',
                     left: '0px',
                     height: '50%',
                     width: '50%',
                 }, 1500, null, ()=> {
-                    chat.stop().animate({
+                    this.chat.stop().animate({
                         boxShadow: `1 1 1000px 100px 'silver'`
                     },400, null, ()=>{
-                        chat.stop().animate({
-                            boxShadow: shadow
+                        this.chat.stop().animate({
+                            boxShadow: args.shadow
                         },3000);
-                        chat.printer.stop().animate({
-                            color: text,
-                            backgroundColor: bgformatted
+                        this.msgs.stop().animate({
+                            color: args.text,
+                            backgroundColor: args.bgformatted
+                            //doesn't work shamefully
+                            //textShadow: args.shadow
+                        },2000);
+                        this.istyping.stop().animate({
+                            color: args.text,
+                            backgroundColor: args.bgformatted
                         },2000);
                     });
-                    chat.chatinput.stop().animate({
+                    this.textarea.stop().animate({
                         backgroundColor: 'white'
                     },150, null, ()=>{
-                        chat.chatinput.stop().animate({
-                            backgroundColor: cinput,
-                            color: text
+                        this.textarea.stop().animate({
+                            backgroundColor: args.cinput,
+                            color: args.text
                         }, 1500);
                     });
-                    chat.config.stop().animate({
-                        backgroundColor: bgformatted,
-                        color: text
+                    this.config.stop().animate({
+                        backgroundColor: args.bgformatted,
+                        color: args.text
                     });
-                    onlineusers.stop().animate({
+                    this.onlineusers.stop().animate({
                             opacity: 1
                     }, 1500);
                 });
@@ -307,7 +314,7 @@ body{
 
 //a glorified animation
     $(document).ready(()=> {
-        chat.randomizedstartinganimation();
+        chat.randomizedstartinganimation(0);
         //glowing red text for banner and online users
         setInterval(()=> {
             $('.redshadow').animate({
@@ -322,8 +329,8 @@ body{
 //net
     //data expects data.chatmessages[].properties
     socket.on('addToChat', (data) => {
-        var shouldscroll = chat.printer.scrollTop() >= (chat.printer[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
-        var renderobj = new RenderingObject();
+        let shouldscroll = chat.msgs.scrollTop() >= (chat.msgs[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
+        let renderobj = new builder.RenderingObject(chat);
         for (let i=0; i<data.chatmessages.length; i++){
             //evil dragons be here
             renderobj[data.chatmessages[i].action](data.chatmessages[i]);
@@ -334,49 +341,103 @@ body{
 
     //data expects array
     socket.on('updateUsers', (data) => {
-        onlineusers.empty();
-        onlineusers.append('<div class="redshadow">Online Users: &nbsp</div>');
-        for (var i=0; i<data.length; i++){
+        chat.onlineusers.empty();
+        chat.onlineusers.append('<div class="redshadow">Online Users: &nbsp</div>');
+        for (let i=0; i<data.length; i++){
             if (isNaN(data[i]))
                 data[i] = data[i].replace(/\n/g, '<br>');
-            onlineusers.append(`<div style="color:${data[i].color}">${data[i]}</div>`);
+            chat.onlineusers.append(`<div class="user" style="color:${data[i].color}">${data[i]}</div>`);
         }
+        chat.user = $('.user');
+        chat.getuserinfo = function(){
+            //console.log($(this)); //is user id/name
+            windows++;
+            var im = new builder(windows);
+        }
+        chat.user.click(chat.getuserinfo);
     });
 
     //data expects string
     socket.on('changeInputFontColor', (data) => {
-        chat.chatinput.css("color", data);
+        chat.textarea.css("color", data);
+    });
+
+    //data expects array
+    socket.on('ischattinglist', (data) =>{
+        let ret = '';
+        if (data.length > 4){
+            ret = 'Many people are typing...'
+        } else if (data.length < 5 && data.length > 1){
+            for(let i=0; i<data.length; i++){
+                ret = ret + data[i] + ' and ';
+            }
+            ret = ret.substring(0, ret.length - 4);
+            ret += 'are typing...'
+        } else if (data.length == 1){
+            ret = data[0] + ' is typing...'
+        } else {
+            ret = ' ';
+        }
+        chat.istyping.html(ret);
     });
 
     //data expects string
-    socket.on('changeTheme', (data) => {       
-        chat.randomizedstartinganimation(data);
+    socket.on('changeTheme', (data) => {     
+        if (data == 'off'){
+            chat.chat.stop().animate({
+                boxShadow: `0 0 10px 1000px rgb(255,255,255)`,
+                backgroundColor: 'white',
+            });
+            chat.msgs.stop().animate({
+                color: 'black',
+                backgroundColor: 'white'
+            });
+            chat.textarea.stop().animate({
+                color: 'white',
+                backgroundColor: 'black'
+            });
+            chat.inputcontainer.stop().animate({
+                color: 'white',
+                backgroundColor: 'black'
+            });
+            chat.config.stop().animate({
+                color: 'black',
+                backgroundColor: 'white'
+            });
+            chat.istyping.stop().animate({
+                color: 'black',
+                backgroundColor: 'white'
+            });
+        } else {
+            let args = chat.getTheme(data); 
+            chat.randomizedstartinganimation(data);
+        }
     });
 
     
-    var RenderingObject = function() {
+    builder.RenderingObject = function(self) {
         this.renderText = (args) => {
-            let div = `<div style="color:${args.color}; background-color:${args.bgcolor}; text-shadow: ${args.textshadow};">${args.date}<b> ${args.name} </b>${args.msg}</div>`;
-            chat.printer.append(div);
+            let div = `<div background-color:${args.bgcolor}; text-shadow: ${args.textshadow};">${args.date}<b> ${args.name} </b><span style="color:${args.color};">${args.msg}</span></div>`;
+            self.msgs.append(div);
         },
         this.renderImage = (args) => {
             let img = `<a href="${args.msg}" target="_blank"><img class="imgs" src="${args.msg}" target="_blank" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img></a>`;
             let link = `<a href="${args.msg}" target="_blank">${args.msg}</a>`;
-            let div = `<div style="color:${args.color};">${args.date}<b> ${args.name} </b>${link}<br>${img}</div>`
-            chat.printer.append(div);
-            chat.cfg.imagestoggle ? $('.imgs').show() : $('.imgs').hide();
+            let div = $(`<div style="color:${args.color};">${args.date}<b> ${args.name} </b>${link}<br>${img}</div>`);
+            div.appendTo(self.msgs);
+            self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
             //lolfun $('.imgs').draggable({containment: $('.msgs')});
         }
         this.renderStaticImage = (args) => {
             let img = `<img class="imgs" src="data:image/png;base64,${args.image}" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img>`;
             let div = `<div style ="color:${args.color};">${args.date}<b> ${args.name} </b>${img} </div>`
-            chat.printer.append(div);
-            chat.cfg.imagestoggle ? $('.imgs').show() : $('.imgs').hide();
+            self.msgs.append(div);
+            self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
         }
         this.renderCodeBlock = (args) => {
             let div = `<div style="color:${args.color};">${args.date}<b> ${args.name} CODEBLOCK:</b> 
                       </div><pre style="white-space: pre-wrap;"><code class="code" style="border-radius: 10px;">${args.msg.replace(/\n/g, '<br>')} </code></pre>`;
-            chat.printer.append(div);
+            self.msgs.append(div);
             $('.code').each(function(i, block) {
               hljs.highlightBlock(block);
             });
@@ -386,8 +447,9 @@ body{
             let link = `<a href="${url}">${url}</a>`;
             let iframe = `<iframe class="iframe" style="height: 300px; width: 500px" src="//www.youtube.com/embed/${args.msg}" allowfullscreen></iframe>`; 
             let div = `<div style="color:${args.color};">${args.date}<b> ${args.name} </b>${link}<br>${iframe}</div>`; 
-            chat.printer.append(div);
-            chat.cfg.videostoggle ? $('.iframe').show() : $('.iframe').hide();
+            self.msgs.append(div);
+            self.videotoggle ? $('.iframe').show() : $('.iframe').hide();
         }
     };
+    let chat = new builder(windows);
 </script>

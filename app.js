@@ -26,7 +26,6 @@ server.listen(port);
 console.log(`Listening on port: ${port}`);
 
 var SOCKET_CONNECTIONS = [];
-
 //socket: object
 //description: consider this as a looping system, since sockets are persistant, 
 //the contents inside are always being evaluated.  this is the main loop of the program.
@@ -34,6 +33,7 @@ io.sockets.on('connection', (socket) => {
     init(socket);
     socket.on('disconnect', () => disconnects(socket));
     socket.on('chatMsg', (msg) => chatMsg(socket, msg));
+    socket.on('istyping', (bools) => istyping(socket, bools));
 });
 
 //socket: object
@@ -83,14 +83,37 @@ function disconnects(socket){
     SOCKET_CONNECTIONS.splice(temp, 1);
     for (let j =0; j < SOCKET_CONNECTIONS.length; j++){     
         SOCKET_CONNECTIONS[j].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
+        SOCKET_CONNECTIONS[j].emit('ischattinglist', getUsersTyping());
+    }
+}
+function getUsersTyping(){
+    var ret = [];
+    for (var i=0; i<SOCKET_CONNECTIONS.length; i++){
+        if (SOCKET_CONNECTIONS[i].ischatting)
+            ret.push(SOCKET_CONNECTIONS[i].name || SOCKET_CONNECTIONS.indexOf(SOCKET_CONNECTIONS[i]));
+    }
+    return ret;
+}
+
+function istyping(socket, bools){
+    if (bools)
+        socket.ischatting = true;
+    else
+        socket.ischatting = false;
+    let ret = getUsersTyping();
+    for (var i=0; i<SOCKET_CONNECTIONS.length; i++){
+        SOCKET_CONNECTIONS[i].emit('ischattinglist', ret);
     }
 }
 
 //socket: object
-//msg: string
+//msg: object
 //returns: void
 function chatMsg(socket, msg){ 
     const now = new moment();
+    var id = msg.id;
+    msg = msg.msg;
+    console.log(msg);
     if (msg.indexOf('<') > -1)
         msg = msg.replace(new RegExp(/</, 'g'), '&lt');
     if (msg.substr(0, 1) == '/'){
@@ -147,6 +170,16 @@ function command(socket, msg){
             break;
         case '/color':
             socket.color = mod;
+            send = {
+                chatmessages: [{
+                    action: 'renderText',
+                    date: now.format("HH:mm:ss"),
+                    name: ``,
+                    msg:  `Your color is now <span style="color: ${mod};">${mod}</span>.`,
+                    color: `black`
+                }]
+            }
+            socket.emit('addToChat', send);
             socket.emit('changeInputFontColor', socket.color);
             break;
         case '/gif':
@@ -289,7 +322,7 @@ function changename(socket, mod){
                 date: now.format("HH:mm:ss"),
                 name: ``,
                 msg:  `<b>${oldname}</b> is now known as: <b>${socket.name}</b>`, 
-                color: `silver`
+                color: `white`
             }]
         };
         for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
@@ -432,7 +465,7 @@ function getNames(arg){
         if(arg[i].name)
             temp = arg[i].name.trim();
         else
-            temp = i;
+            temp = String(i);
         ret.push(temp)
     }
     return ret;
