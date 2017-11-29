@@ -14,7 +14,6 @@ const youtube = new youtubenode();
 const apiKeys = require('./apiKeys');
 let keys = {};
 // should really store api keys in .env.
-// right now, api keys are read in asynchronously and may not be available at time of need
 ['youtube', 'giphy'].forEach((path) => {
     apiKeys.getApiKey(path)
         .then(key => keys[path] = key)
@@ -47,14 +46,9 @@ function init(socket){
             action: 'renderText',
             date:  moment().format("HH:mm:ss"),
             name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
-<<<<<<< HEAD
-            msg:  `User ${address} has connected.`,
+            msg:  `User ${socket.request.connection.remoteAddress} has connected.`,
             color: socket.color,
             window: 0
-=======
-            msg:  `User ${socket.request.connection.remoteAddress} has connected.`,
-            color: socket.color
->>>>>>> 787e61a5f085af524d6e367c0a590b3043f8cac5
         }]
     };
     for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
@@ -241,13 +235,13 @@ function command(socket, msg){
 function youtuberequest(socket, mod){
     const now = new moment();
     let send;
-    if (!apikeys.youtube){
+    if (!keys.youtube){
         send = {
             chatmessages: [{
                 action: 'renderText',
                 date: now.format("HH:mm:ss"),
                 name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
-                msg:  `Server not configured for that command yet.`,
+                msg:  `Server not configured for that command.`,
                 color: `red`
             }]
         };
@@ -342,13 +336,13 @@ function changename(socket, mod){
 function giphyrequest(socket, mod){
     const now = new moment();
     let send;
-    if (!apikeys.giphy){
+    if (!keys.giphy){
         send = {
             chatmessages: [{
                 action: 'renderText',
                 date: now.format("HH:mm:ss"),
                 name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
-                msg:  `Server not configured for that command yet.`,
+                msg:  `Server not configured for that command.`,
                 color: `red`
             }]
         };
