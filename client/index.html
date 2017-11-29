@@ -113,6 +113,7 @@ body{
     var windows = 0;
     var builder = function(args){
         var self = this;
+        this.id = args;
         this.chat = $(`<div id="chat${args}" class="chat">`);
         this.inputcontainer = $(`<div id="inputcontainer${args}" class="inputcontainer">`).appendTo(this.chat);
         this.msgs = $(`<div id="msgs${args}" class="msgs">`).appendTo(this.chat);
@@ -127,7 +128,9 @@ body{
             this.welcome = $(`<div class="redshadow">Welcome to the proper lunch chat channel!</br></div>`).appendTo(this.msgs);
             this.githublink = $(`<div>&nbsp; &nbsp; github --> <a href="https://github.com/simon-kyger/chat" target="_blank">https://github.com/simon-kyger/chat</a></br></div>`).appendTo(this.msgs);
             this.commandlist = $(`<div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>`).appendTo(this.msgs);
-            this.onlineusers = $(`<div id="onlineusers" class="onlineusers"></div>`).appendTo(this.chat);
+            this.onlineusers = $(`<div id="onlineusers" class="onlineusers"></div>`); 
+            this.onlineusers.appendTo(this.chat);
+            this.someuser = $(`<div id="hiddenuser" class="user"></div>`).appendTo(this.onlineusers);
         }
         this.chat.draggable({
             containment: "body"
@@ -161,7 +164,7 @@ body{
             if (e.which == 13 && !e.shiftKey && this.value.trim().length>0) {
                 e.preventDefault();
                 let msg = this.value.trim(); 
-                socket.emit('chatMsg', {msg: msg, id: this.id});
+                socket.emit('chatMsg', {msg: msg, id: self.id});
                 self.posts.push(msg);
                 self.position = self.posts.length;
                 this.value = ''; // CLEAR TEXTAREA
@@ -240,7 +243,7 @@ body{
             randomrgb[i]-50 < 0 ? darkest.push(0) : darkest.push(randomrgb[i]-50);
         }
         bgformatted = `rgb(${randomrgb[0]},${randomrgb[1]},${randomrgb[2]})`;
-        shadow = `0 0 10px 1000px rgb(${darker[0]},${darker[1]},${darker[2]})`;
+        shadow = `0 0 10px 10000px rgb(${darker[0]},${darker[1]},${darker[2]})`;
         cinput = `rgb(${darkest[0]},${darkest[1]},${darkest[2]})`;
         let ret = {
             bgformatted: bgformatted,
@@ -314,7 +317,7 @@ body{
 
 //a glorified animation
     $(document).ready(()=> {
-        chat.randomizedstartinganimation(0);
+        chat[0].randomizedstartinganimation(0);
         //glowing red text for banner and online users
         setInterval(()=> {
             $('.redshadow').animate({
@@ -329,37 +332,36 @@ body{
 //net
     //data expects data.chatmessages[].properties
     socket.on('addToChat', (data) => {
-        let shouldscroll = chat.msgs.scrollTop() >= (chat.msgs[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
-        let renderobj = new builder.RenderingObject(chat);
+
+        let shouldscroll = chat[0].msgs.scrollTop() >= (chat[0].msgs[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
+        let renderobj = new builder.RenderingObject(chat[0]);
         for (let i=0; i<data.chatmessages.length; i++){
             //evil dragons be here
             renderobj[data.chatmessages[i].action](data.chatmessages[i]);
         }
         if (shouldscroll)
-            chat.scrollBottom();
+            chat[0].scrollBottom();
     });
 
     //data expects array
     socket.on('updateUsers', (data) => {
-        chat.onlineusers.empty();
-        chat.onlineusers.append('<div class="redshadow">Online Users: &nbsp</div>');
+        chat[0].onlineusers.empty();
+        chat[0].onlineusers.append('<div class="redshadow">Online Users: &nbsp</div>');
         for (let i=0; i<data.length; i++){
             if (isNaN(data[i]))
                 data[i] = data[i].replace(/\n/g, '<br>');
-            chat.onlineusers.append(`<div class="user" style="color:${data[i].color}">${data[i]}</div>`);
+            chat[0].onlineusers.append(`<div class="user" style="color:${data[i].color}">${data[i]}</div>`);
         }
-        chat.user = $('.user');
-        chat.getuserinfo = function(){
-            //console.log($(this)); //is user id/name
+        $('.user').on('click', function() {
             windows++;
-            var im = new builder(windows);
-        }
-        chat.user.click(chat.getuserinfo);
+            chat.push(new builder(windows));
+            chat[1].randomizedstartinganimation(1)
+        });
     });
 
     //data expects string
     socket.on('changeInputFontColor', (data) => {
-        chat.textarea.css("color", data);
+        chat[0].textarea.css("color", data);
     });
 
     //data expects array
@@ -378,39 +380,39 @@ body{
         } else {
             ret = ' ';
         }
-        chat.istyping.html(ret);
+        chat[0].istyping.html(ret);
     });
 
     //data expects string
     socket.on('changeTheme', (data) => {     
         if (data == 'off'){
-            chat.chat.stop().animate({
+            chat[0].chat.stop().animate({
                 boxShadow: `0 0 10px 1000px rgb(255,255,255)`,
                 backgroundColor: 'white',
             });
-            chat.msgs.stop().animate({
+            chat[0].msgs.stop().animate({
                 color: 'black',
                 backgroundColor: 'white'
             });
-            chat.textarea.stop().animate({
+            chat[0].textarea.stop().animate({
                 color: 'white',
                 backgroundColor: 'black'
             });
-            chat.inputcontainer.stop().animate({
+            chat[0].inputcontainer.stop().animate({
                 color: 'white',
                 backgroundColor: 'black'
             });
-            chat.config.stop().animate({
+            chat[0].config.stop().animate({
                 color: 'black',
                 backgroundColor: 'white'
             });
-            chat.istyping.stop().animate({
+            chat[0].istyping.stop().animate({
                 color: 'black',
                 backgroundColor: 'white'
             });
         } else {
-            let args = chat.getTheme(data); 
-            chat.randomizedstartinganimation(data);
+            let args = chat[0].getTheme(data); 
+            chat[0].randomizedstartinganimation(data);
         }
     });
 
@@ -451,5 +453,5 @@ body{
             self.videotoggle ? $('.iframe').show() : $('.iframe').hide();
         }
     };
-    let chat = new builder(windows);
+    let chat = [new builder(windows)];
 </script>

@@ -46,7 +46,8 @@ function init(socket){
             date: now.format("HH:mm:ss"),
             name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
             msg:  `User ${address} has connected.`,
-            color: socket.color
+            color: socket.color,
+            window: 0
         }]
     };
     for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
@@ -110,7 +111,7 @@ function chatMsg(socket, msg){
     const now = new moment();
     var id = msg.id;
     msg = msg.msg;
-    console.log(msg);
+    console.log(id);
     if (msg.indexOf('<') > -1)
         msg = msg.replace(new RegExp(/</, 'g'), '&lt');
     if (msg.substr(0, 1) == '/'){
@@ -133,7 +134,8 @@ function chatMsg(socket, msg){
             date: now.format("HH:mm:ss"),
             name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
             msg:  msg,
-            color: socket.color
+            color: socket.color,
+            window: id
         }]
     };
 
