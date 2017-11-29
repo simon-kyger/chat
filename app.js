@@ -57,16 +57,6 @@ function init(socket){
     }
 }
 
-const getUsersTyping = () => {
-    return SOCKET_CONNECTIONS.reduce((typers, connection) => {
-        if (connection.ischatting) {
-            typers.push(connection.name || SOCKET_CONNECTIONS.indexOf(connection))
-        }
-
-        return typers;
-    }, []);
-};
-
 //socket: object
 //returns: void
 //description: events that occur after a user disconnects from the server
@@ -94,6 +84,16 @@ function disconnects(socket){
         SOCKET_CONNECTIONS[j].emit('ischattinglist', getUsersTyping());
     }
 }
+
+const getUsersTyping = () => {
+    return SOCKET_CONNECTIONS.reduce((typers, connection) => {
+        if (connection.ischatting) {
+            typers.push(connection.name || SOCKET_CONNECTIONS.indexOf(connection))
+        }
+
+        return typers;
+    }, []);
+};
 
 function istyping(socket, bools){
     socket.ischatting = !!bools;
@@ -355,13 +355,13 @@ function giphyrequest(socket, mod){
                 chatmessages: [{
                     action: 'renderText',
                     date: now.format("HH:mm:ss"),
-                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    name: ``,
                     msg:  `Giphy does not allow one to query with hashtags.`,
                     color: `red`
                 },{
                     action: 'renderText',
                     date: now.format("HH:mm:ss"),
-                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    name: ``,
                     msg:  `Search query-> ${mod}`,
                     color: `red`
                 },{
@@ -375,7 +375,7 @@ function giphyrequest(socket, mod){
         });
         return;
     }
-    let link = `http://api.giphy.com/v1/gifs/search?q=${mod}&api_key=${apikeys.giphy}&limit=1`;
+    let link = `http://api.giphy.com/v1/gifs/search?q=${mod}&api_key=${keys.giphy}&limit=1`;
     request.get(link, function (error, response, body) {
         let ret = JSON.parse(body);
         if (error || !ret.data){

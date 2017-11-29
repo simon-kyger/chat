@@ -115,22 +115,33 @@ body{
         var self = this;
         this.id = args;
         this.chat = $(`<div id="chat${args}" class="chat">`);
-        this.inputcontainer = $(`<div id="inputcontainer${args}" class="inputcontainer">`).appendTo(this.chat);
-        this.msgs = $(`<div id="msgs${args}" class="msgs">`).appendTo(this.chat);
-        this.config = $(`<div id="config${args}" class="config">`).appendTo(this.chat);
-        this.chatresizer = $(`<div id="chatresizer${args}" class="resizer ui-resizable-handl ui-resizable-ne">`).appendTo(this.chat);
-        this.videotoggle = $(`<input id="videotoggle${args}" class="videotoggle" type="checkbox">Hide Videos<br>`).appendTo(this.config);
-        this.imagetoggle = $(`<input id="imagetoggle${args}" class="imagetoggle" type="checkbox">Hide Images</input>`).appendTo(this.config);        
-        this.cfg = $(`<div id="cfg${args}" class="cfg">&#x2699;</div>`).appendTo(this.inputcontainer);
-        this.textarea = $(`<textarea id="chatinput${args}" class="chatinput" placeholder="Chat here! or /? for a list of commands." autofocus="autofocus"></textarea>`).appendTo(this.inputcontainer);
-        this.istyping = $(`<div class="istyping"></div>`).appendTo(this.inputcontainer);
+        this.inputcontainer = $(`<div id="inputcontainer${args}" class="inputcontainer">`);
+        this.inputcontainer.appendTo(this.chat);
+        this.msgs = $(`<div id="msgs${args}" class="msgs">`);
+        this.msgs.appendTo(this.chat);
+        this.config = $(`<div id="config${args}" class="config">`);
+        this.config.appendTo(this.chat);
+        this.chatresizer = $(`<div id="chatresizer${args}" class="resizer ui-resizable-handl ui-resizable-ne">`);
+        this.chatresizer.appendTo(this.chat);
+        this.videotoggle = $(`<input id="videotoggle${args}" class="videotoggle" type="checkbox">Hide Videos<br>`);
+        this.videotoggle.appendTo(this.config);
+        this.imagetoggle = $(`<input id="imagetoggle${args}" class="imagetoggle" type="checkbox">Hide Images</input>`);
+        this.imagetoggle.appendTo(this.config);
+        this.cfg = $(`<div id="cfg${args}" class="cfg">&#x2699;</div>`);
+        this.cfg.appendTo(this.inputcontainer);
+        this.textarea = $(`<textarea id="chatinput${args}" class="chatinput" placeholder="Chat here! or /? for a list of commands." autofocus="autofocus"></textarea>`);
+        this.textarea.appendTo(this.inputcontainer);
+        this.istyping = $(`<div class="istyping"></div>`);
+        this.istyping.appendTo(this.inputcontainer);
         if (!args){
-            this.welcome = $(`<div class="redshadow">Welcome to the proper lunch chat channel!</br></div>`).appendTo(this.msgs);
-            this.githublink = $(`<div>&nbsp; &nbsp; github --> <a href="https://github.com/simon-kyger/chat" target="_blank">https://github.com/simon-kyger/chat</a></br></div>`).appendTo(this.msgs);
-            this.commandlist = $(`<div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>`).appendTo(this.msgs);
+            this.welcome = $(`<div class="redshadow">Welcome to the proper lunch chat channel!</br></div>`);
+            this.welcome.appendTo(this.msgs);
+            this.githublink = $(`<div>&nbsp; &nbsp; github --> <a href="https://github.com/simon-kyger/chat" target="_blank">https://github.com/simon-kyger/chat</a></br></div>`)
+            this.githublink.appendTo(this.msgs);
+            this.commandlist = $(`<div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>`);
+            this.commandlist.appendTo(this.msgs);
             this.onlineusers = $(`<div id="onlineusers" class="onlineusers"></div>`); 
             this.onlineusers.appendTo(this.chat);
-            this.someuser = $(`<div id="hiddenuser" class="user"></div>`).appendTo(this.onlineusers);
         }
         this.chat.draggable({
             containment: "body"
@@ -354,8 +365,10 @@ body{
         }
         $('.user').on('click', function() {
             windows++;
-            chat.push(new builder(windows));
-            chat[1].randomizedstartinganimation(1)
+            var newwindow = new builder(windows);
+            chat.push(newwindow);
+            chat[windows].msgs.append($(this)[0].textContent);
+            //chat[windows].randomizedstartinganimation(0);
         });
     });
 
