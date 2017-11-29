@@ -16,7 +16,10 @@ let keys = {};
 // should really store api keys in .env.
 ['youtube', 'giphy'].forEach((path) => {
     apiKeys.getApiKey(path)
-        .then(key => keys[path] = key)
+        .then(key => {
+            keys[path] = key;
+            if (path === 'youtube') youtube.setKey(key);
+        })
         .catch(err => console.log(err))
 });
 
