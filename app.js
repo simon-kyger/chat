@@ -8,16 +8,19 @@ const request = require('request');
 const io = require('socket.io')(server);
 const linkifyHtml = require('linkifyjs/html');
 const isImage = require('is-image');
-const port = 80;
+const config = require('config');
+const port = config.get('port');
 const youtubenode = require('youtube-node');
 const youtube = new youtubenode();
 const apiKeys = require('./apiKeys');
 let keys = {};
 // should really store api keys in .env.
-// right now, api keys are read in asynchronously and may not be available at time of need
 ['youtube', 'giphy'].forEach((path) => {
     apiKeys.getApiKey(path)
-        .then(key => keys[path] = key)
+        .then(key => {
+            keys[path] = key;
+            if (path === 'youtube') youtube.setKey(key);
+        })
         .catch(err => console.log(err))
 });
 
@@ -47,14 +50,9 @@ function init(socket){
             action: 'renderText',
             date:  moment().format("HH:mm:ss"),
             name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
-<<<<<<< HEAD
-            msg:  `User ${address} has connected.`,
+            msg:  `User ${socket.request.connection.remoteAddress} has connected.`,
             color: socket.color,
             window: 0
-=======
-            msg:  `User ${socket.request.connection.remoteAddress} has connected.`,
-            color: socket.color
->>>>>>> 787e61a5f085af524d6e367c0a590b3043f8cac5
         }]
     };
     for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
@@ -62,16 +60,6 @@ function init(socket){
         SOCKET_CONNECTIONS[i].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
     }
 }
-
-const getUsersTyping = () => {
-    return SOCKET_CONNECTIONS.reduce((typers, connection) => {
-        if (connection.ischatting) {
-            typers.push(connection.name || SOCKET_CONNECTIONS.indexOf(connection))
-        }
-
-        return typers;
-    }, []);
-};
 
 //socket: object
 //returns: void
@@ -100,6 +88,16 @@ function disconnects(socket){
         SOCKET_CONNECTIONS[j].emit('ischattinglist', getUsersTyping());
     }
 }
+
+const getUsersTyping = () => {
+    return SOCKET_CONNECTIONS.reduce((typers, connection) => {
+        if (connection.ischatting) {
+            typers.push(connection.name || SOCKET_CONNECTIONS.indexOf(connection))
+        }
+
+        return typers;
+    }, []);
+};
 
 function istyping(socket, bools){
     socket.ischatting = !!bools;
@@ -241,13 +239,13 @@ function command(socket, msg){
 function youtuberequest(socket, mod){
     const now = new moment();
     let send;
-    if (!apikeys.youtube){
+    if (!keys.youtube){
         send = {
             chatmessages: [{
                 action: 'renderText',
                 date: now.format("HH:mm:ss"),
                 name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
-                msg:  `Server not configured for that command yet.`,
+                msg:  `Server not configured for that command.`,
                 color: `red`
             }]
         };
@@ -342,13 +340,13 @@ function changename(socket, mod){
 function giphyrequest(socket, mod){
     const now = new moment();
     let send;
-    if (!apikeys.giphy){
+    if (!keys.giphy){
         send = {
             chatmessages: [{
                 action: 'renderText',
                 date: now.format("HH:mm:ss"),
                 name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
-                msg:  `Server not configured for that command yet.`,
+                msg:  `Server not configured for that command.`,
                 color: `red`
             }]
         };
@@ -361,13 +359,13 @@ function giphyrequest(socket, mod){
                 chatmessages: [{
                     action: 'renderText',
                     date: now.format("HH:mm:ss"),
-                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    name: ``,
                     msg:  `Giphy does not allow one to query with hashtags.`,
                     color: `red`
                 },{
                     action: 'renderText',
                     date: now.format("HH:mm:ss"),
-                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    name: ``,
                     msg:  `Search query-> ${mod}`,
                     color: `red`
                 },{
@@ -381,7 +379,7 @@ function giphyrequest(socket, mod){
         });
         return;
     }
-    let link = `http://api.giphy.com/v1/gifs/search?q=${mod}&api_key=${apikeys.giphy}&limit=1`;
+    let link = `http://api.giphy.com/v1/gifs/search?q=${mod}&api_key=${keys.giphy}&limit=1`;
     request.get(link, function (error, response, body) {
         let ret = JSON.parse(body);
         if (error || !ret.data){

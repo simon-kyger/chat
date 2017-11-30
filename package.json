@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "dependencies": {
+    "config": "^1.28.1",
     "delivery": "0.0.6",
     "express": "^4.16.2",
     "fs": "0.0.1-security",
