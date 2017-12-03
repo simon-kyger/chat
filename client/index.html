@@ -15,7 +15,7 @@ body{
 }
 .chat .msgs{
     overflow-y:scroll;
-    width:100%;
+    width:80%;
     height:85%;
 }
 .inputcontainer{
@@ -33,7 +33,7 @@ body{
     position:absolute;
     top: 0%;
     //width: -webkit-calc(100% - 15px);
-    width: 100%;
+    width: 80%;
     height: 30%;
     line-height: 1.3;
 }
@@ -78,25 +78,32 @@ body{
     top: 0px;
     right: 0px;
     position: absolute !important;
-    z-index:9999;
+    z-index:2;
     cursor: nesw-resize;
 }
 .onlineusers{
+    z-index: 1;
     top: 0px;
-    right: 17px;
-    position: absolute !important;
-    z-index: 9999;
+    right: 0px;
+    position: absolute;
     opacity: 0;
-    border-left: 1px solid;
     border-bottom: 1px solid;
     border-color: black; 
-    padding-left: 1px;
-    padding-bottom: 1px;
+    width: 20%;
 }
 .redshadow{
     text-shadow: 2px 2px 8px #FF0000;
     font-weight: bold;
 }
+.cgroup{
+    width:80%;
+    height:5%;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+    display:flex;
+    justify-content:space-evenly;
+}
+
 </style>
 </head>
 <body>
@@ -110,41 +117,58 @@ body{
 <script>
 //globals
     let socket = io();
-    var windows = 0;
-    var builder = function(args){
+    var builder = function(){
         var self = this;
-        this.id = args;
-        this.chat = $(`<div id="chat${args}" class="chat">`);
-        this.inputcontainer = $(`<div id="inputcontainer${args}" class="inputcontainer">`);
+        this.chat = $(`<div id='chat' class='chat'>`);
+        this.chat.appendTo($('body'));
+        this.inputcontainer = $(`<div id='inputcontainer' class='inputcontainer'>`);
         this.inputcontainer.appendTo(this.chat);
-        this.msgs = $(`<div id="msgs${args}" class="msgs">`);
+        this.cgroup = $(`<div id='cgroup' class='cgroup'>`);
+        this.cgroup.appendTo(this.chat);
+        this.msgs = $(`<div id='msgs' class='msgs'>`);
         this.msgs.appendTo(this.chat);
-        this.config = $(`<div id="config${args}" class="config">`);
+        this.config = $(`<div id='config' class='config'>`);
         this.config.appendTo(this.chat);
-        this.chatresizer = $(`<div id="chatresizer${args}" class="resizer ui-resizable-handl ui-resizable-ne">`);
+        this.chatresizer = $(`<div id='chatresizer' class='resizer ui-resizable-handl ui-resizable-ne'>`);
         this.chatresizer.appendTo(this.chat);
-        this.videotoggle = $(`<input id="videotoggle${args}" class="videotoggle" type="checkbox">Hide Videos<br>`);
+        this.videotoggle = $(`<input id='videotoggle' class='videotoggle' type='checkbox'>Hide Videos<br>`);
         this.videotoggle.appendTo(this.config);
-        this.imagetoggle = $(`<input id="imagetoggle${args}" class="imagetoggle" type="checkbox">Hide Images</input>`);
+        this.imagetoggle = $(`<input id='imagetoggle' class='imagetoggle' type='checkbox'>Hide Images</input>`);
         this.imagetoggle.appendTo(this.config);
-        this.cfg = $(`<div id="cfg${args}" class="cfg">&#x2699;</div>`);
+        this.cfg = $(`<div id='cfg' class='cfg'>&#x2699;</div>`);
         this.cfg.appendTo(this.inputcontainer);
-        this.textarea = $(`<textarea id="chatinput${args}" class="chatinput" placeholder="Chat here! or /? for a list of commands." autofocus="autofocus"></textarea>`);
+        this.textarea = $(`<textarea id='chatinput' class='chatinput' placeholder='Chat here! or /? for a list of commands.' autofocus='autofocus'></textarea>`);
         this.textarea.appendTo(this.inputcontainer);
-        this.istyping = $(`<div class="istyping"></div>`);
+        this.istyping = $(`<div class='istyping'></div>`);
         this.istyping.appendTo(this.inputcontainer);
-        if (!args){
-            this.welcome = $(`<div class="redshadow">Welcome to the proper lunch chat channel!</br></div>`);
-            this.welcome.appendTo(this.msgs);
-            this.githublink = $(`<div>&nbsp; &nbsp; github --> <a href="https://github.com/simon-kyger/chat" target="_blank">https://github.com/simon-kyger/chat</a></br></div>`)
-            this.githublink.appendTo(this.msgs);
-            this.commandlist = $(`<div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>`);
-            this.commandlist.appendTo(this.msgs);
-            this.onlineusers = $(`<div id="onlineusers" class="onlineusers"></div>`); 
-            this.onlineusers.appendTo(this.chat);
+        this.welcome = $(`<div class='redshadow'>Welcome to the proper lunch chat channel!</br></div>`);
+        this.welcome.appendTo(this.msgs);
+        this.githublink = $(`<div>&nbsp; &nbsp; github --> <a href='https://github.com/simon-kyger/chat' target='_blank'>https://github.com/simon-kyger/chat</a></br></div>`)
+        this.githublink.appendTo(this.msgs);
+        this.commandlist = $(`<div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>`);
+        this.commandlist.appendTo(this.msgs);
+        this.onlineusers = $(`<div id='onlineusers' class='onlineusers'></div>`); 
+        this.onlineusers.appendTo(this.chat);
+        this.maincgroup = $(`<div id='maincgroup' style='float: left; cursor: pointer;'>Main</div>`);
+        this.maincgroup.appendTo(this.cgroup);
+        this.prevmsgs = {};
+        this.curtab = 'Main';
+        //args.curtab = 'main' args.id = id of thing clicked
+        this.newtab = function(args){
+            $(`<div id='${args.id}' style='border: 1px solid black;cursor: pointer;'>${args.id}<div style="display:inline-block">X</div></div>`).appendTo(self.cgroup);
+            self.curtab = args.id;
+            self.msgs.empty();
+            self.msgs.append(self.prevmsgs[args.id])
         }
+
+        this.maincgroup.on('click', function(){
+            self.curtab = 'Main';
+            self.msgs.empty();
+            self.msgs.append(self.prevmsgs['Main']);
+        });
+
         this.chat.draggable({
-            containment: "body"
+            containment: 'body'
         });
         this.chat.resizable({
             handles: {
@@ -153,7 +177,7 @@ body{
         });
         this.posts = [];
         this.position = 0;
-        this.textarea.on("change keydown input paste", function(e){
+        this.textarea.on('change keydown input paste', function(e){
             //down
             if (e.which == 40){
                 self.position--;
@@ -207,27 +231,26 @@ body{
         this.cfg.click(function(){
             if (self.cfg.expanded){
                 self.config.animate({
-                    width: "0%",
-                    height: "0%",
+                    width: '0%',
+                    height: '0%',
                     opacity: 0,
-                    fontSize: "0",
-                    borderWidth: "20px"
+                    fontSize: '0',
+                    borderWidth: '20px'
                 }, 500 );
                 self.cfg.expanded = false;
             } else {
                 self.config.animate({
-                    width: "20%",
-                    height: "30%",
+                    width: '20%',
+                    height: '30%',
                     opacity: 0.8,
-                    fontSize: "14",
-                    borderWidth: "2px"
+                    fontSize: '14',
+                    borderWidth: '2px'
                 }, 500 );
                 self.cfg.expanded = true;
             }
         });
-
-        this.chat.appendTo($('body'));
     }
+    let chat = new builder();
     builder.prototype.scrollBottom = function() {
         this.msgs.stop().animate({ 
             scrollTop: this.msgs[0].scrollHeight
@@ -328,7 +351,7 @@ body{
 
 //a glorified animation
     $(document).ready(()=> {
-        chat[0].randomizedstartinganimation(0);
+        chat.randomizedstartinganimation(0);
         //glowing red text for banner and online users
         setInterval(()=> {
             $('.redshadow').animate({
@@ -344,37 +367,39 @@ body{
     //data expects data.chatmessages[].properties
     socket.on('addToChat', (data) => {
 
-        let shouldscroll = chat[0].msgs.scrollTop() >= (chat[0].msgs[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
-        let renderobj = new builder.RenderingObject(chat[0]);
+        let shouldscroll = chat.msgs.scrollTop() >= (chat.msgs[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
+        let renderobj = new builder.RenderingObject(chat);
         for (let i=0; i<data.chatmessages.length; i++){
             //evil dragons be here
             renderobj[data.chatmessages[i].action](data.chatmessages[i]);
         }
+
+        chat.prevmsgs[chat.curtab] = chat.msgs[0].innerHTML;
+
         if (shouldscroll)
-            chat[0].scrollBottom();
+            chat.scrollBottom();
     });
 
     //data expects array
     socket.on('updateUsers', (data) => {
-        chat[0].onlineusers.empty();
-        chat[0].onlineusers.append('<div class="redshadow">Online Users: &nbsp</div>');
+        chat.onlineusers.empty();
+        chat.onlineusers.append(`<div class='redshadow'>Online Users: &nbsp</div>`);
         for (let i=0; i<data.length; i++){
             if (isNaN(data[i]))
                 data[i] = data[i].replace(/\n/g, '<br>');
-            chat[0].onlineusers.append(`<div class="user" style="color:${data[i].color}">${data[i]}</div>`);
+            chat.onlineusers.append(`<div class='user' style='color:${data[i].color}; cursor: pointer'>${data[i]}</div>`);
         }
         $('.user').on('click', function() {
-            windows++;
-            var newwindow = new builder(windows);
-            chat.push(newwindow);
-            chat[windows].msgs.append($(this)[0].textContent);
-            //chat[windows].randomizedstartinganimation(0);
+            chat.newtab({ 
+                curtab: chat.curtab, 
+                id: $(this)[0].textContent 
+            });
         });
     });
 
     //data expects string
     socket.on('changeInputFontColor', (data) => {
-        chat[0].textarea.css("color", data);
+        chat.textarea.css('color', data);
     });
 
     //data expects array
@@ -393,65 +418,65 @@ body{
         } else {
             ret = ' ';
         }
-        chat[0].istyping.html(ret);
+        chat.istyping.html(ret);
     });
 
     //data expects string
     socket.on('changeTheme', (data) => {     
         if (data == 'off'){
-            chat[0].chat.stop().animate({
+            chat.chat.stop().animate({
                 boxShadow: `0 0 10px 1000px rgb(255,255,255)`,
                 backgroundColor: 'white',
             });
-            chat[0].msgs.stop().animate({
+            chat.msgs.stop().animate({
                 color: 'black',
                 backgroundColor: 'white'
             });
-            chat[0].textarea.stop().animate({
+            chat.textarea.stop().animate({
                 color: 'white',
                 backgroundColor: 'black'
             });
-            chat[0].inputcontainer.stop().animate({
+            chat.inputcontainer.stop().animate({
                 color: 'white',
                 backgroundColor: 'black'
             });
-            chat[0].config.stop().animate({
+            chat.config.stop().animate({
                 color: 'black',
                 backgroundColor: 'white'
             });
-            chat[0].istyping.stop().animate({
+            chat.istyping.stop().animate({
                 color: 'black',
                 backgroundColor: 'white'
             });
         } else {
-            let args = chat[0].getTheme(data); 
-            chat[0].randomizedstartinganimation(data);
+            let args = chat.getTheme(data); 
+            chat.randomizedstartinganimation(data);
         }
     });
 
     
     builder.RenderingObject = function(self) {
         this.renderText = (args) => {
-            let div = `<div background-color:${args.bgcolor}; text-shadow: ${args.textshadow};">${args.date}<b> ${args.name} </b><span style="color:${args.color};">${args.msg}</span></div>`;
+            let div = `<div style='background-color:${args.bgcolor}; text-shadow: ${args.textshadow};'>${args.date}<b> ${args.name} </b><span style='color:${args.color};'>${args.msg}</span></div>`;
             self.msgs.append(div);
         },
         this.renderImage = (args) => {
-            let img = `<a href="${args.msg}" target="_blank"><img class="imgs" src="${args.msg}" target="_blank" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img></a>`;
-            let link = `<a href="${args.msg}" target="_blank">${args.msg}</a>`;
-            let div = $(`<div style="color:${args.color};">${args.date}<b> ${args.name} </b>${link}<br>${img}</div>`);
+            let img = `<a href='${args.msg}' target='_blank'><img class='imgs' src='${args.msg}' target='_blank' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img></a>`;
+            let link = `<a href='${args.msg}' target='_blank'>${args.msg}</a>`;
+            let div = $(`<div style='color:${args.color};'>${args.date}<b> ${args.name} </b>${link}<br>${img}</div>`);
             div.appendTo(self.msgs);
             self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
             //lolfun $('.imgs').draggable({containment: $('.msgs')});
         }
         this.renderStaticImage = (args) => {
-            let img = `<img class="imgs" src="data:image/png;base64,${args.image}" style="width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;"></img>`;
-            let div = `<div style ="color:${args.color};">${args.date}<b> ${args.name} </b>${img} </div>`
+            let img = `<img class='imgs' src='data:image/png;base64,${args.image}' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img>`;
+            let div = `<div style ='color:${args.color};'>${args.date}<b> ${args.name} </b>${img} </div>`
             self.msgs.append(div);
             self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
         }
         this.renderCodeBlock = (args) => {
-            let div = `<div style="color:${args.color};">${args.date}<b> ${args.name} CODEBLOCK:</b> 
-                      </div><pre style="white-space: pre-wrap;"><code class="code" style="border-radius: 10px;">${args.msg.replace(/\n/g, '<br>')} </code></pre>`;
+            let div = `<div style='color:${args.color};'>${args.date}<b> ${args.name} CODEBLOCK:</b> 
+                      </div><pre style='white-space: pre-wrap;'><code class='code' style='border-radius: 10px;'>${args.msg.replace(/\n/g, '<br>')} </code></pre>`;
             self.msgs.append(div);
             $('.code').each(function(i, block) {
               hljs.highlightBlock(block);
@@ -459,12 +484,11 @@ body{
         }
         this.renderVideo = (args) => {
             let url = `https://www.youtube.com/embed/${args.msg}`;
-            let link = `<a href="${url}">${url}</a>`;
-            let iframe = `<iframe class="iframe" style="height: 300px; width: 500px" src="//www.youtube.com/embed/${args.msg}" allowfullscreen></iframe>`; 
-            let div = `<div style="color:${args.color};">${args.date}<b> ${args.name} </b>${link}<br>${iframe}</div>`; 
+            let link = `<a href='${url}'>${url}</a>`;
+            let iframe = `<iframe class='iframe' style='height: 300px; width: 500px' src='//www.youtube.com/embed/${args.msg}' allowfullscreen></iframe>`; 
+            let div = `<div style='color:${args.color};'>${args.date}<b> ${args.name} </b>${link}<br>${iframe}</div>`; 
             self.msgs.append(div);
             self.videotoggle ? $('.iframe').show() : $('.iframe').hide();
         }
     };
-    let chat = [new builder(windows)];
 </script>
