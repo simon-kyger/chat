@@ -405,7 +405,7 @@ body{
             if (temp == data.chatmessages[0].curtab)
                 boolers = true;
         }
-        if(!boolers || data.chatmessages[0].curtab !== 'Main'){
+        if(!boolers){
             chat.newtab({curtab: data.chatmessages[0].curtab});
         }
         let shouldscroll = chat.msgs.scrollTop() >= (chat.msgs[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
