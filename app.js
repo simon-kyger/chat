@@ -30,6 +30,7 @@ server.listen(port);
 console.log(`Listening on port: ${port}`);
 
 let SOCKET_CONNECTIONS = [];
+let gnameincrementer = 0;
 //socket: object
 //description: consider this as a looping system, since sockets are persistant,
 //the contents inside are always being evaluated.  this is the main loop of the program.
@@ -45,14 +46,16 @@ io.sockets.on('connection', (socket) => {
 //description: static method that only occurs once per connection to server is establish
 function init(socket){
     SOCKET_CONNECTIONS.push(socket);
+    socket.name = gnameincrementer;
+    gnameincrementer++;
     let send = {
         chatmessages: [{
             action: 'renderText',
             date:  moment().format("HH:mm:ss"),
-            name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+            name: ``,
             msg:  `User ${socket.request.connection.remoteAddress} has connected.`,
             color: socket.color,
-            window: 0
+            curtab: 'Main'
         }]
     };
     for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
@@ -70,9 +73,10 @@ function disconnects(socket){
         chatmessages: [{
             action: 'renderText',
             date: moment().format("HH:mm:ss"),
-            name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
-            msg:  `User ${SOCKET_CONNECTIONS.indexOf(socket)} has disconnected.`,
-            color: socket.color
+            name: socket.name,
+            msg:  `User ${socket.name} has disconnected.`,
+            color: socket.color,
+            curtab: 'Main'
         }]
     };
     for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
@@ -92,7 +96,7 @@ function disconnects(socket){
 const getUsersTyping = () => {
     return SOCKET_CONNECTIONS.reduce((typers, connection) => {
         if (connection.ischatting) {
-            typers.push(connection.name || SOCKET_CONNECTIONS.indexOf(connection))
+            typers.push(connection.name)
         }
 
         return typers;
@@ -112,9 +116,8 @@ function istyping(socket, bools){
 //returns: void
 function chatMsg(socket, msg){
     const now = new moment();
-    var id = msg.id;
+    var curtab = msg.curtab;
     msg = msg.msg;
-    console.log(id);
     if (msg.indexOf('<') > -1)
         msg = msg.replace(new RegExp(/</, 'g'), '&lt');
     if (msg.substr(0, 1) == '/'){
@@ -135,18 +138,34 @@ function chatMsg(socket, msg){
         chatmessages: [{
             action: act,
             date: now.format("HH:mm:ss"),
-            name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+            name: `${socket.name}:`,
             msg:  msg,
             color: socket.color,
-            window: id
+            curtab: curtab
         }]
     };
+
+    if (curtab !== 'Main'){
+        for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
+            if (SOCKET_CONNECTIONS[i].name == curtab){
+                SOCKET_CONNECTIONS[i].emit('addToChat', send);
+                socket.emit('addToChat', send);
+                return;
+            }
+        }
+    }
 
     for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
         SOCKET_CONNECTIONS[i].emit('addToChat', send);
     }
 }
 
+function getIpOfName(name){
+    for (let i=0; i<SOCKET_CONNECTIONS.length; i++){
+        if (SOCKET_CONNECTIONS[i].name == name)
+            return SOCKET_CONNECTIONS[i].request.connection.remoteAddress;
+    }
+}
 
 //socket: object
 //msg: string
@@ -163,7 +182,7 @@ function command(socket, msg){
                 chatmessages: [{
                     action: 'renderCodeBlock',
                     date: now.format("HH:mm:ss"),
-                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    name: `${socket.name}:`,
                     msg:  mod,
                     color: socket.color
                 }]
@@ -224,7 +243,7 @@ function command(socket, msg){
                 chatmessages: [{
                     action: 'renderText',
                     date: now.format("HH:mm:ss"),
-                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    name: `${socket.name}:`,
                     msg:  `Unknown command: ${command}`,
                     color: `red`
                 }]
@@ -244,7 +263,7 @@ function youtuberequest(socket, mod){
             chatmessages: [{
                 action: 'renderText',
                 date: now.format("HH:mm:ss"),
-                name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                name: `${socket.name}:`,
                 msg:  `Server not configured for that command.`,
                 color: `red`
             }]
@@ -262,7 +281,7 @@ function youtuberequest(socket, mod){
                 chatmessages: [{
                     action: 'renderVideo',
                     date: now.format("HH:mm:ss"),
-                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    name: `${socket.name}:`,
                     msg:  result.items[0].id.videoId,
                 }]
             };
@@ -271,19 +290,19 @@ function youtuberequest(socket, mod){
                 chatmessages: [{
                     action: 'renderText',
                     date: now.format("HH:mm:ss"),
-                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    name: `${socket.name}:`,
                     msg:  `Youtube failed. This can happen easily if you match a channel owner's name.`,
                     color: `red`
                 },{
                     action: 'renderText',
                     date: now.format("HH:mm:ss"),
-                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    name: `${socket.name}:`,
                     msg:  `Search query->'${mod}'.`,
                     color: `red`
                 },{
                     action: 'renderText',
                     date: now.format("HH:mm:ss"),
-                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    name: `${socket.name}:`,
                     msg:  `Try refining your search pattern with more text.`,
                     color: `red`
                 }]
@@ -303,12 +322,28 @@ function youtuberequest(socket, mod){
 function changename(socket, mod){
     const now = new moment();
     let send;
+    let allnames = getNames(SOCKET_CONNECTIONS);
+    for (let i = 0; i<allnames.length; i++){
+        if (allnames[i] == mod){
+            send = {
+                chatmessages: [{
+                    action: 'renderText',
+                    date: now.format("HH:mm:ss"),
+                    name: ``,
+                    msg:  `Name '${mod}' is already in use.`,
+                    color: 'red'
+                }]
+            };
+            socket.emit('addToChat', send);
+            return;
+        }
+    }
     if(mod.length > 20 || mod.length < 1){
         send = {
             chatmessages: [{
                 action: 'renderText',
                 date: now.format("HH:mm:ss"),
-                name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                name: `${socket.name}:`,
                 msg:  `Use 1-20 characters for your name plz`,
                 color: socket.color
             }]
@@ -316,8 +351,8 @@ function changename(socket, mod){
         socket.emit('addToChat', send);
         return;
     } else {
-        let oldname = socket.name || SOCKET_CONNECTIONS.indexOf(socket);
-        socket.name = mod || SOCKET_CONNECTIONS.indexOf(socket);
+        let oldname = socket.name;
+        socket.name = mod;
         send = {
             chatmessages: [{
                 action: 'renderText',
@@ -345,7 +380,7 @@ function giphyrequest(socket, mod){
             chatmessages: [{
                 action: 'renderText',
                 date: now.format("HH:mm:ss"),
-                name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                name: `${socket.name}:`,
                 msg:  `Server not configured for that command.`,
                 color: `red`
             }]
@@ -388,13 +423,13 @@ function giphyrequest(socket, mod){
                 chatmessages: [{
                     action: 'renderText',
                     date: now.format("HH:mm:ss"),
-                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    name: `${socket.name}:`,
                     msg:  `Giphy is having issues or is down apparently.`,
                     color: `red`
                 },{
                     action: 'renderText',
                     date: now.format("HH:mm:ss"),
-                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    name: `${socket.name}:`,
                     msg:  `Try again later.`,
                     color: `red`
                 }]
@@ -413,7 +448,7 @@ function giphyrequest(socket, mod){
                 chatmessages: [{
                     action: 'renderImage',
                     date: now.format("HH:mm:ss"),
-                    name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                    name: `${socket.name}:`,
                     msg:  ret,
                 }]
             };
@@ -428,19 +463,19 @@ function giphyrequest(socket, mod){
                     chatmessages: [{
                         action: 'renderText',
                         date: now.format("HH:mm:ss"),
-                        name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                        name: `${socket.name}:`,
                         msg:  `Giphy failed to return anything!`,
                         color: `red`
                     },{
                         action: 'renderText',
                         date: now.format("HH:mm:ss"),
-                        name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                        name: `${socket.name}:`,
                         msg:  `Search query->'${mod}'`,
                         color: `red`
                     },{
                         action: 'renderText',
                         date: now.format("HH:mm:ss"),
-                        name: `${socket.name || SOCKET_CONNECTIONS.indexOf(socket)}:`,
+                        name: `${socket.name}:`,
                         msg:  `Sorry about that, here's a sad puppy instead:`,
                         color: `red`
                     },{
@@ -465,7 +500,7 @@ function getNames(arg){
     let temp;
     for(let i=0; i<arg.length; i++){
         if(arg[i].name)
-            temp = arg[i].name.trim();
+            temp = arg[i].name;
         else
             temp = String(i);
         ret.push(temp)

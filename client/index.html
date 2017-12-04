@@ -100,8 +100,24 @@ body{
     height:5%;
     border-bottom: 1px solid;
     border-right: 1px solid;
-    display:flex;
-    justify-content:space-evenly;
+    display: inline-block;
+    overflow: hidden;
+}
+.tab{
+    border: 1px solid black;
+    cursor: pointer;
+    width: 10%;
+    float:left;
+    height:100%;
+}
+.closerX{
+    width: 15px;
+    height: 15px;
+    display:inline-block;
+    color: white;
+    background-color: black;
+    text-align: -webkit-center;
+    float: right;
 }
 
 </style>
@@ -149,16 +165,30 @@ body{
         this.commandlist.appendTo(this.msgs);
         this.onlineusers = $(`<div id='onlineusers' class='onlineusers'></div>`); 
         this.onlineusers.appendTo(this.chat);
-        this.maincgroup = $(`<div id='maincgroup' style='float: left; cursor: pointer;'>Main</div>`);
+        this.maincgroup = $(`<div id='maincgroup' class='tab' style='width: 10%;'>Main</div>`);
         this.maincgroup.appendTo(this.cgroup);
         this.prevmsgs = {};
         this.curtab = 'Main';
         //args.curtab = 'main' args.id = id of thing clicked
         this.newtab = function(args){
-            $(`<div id='${args.id}' style='border: 1px solid black;cursor: pointer;'>${args.id}<div style="display:inline-block">X</div></div>`).appendTo(self.cgroup);
-            self.curtab = args.id;
+            if(args.curtab == 'Main')
+                return;
+            self.tab = $(`<div id='tab${args.curtab}' class='tab'>${args.curtab}</div>`);
+            self.tab.appendTo(self.cgroup);
+            self.tabX = $(`<div id='tabX${args.curtab}' class='closerX'>X</div>`);
+            self.tabX.appendTo(self.tab);
+            self.tabX.on('click', function(){
+                self.maincgroup.click();
+                this.parentElement.remove();
+            });
+            self.tab.on('click', function(){
+                self.curtab = this.innerText.slice(0, -1);
+                self.msgs.empty();
+                self.msgs.append(self.prevmsgs[self.curtab]);
+            });
+            self.curtab = this.tab[0].innerText.slice(0, -1);
             self.msgs.empty();
-            self.msgs.append(self.prevmsgs[args.id])
+            self.msgs.append(self.prevmsgs[self.curtab]);
         }
 
         this.maincgroup.on('click', function(){
@@ -199,7 +229,7 @@ body{
             if (e.which == 13 && !e.shiftKey && this.value.trim().length>0) {
                 e.preventDefault();
                 let msg = this.value.trim(); 
-                socket.emit('chatMsg', {msg: msg, id: self.id});
+                socket.emit('chatMsg', {msg: msg, curtab: self.curtab});
                 self.posts.push(msg);
                 self.position = self.posts.length;
                 this.value = ''; // CLEAR TEXTAREA
@@ -366,7 +396,16 @@ body{
 //net
     //data expects data.chatmessages[].properties
     socket.on('addToChat', (data) => {
-
+        let boolers = null;
+        for(let i=0; i<chat.cgroup.tabs().children().length; i++){
+            let temp = chat.cgroup.tabs().children()[i].innerText;
+            temp = temp.slice(0, -1);
+            if (temp == data.chatmessages[0].curtab)
+                boolers = true;
+        }
+        if(!boolers){
+            chat.newtab({curtab: data.chatmessages[0].curtab});
+        }
         let shouldscroll = chat.msgs.scrollTop() >= (chat.msgs[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
         let renderobj = new builder.RenderingObject(chat);
         for (let i=0; i<data.chatmessages.length; i++){
@@ -391,7 +430,7 @@ body{
         }
         $('.user').on('click', function() {
             chat.newtab({ 
-                curtab: chat.curtab, 
+                curtab: $(this)[0].textContent, 
                 id: $(this)[0].textContent 
             });
         });
