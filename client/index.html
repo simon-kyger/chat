@@ -16,7 +16,7 @@ body{
 .chat .msgs{
     overflow-y:scroll;
     width:80%;
-    height:85%;
+    height:80%;
 }
 .inputcontainer{
     width: 100%;
@@ -396,6 +396,8 @@ body{
 //net
     //data expects data.chatmessages[].properties
     socket.on('addToChat', (data) => {
+        if (!data.chatmessages[0].curtab)
+            data.chatmessages[0].curtab = 'Main';
         let boolers = null;
         for(let i=0; i<chat.cgroup.tabs().children().length; i++){
             let temp = chat.cgroup.tabs().children()[i].innerText;
@@ -403,7 +405,7 @@ body{
             if (temp == data.chatmessages[0].curtab)
                 boolers = true;
         }
-        if(!boolers){
+        if(!boolers || data.chatmessages[0].curtab !== 'Main'){
             chat.newtab({curtab: data.chatmessages[0].curtab});
         }
         let shouldscroll = chat.msgs.scrollTop() >= (chat.msgs[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
