@@ -141,13 +141,15 @@ function chatMsg(socket, msg){
             name: `${socket.name}:`,
             msg:  msg,
             color: socket.color,
-            curtab: curtab
+            curtab: curtab,
+            id: socket.name
         }]
     };
 
     if (curtab !== 'Main'){
         for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
             if (SOCKET_CONNECTIONS[i].name == curtab){
+                console.log(send);
                 SOCKET_CONNECTIONS[i].emit('addToChat', send);
                 socket.emit('addToChat', send);
                 return;

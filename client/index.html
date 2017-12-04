@@ -178,7 +178,9 @@ body{
             self.tabX = $(`<div id='tabX${args.curtab}' class='closerX'>X</div>`);
             self.tabX.appendTo(self.tab);
             self.tabX.on('click', function(){
-                self.maincgroup.click();
+                self.curtab = 'Main';
+                self.msgs.empty();
+                self.msgs.append(self.prevmsgs['Main']);
                 this.parentElement.remove();
             });
             self.tab.on('click', function(){
@@ -186,9 +188,6 @@ body{
                 self.msgs.empty();
                 self.msgs.append(self.prevmsgs[self.curtab]);
             });
-            self.curtab = this.tab[0].innerText.slice(0, -1);
-            self.msgs.empty();
-            self.msgs.append(self.prevmsgs[self.curtab]);
         }
 
         this.maincgroup.on('click', function(){
@@ -398,6 +397,7 @@ body{
     socket.on('addToChat', (data) => {
         if (!data.chatmessages[0].curtab)
             data.chatmessages[0].curtab = 'Main';
+        //boolers is a check to see if tab exists
         let boolers = null;
         for(let i=0; i<chat.cgroup.tabs().children().length; i++){
             let temp = chat.cgroup.tabs().children()[i].innerText;
@@ -405,8 +405,9 @@ body{
             if (temp == data.chatmessages[0].curtab)
                 boolers = true;
         }
-        if(!boolers){
-            chat.newtab({curtab: data.chatmessages[0].curtab});
+        //if the tab doesn't exist, and if theres an id
+        if(!boolers && data.chatmessages[0].id){
+            chat.newtab({curtab: data.chatmessages[0].id});
         }
         let shouldscroll = chat.msgs.scrollTop() >= (chat.msgs[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
         let renderobj = new builder.RenderingObject(chat);
@@ -431,6 +432,9 @@ body{
             chat.onlineusers.append(`<div class='user' style='color:${data[i].color}; cursor: pointer'>${data[i]}</div>`);
         }
         $('.user').on('click', function() {
+            chat.curtab = $(this)[0].textContent;
+            chat.msgs.empty();
+            chat.msgs.append(chat.prevmsgs[chat.curtab]);
             chat.newtab({ 
                 curtab: $(this)[0].textContent, 
                 id: $(this)[0].textContent 
