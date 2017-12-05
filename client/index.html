@@ -169,7 +169,11 @@ body{
         this.maincgroup.appendTo(this.cgroup);
         this.prevmsgs = {};
         this.curtab = 'Main';
-        //args.curtab = 'main' args.id = id of thing clicked
+        this.maincgroup.on('click', function(){
+            self.curtab = 'Main';
+            self.msgs.empty();
+            self.msgs.append(self.prevmsgs['Main']);
+        });
         this.newtab = function(args){
             if(args.curtab == 'Main')
                 return;
@@ -177,24 +181,18 @@ body{
             self.tab.appendTo(self.cgroup);
             self.tabX = $(`<div id='tabX${args.curtab}' class='closerX'>X</div>`);
             self.tabX.appendTo(self.tab);
-            self.tabX.on('click', function(){
-                self.curtab = 'Main';
-                self.msgs.empty();
-                self.msgs.append(self.prevmsgs['Main']);
-                this.parentElement.remove();
-            });
-            self.tab.on('click', function(){
+            self.tab.on('click', function(e){
+                if (e.target !== this) //this is necessary because tabX rests inside, if user clicks that then ignore this event
+                    return;
                 self.curtab = this.innerText.slice(0, -1);
                 self.msgs.empty();
                 self.msgs.append(self.prevmsgs[self.curtab]);
             });
+            self.tabX.on('click', function(e){
+                this.parentElement.remove();
+                self.maincgroup.click();
+            });
         }
-
-        this.maincgroup.on('click', function(){
-            self.curtab = 'Main';
-            self.msgs.empty();
-            self.msgs.append(self.prevmsgs['Main']);
-        });
 
         this.chat.draggable({
             containment: 'body'
@@ -398,7 +396,7 @@ body{
         if (!data.chatmessages[0].curtab)
             data.chatmessages[0].curtab = 'Main';
         //boolers is a check to see if tab exists
-        let boolers = null;
+        let boolers = false;
         for(let i=0; i<chat.cgroup.tabs().children().length; i++){
             let temp = chat.cgroup.tabs().children()[i].innerText;
             temp = temp.slice(0, -1);
@@ -406,11 +404,15 @@ body{
                 boolers = true;
         }
         //if the tab doesn't exist, and if theres an id
-        if(!boolers && data.chatmessages[0].id){
-            chat.newtab({curtab: data.chatmessages[0].id});
-        }
         let shouldscroll = chat.msgs.scrollTop() >= (chat.msgs[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
         let renderobj = new builder.RenderingObject(chat);
+        if(!boolers && data.chatmessages[0].id && data.chatmessages[0].curtab !== 'Main'){
+            chat.newtab({curtab: data.chatmessages[0].id});
+            for (let i=0; i<data.chatmessages.length; i++){
+                chat.prevmsgs[data.chatmessages[i].id] += `<div>${data.chatmessages[i].msg}</div>`; //this is terrible and needs to be refactored
+            }
+            return;
+        }
         for (let i=0; i<data.chatmessages.length; i++){
             //evil dragons be here
             renderobj[data.chatmessages[i].action](data.chatmessages[i]);

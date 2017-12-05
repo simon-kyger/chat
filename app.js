@@ -116,20 +116,18 @@ function istyping(socket, bools){
 //returns: void
 function chatMsg(socket, msg){
     const now = new moment();
-    var curtab = msg.curtab;
-    msg = msg.msg;
-    if (msg.indexOf('<') > -1)
-        msg = msg.replace(new RegExp(/</, 'g'), '&lt');
-    if (msg.substr(0, 1) == '/'){
-        command(socket, msg);
+    if (msg.msg.indexOf('<') > -1)
+        msg.msg = msg.msg.replace(new RegExp(/</, 'g'), '&lt');
+    if (msg.msg.substr(0, 1) == '/'){
+        command(socket, msg.msg);
         return;
     }
 
     let act = `renderText`;
-    if (isImage(msg)){
+    if (isImage(msg.msg)){
         act = `renderImage`;
     } else {
-        msg = linkifyHtml(msg, {
+        msg.msg = linkifyHtml(msg.msg, {
             defaultProtocol: `https`,
         });
     }
@@ -139,17 +137,16 @@ function chatMsg(socket, msg){
             action: act,
             date: now.format("HH:mm:ss"),
             name: `${socket.name}:`,
-            msg:  msg,
+            msg:  msg.msg,
             color: socket.color,
-            curtab: curtab,
+            curtab: msg.curtab,
             id: socket.name
         }]
     };
 
-    if (curtab !== 'Main'){
+    if (msg.curtab !== 'Main'){
         for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
-            if (SOCKET_CONNECTIONS[i].name == curtab){
-                console.log(send);
+            if (SOCKET_CONNECTIONS[i].name == msg.curtab){
                 SOCKET_CONNECTIONS[i].emit('addToChat', send);
                 socket.emit('addToChat', send);
                 return;
@@ -247,7 +244,8 @@ function command(socket, msg){
                     date: now.format("HH:mm:ss"),
                     name: `${socket.name}:`,
                     msg:  `Unknown command: ${command}`,
-                    color: `red`
+                    color: `red`,
+                    curtab: msg.curtab
                 }]
             };
             socket.emit('addToChat', send);
