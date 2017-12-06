@@ -1,5 +1,6 @@
 body{
     margin: 0px;
+    height: 100vh;
 }
 .chat{
     position:absolute !important;

@@ -1,9 +1,10 @@
+$(document).ready(function(){
 //globals
     let socket = io();
     var builder = function(){
         var self = this;
         this.chat = $(`<div id='chat' class='chat'>`);
-        this.chat.appendTo($('#container'));
+        this.chat.appendTo($('body'));
         this.inputcontainer = $(`<div id='inputcontainer' class='inputcontainer'>`);
         this.inputcontainer.appendTo(this.chat);
         this.cgroup = $(`<div id='cgroup' class='cgroup'>`);
@@ -136,7 +137,7 @@
             }
         });
         this.chat.draggable({
-            containment: $('#container')
+            containment: 'body'
         });
         this.chat.resizable({
             handles: {
@@ -405,3 +406,4 @@
             chat.randomizedstartinganimation(data);
         }
     });
+});
