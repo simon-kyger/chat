@@ -24,7 +24,10 @@ let keys = {};
         .catch(err => console.log(err))
 });
 
-app.get('/', (req, res) => res.sendFile(`${__dirname}/client/index.html`));
+// This serves the static assets directory from '/'
+// will try to match resources specified after root ('/')
+// against explicit resource handlers 
+app.use('/', express.static(path.join(__dirname, 'client')));
 
 server.listen(port);
 console.log(`Listening on port: ${port}`);
