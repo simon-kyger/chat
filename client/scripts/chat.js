@@ -3,7 +3,7 @@
     var builder = function(){
         var self = this;
         this.chat = $(`<div id='chat' class='chat'>`);
-        this.chat.appendTo($('body'));
+        this.chat.appendTo($('#container'));
         this.inputcontainer = $(`<div id='inputcontainer' class='inputcontainer'>`);
         this.inputcontainer.appendTo(this.chat);
         this.cgroup = $(`<div id='cgroup' class='cgroup'>`);
@@ -135,7 +135,9 @@
                 self.cfg.expanded = true;
             }
         });
-        this.chat.draggable();
+        this.chat.draggable({
+            containment: $('#container')
+        });
         this.chat.resizable({
             handles: {
                 'ne': this.chatresizer
@@ -202,8 +204,8 @@
                 this.chat.stop().animate({
                     top: '0px',
                     left: '0px',
-                    height: '50%',
-                    width: '50%',
+                    height: '75%',
+                    width: '75%',
                 }, 1500, null, ()=> {
                     this.chat.stop().animate({
                         boxShadow: `1 1 1000px 100px 'silver'`
