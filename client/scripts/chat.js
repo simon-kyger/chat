@@ -61,14 +61,6 @@
             });
         }
 
-        this.chat.draggable({
-            containment: 'body'
-        });
-        this.chat.resizable({
-            handles: {
-                'ne': this.chatresizer
-            }
-        });
         this.posts = [];
         this.position = 0;
         this.textarea.on('change keydown input paste', function(e){
@@ -143,6 +135,12 @@
                 self.cfg.expanded = true;
             }
         });
+        this.chat.draggable();
+        this.chat.resizable({
+            handles: {
+                'ne': this.chatresizer
+            }
+        });
     }
     let chat = new builder();
     builder.prototype.scrollBottom = function() {
@@ -150,6 +148,7 @@
             scrollTop: this.msgs[0].scrollHeight
         }, 1000); // SET SCROLLER TO BOTTOM
     }
+
 
     builder.prototype.getTheme = function(args) {
         let bgformatted;
@@ -242,6 +241,43 @@
             });
         });
     }
+
+    builder.RenderingObject = function(self) {
+        this.renderText = (args) => {
+            let div = `<div style='background-color:${args.bgcolor}; text-shadow: ${args.textshadow};'>${args.date}<b> ${args.name} </b><span style='color:${args.color};'>${args.msg}</span></div>`;
+            self.msgs.append(div);
+        },
+        this.renderImage = (args) => {
+            let img = `<a href='${args.msg}' target='_blank'><img class='imgs' src='${args.msg}' target='_blank' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img></a>`;
+            let link = `<a href='${args.msg}' target='_blank'>${args.msg}</a>`;
+            let div = $(`<div style='color:${args.color};'>${args.date}<b> ${args.name} </b>${link}<br>${img}</div>`);
+            div.appendTo(self.msgs);
+            self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
+            //lolfun $('.imgs').draggable({containment: $('.msgs')});
+        }
+        this.renderStaticImage = (args) => {
+            let img = `<img class='imgs' src='data:image/png;base64,${args.image}' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img>`;
+            let div = `<div style ='color:${args.color};'>${args.date}<b> ${args.name} </b>${img} </div>`
+            self.msgs.append(div);
+            self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
+        }
+        this.renderCodeBlock = (args) => {
+            let div = `<div style='color:${args.color};'>${args.date}<b> ${args.name} CODEBLOCK:</b>
+                      </div><pre style='white-space: pre-wrap;'><code class='code' style='border-radius: 10px;'>${args.msg.replace(/\n/g, '<br>')} </code></pre>`;
+            self.msgs.append(div);
+            $('.code').each(function(i, block) {
+              hljs.highlightBlock(block);
+            });
+        }
+        this.renderVideo = (args) => {
+            let url = `https://www.youtube.com/embed/${args.msg}`;
+            let link = `<a href='${url}'>${url}</a>`;
+            let iframe = `<iframe class='iframe' style='height: 300px; width: 500px' src='//www.youtube.com/embed/${args.msg}' allowfullscreen></iframe>`;
+            let div = `<div style='color:${args.color};'>${args.date}<b> ${args.name} </b>${link}<br>${iframe}</div>`;
+            self.msgs.append(div);
+            self.videotoggle ? $('.iframe').show() : $('.iframe').hide();
+        }
+    };
 
 //a glorified animation
     $(document).ready(()=> {
@@ -367,41 +403,3 @@
             chat.randomizedstartinganimation(data);
         }
     });
-
-
-    builder.RenderingObject = function(self) {
-        this.renderText = (args) => {
-            let div = `<div style='background-color:${args.bgcolor}; text-shadow: ${args.textshadow};'>${args.date}<b> ${args.name} </b><span style='color:${args.color};'>${args.msg}</span></div>`;
-            self.msgs.append(div);
-        },
-        this.renderImage = (args) => {
-            let img = `<a href='${args.msg}' target='_blank'><img class='imgs' src='${args.msg}' target='_blank' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img></a>`;
-            let link = `<a href='${args.msg}' target='_blank'>${args.msg}</a>`;
-            let div = $(`<div style='color:${args.color};'>${args.date}<b> ${args.name} </b>${link}<br>${img}</div>`);
-            div.appendTo(self.msgs);
-            self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
-            //lolfun $('.imgs').draggable({containment: $('.msgs')});
-        }
-        this.renderStaticImage = (args) => {
-            let img = `<img class='imgs' src='data:image/png;base64,${args.image}' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img>`;
-            let div = `<div style ='color:${args.color};'>${args.date}<b> ${args.name} </b>${img} </div>`
-            self.msgs.append(div);
-            self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
-        }
-        this.renderCodeBlock = (args) => {
-            let div = `<div style='color:${args.color};'>${args.date}<b> ${args.name} CODEBLOCK:</b>
-                      </div><pre style='white-space: pre-wrap;'><code class='code' style='border-radius: 10px;'>${args.msg.replace(/\n/g, '<br>')} </code></pre>`;
-            self.msgs.append(div);
-            $('.code').each(function(i, block) {
-              hljs.highlightBlock(block);
-            });
-        }
-        this.renderVideo = (args) => {
-            let url = `https://www.youtube.com/embed/${args.msg}`;
-            let link = `<a href='${url}'>${url}</a>`;
-            let iframe = `<iframe class='iframe' style='height: 300px; width: 500px' src='//www.youtube.com/embed/${args.msg}' allowfullscreen></iframe>`;
-            let div = `<div style='color:${args.color};'>${args.date}<b> ${args.name} </b>${link}<br>${iframe}</div>`;
-            self.msgs.append(div);
-            self.videotoggle ? $('.iframe').show() : $('.iframe').hide();
-        }
-    };
