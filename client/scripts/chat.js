@@ -47,6 +47,8 @@ $(document).ready(function(){
                 return;
             self.tab = $(`<div id='tab${args.curtab}' class='tab'>${args.curtab}</div>`);
             self.tab.appendTo(self.cgroup);
+            self.tab.css('backgroundColor', self.maincgroup.css('backgroundColor'));
+            self.tab.css('color', self.maincgroup.css('color'));
             self.tabX = $(`<div id='tabX${args.curtab}' class='closerX'>X</div>`);
             self.tabX.appendTo(self.tab);
             self.tab.on('click', function(e){
@@ -143,6 +145,13 @@ $(document).ready(function(){
             handles: {
                 'ne': this.chatresizer
             }
+            // resize: function(event, ui) {
+            //     // handle fontsize here
+            //     console.log(ui.size); // gives you the current size of the div
+            //     var size = ui.size;
+            //     // something like this change the values according to your requirements
+            //     $(this).css("font-size", (size.width * size.height)/20000 + "px"); 
+            // }
         });
     }
     let chat = new builder();
@@ -213,16 +222,13 @@ $(document).ready(function(){
                     },400, null, ()=>{
                         this.chat.stop().animate({
                             boxShadow: args.shadow
-                        },3000);
+                        },2000);
                         this.msgs.stop().animate({
                             color: args.text,
                             backgroundColor: args.bgformatted
                             //doesn't work shamefully
                             //textShadow: args.shadow
                         },2000);
-                        this.cgroup.stop().animate({
-                            backgroundColor: args.shadow
-                        });
                         this.inputcontainer.stop().animate({
                             backgroundColor: args.shadow
                         });
@@ -238,6 +244,13 @@ $(document).ready(function(){
                             backgroundColor: args.cinput,
                             color: args.text
                         }, 1500);
+                        this.cgroup.stop().animate({
+                            backgroundColor: args.shadow,
+                        });
+                        this.cgroup.children().stop().animate({
+                            backgroundColor: args.cinput,
+                            color: args.text
+                        });
                         if(args.text == 'white')
                             this.textarea.removeClass('blackphtext');
                         else
@@ -260,25 +273,25 @@ $(document).ready(function(){
 
     builder.RenderingObject = function(self) {
         this.renderText = (args) => {
-            let div = `<div style='background-color:${args.bgcolor}; text-shadow: ${args.textshadow}; direction: ltr; margin-bottom:5px;'>${args.date}<b> ${args.name} </b><span style='color:${args.color};'>${args.msg}</span></div>`;
+            let div = `<div class='msg' style='background-color:${args.bgcolor}; text-shadow: ${args.textshadow};'>${args.date}<b> ${args.name} </b><span style='color:${args.color};'>${args.msg}</span></div>`;
             self.msgs.append(div);
         },
         this.renderImage = (args) => {
             let img = `<a href='${args.msg}' target='_blank'><img class='imgs' src='${args.msg}' target='_blank' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img></a>`;
             let link = `<a href='${args.msg}' target='_blank'>${args.msg}</a>`;
-            let div = $(`<div style='color:${args.color}; direction: ltr; margin-bottom:5px;'>${args.date}<b> ${args.name} </b>${link}<br>${img}</div>`);
+            let div = $(`<div class='msg' style='color:${args.color};'>${args.date}<b> ${args.name} </b>${link}<br>${img}</div>`);
             div.appendTo(self.msgs);
             self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
             //lolfun $('.imgs').draggable({containment: $('.msgs')});
         }
         this.renderStaticImage = (args) => {
             let img = `<img class='imgs' src='data:image/png;base64,${args.image}' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img>`;
-            let div = `<div style ='color:${args.color}; direction: ltr; margin-bottom:5px;'>${args.date}<b> ${args.name} </b>${img} </div>`
+            let div = `<div class='msg' style ='color:${args.color};'>${args.date}<b> ${args.name} </b>${img} </div>`
             self.msgs.append(div);
             self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
         }
         this.renderCodeBlock = (args) => {
-            let div = `<div style='color:${args.color}; direction: ltr; margin-bottom:5px;'>${args.date}<b> ${args.name} CODEBLOCK:</b>
+            let div = `<div class='msg' style='color:${args.color};'>${args.date}<b> ${args.name} CODEBLOCK:</b>
                       </div><pre style='white-space: pre-wrap;'><code class='code' style='border-radius: 10px;'>${args.msg.replace(/\n/g, '<br>')} </code></pre>`;
             self.msgs.append(div);
             $('.code').each(function(i, block) {
@@ -289,7 +302,7 @@ $(document).ready(function(){
             let url = `https://www.youtube.com/embed/${args.msg}`;
             let link = `<a href='${url}'>${url}</a>`;
             let iframe = `<iframe class='iframe' style='height: 300px; width: 500px' src='//www.youtube.com/embed/${args.msg}' allowfullscreen></iframe>`;
-            let div = `<div style='color:${args.color}; direction: ltr; margin-bottom:5px;'>${args.date}<b> ${args.name} </b>${link}<br>${iframe}</div>`;
+            let div = `<div class='msg' style='color:${args.color};'>${args.date}<b> ${args.name} </b>${link}<br>${iframe}</div>`;
             self.msgs.append(div);
             self.videotoggle ? $('.iframe').show() : $('.iframe').hide();
         }
