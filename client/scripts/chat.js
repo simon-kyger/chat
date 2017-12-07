@@ -193,7 +193,7 @@ $(document).ready(function(){
         return ret;
     }
 
-    builder.prototype.randomizedstartinganimation = function(args) {
+    builder.prototype.randomizedstartinganimation = function(args, start) {
         //dragons be here
         args = this.getTheme(args);
         this.chat.stop().animate({
@@ -202,7 +202,7 @@ $(document).ready(function(){
             width: '15px',
             height: '15px',
             opacity: '1.0',
-        }, 0, null, ()=> {
+        }, start, null, ()=> {
             this.chat.stop().animate({
                 top: `${Math.floor(Math.random()*99)}%`,
                 left: `${Math.floor(Math.random()*99)}%`,
@@ -216,7 +216,7 @@ $(document).ready(function(){
                     left: '10%',
                     height: '75%',
                     width: '75%',
-                }, 1500, null, ()=> {
+                }, 1000, null, ()=> {
                     this.chat.stop().animate({
                         boxShadow: `1 1 1000px 100px 'silver'`
                     },400, null, ()=>{
@@ -310,7 +310,7 @@ $(document).ready(function(){
 
 //a glorified animation
     $(document).ready(()=> {
-        chat.randomizedstartinganimation(0);
+        chat.randomizedstartinganimation(0, 0);
         //glowing red text for banner and online users
         setInterval(()=> {
             $('.redshadow').animate({
@@ -430,6 +430,10 @@ $(document).ready(function(){
             chat.cgroup.stop().animate({
                 color: 'black',
                 backgroundColor: 'white'
+            });
+            chat.cgroup.children().stop().animate({
+                color: 'white',
+                backgroundColor: 'black'
             });
             chat.onlineusers.stop().animate({
                 color: 'black',
