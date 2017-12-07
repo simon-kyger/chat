@@ -1,3 +1,16 @@
+/* Please do not move these two rules at the top unless you know what you're doing */
+::-webkit-scrollbar-thumb {
+  background: #ffffff;
+  border: 0px none #ffffff;
+  border-radius: 0px;
+}
+::-webkit-scrollbar-track {
+  border: 0px none #ffffff;
+  border-radius: 0px;
+}
+
+/*Please do not remove the above two rules at the top unless you know what you're doing */
+
 body{
     margin: 0px;
     height: 100vh;
@@ -136,29 +149,21 @@ body{
 }
 
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
   height: 4px;
 }
 ::-webkit-scrollbar-button {
   width: 0px;
   height: 0px;
 }
-::-webkit-scrollbar-thumb {
-  background: #e1e1e1;
-  border: 0px none #ffffff;
-  border-radius: 0px;
-}
+
 ::-webkit-scrollbar-thumb:hover {
   background: #ffffff;
 }
 ::-webkit-scrollbar-thumb:active {
   background: #ffffff;
 }
-::-webkit-scrollbar-track {
-  background: #000000;
-  border: 0px none #ffffff;
-  border-radius: 0px;
-}
+
 ::-webkit-scrollbar-track:hover {
   background: #000000;
 }

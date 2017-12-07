@@ -217,10 +217,12 @@ $(document).ready(function(){
                     height: '75%',
                     width: '75%',
                 }, 1000, null, ()=> {
-                    this.scrollBottom();
                     this.msgs.stop().animate({
                         boxShadow: `1 1 1000px 100px 'silver'`
                     },400, null, ()=>{
+                        //scrollbar crap
+                        document.styleSheets[0].cssRules[0].style.background = args.bgformatted;
+                        document.styleSheets[0].cssRules[1].style.background = args.cinput;
                         this.chat.stop().animate({
                             boxShadow: args.shadow
                         },2000);
@@ -237,6 +239,7 @@ $(document).ready(function(){
                             color: args.text,
                             backgroundColor: args.bgformatted
                         });
+                        this.scrollBottom();
                     });
                     this.textarea.stop().animate({
                         backgroundColor: 'white'
@@ -452,6 +455,8 @@ $(document).ready(function(){
                 color: 'white'
             });
             chat.textarea.addClass('whitephtext');
+            document.styleSheets[0].cssRules[0].style.background = 'white';
+            document.styleSheets[0].cssRules[1].style.background = 'black';
         } else {
             let args = chat.getTheme(data);
             chat.randomizedstartinganimation(data);
