@@ -21,7 +21,7 @@ $(document).ready(function(){
         this.imagetoggle.appendTo(this.config);
         this.cfg = $(`<div id='cfg' class='cfg'>&#x2699;</div>`);
         this.cfg.appendTo(this.inputcontainer);
-        this.textarea = $(`<textarea id='chatinput' class='chatinput' placeholder='Chat here! or /? for a list of commands.' autofocus='autofocus'></textarea>`);
+        this.textarea = $(`<textarea id='chatinput' class='chatinput blackphtext' placeholder='Chat here! or /? for a list of commands.' autofocus='autofocus'></textarea>`);
         this.textarea.appendTo(this.inputcontainer);
         this.istyping = $(`<div class='istyping'></div>`);
         this.istyping.appendTo(this.inputcontainer);
@@ -203,8 +203,8 @@ $(document).ready(function(){
                     backgroundColor: '#e5e5e5'
                 }, 1500);
                 this.chat.stop().animate({
-                    top: '0px',
-                    left: '0px',
+                    top: '10%',
+                    left: '10%',
                     height: '75%',
                     width: '75%',
                 }, 1500, null, ()=> {
@@ -238,6 +238,11 @@ $(document).ready(function(){
                             backgroundColor: args.cinput,
                             color: args.text
                         }, 1500);
+                        if(args.text == 'white')
+                            this.textarea.removeClass('blackphtext');
+                        else
+                            this.textarea.removeClass('whitephtext');
+                        this.textarea.addClass(`${args.text}phtext`);
                     });
                     this.config.stop().animate({
                         backgroundColor: args.bgformatted,
@@ -428,6 +433,7 @@ $(document).ready(function(){
             chat.cfg.stop().animate({
                 color: 'white'
             });
+            chat.textarea.addClass('whitephtext');
         } else {
             let args = chat.getTheme(data);
             chat.randomizedstartinganimation(data);
