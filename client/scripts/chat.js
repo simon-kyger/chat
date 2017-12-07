@@ -217,7 +217,8 @@ $(document).ready(function(){
                     height: '75%',
                     width: '75%',
                 }, 1000, null, ()=> {
-                    this.chat.stop().animate({
+                    this.scrollBottom();
+                    this.msgs.stop().animate({
                         boxShadow: `1 1 1000px 100px 'silver'`
                     },400, null, ()=>{
                         this.chat.stop().animate({
