@@ -226,7 +226,9 @@ $(document).ready(function(){
                         this.chat.stop().animate({
                             boxShadow: args.shadow
                         },2000);
-                        this.msgs.stop().animate({
+                        //for some reason using stop on msgs here gets squirley with above stylesheet changes
+                        //leave this in without .stop()
+                        this.msgs.animate({
                             color: args.text,
                             backgroundColor: args.bgformatted
                             //doesn't work shamefully
