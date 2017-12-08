@@ -121,16 +121,17 @@ function chatMsg(socket, msg){
     const now = new moment();
     if (msg.msg.indexOf('<') > -1)
         msg.msg = msg.msg.replace(new RegExp(/</, 'g'), '&lt');
+
     if (msg.msg.substr(0, 1) == '/'){
         command(socket, msg.msg);
         return;
     }
-
     let act = `renderText`;
-    if (isImage(msg.msg)){
-        act = `renderImage`;
-    } else if (msg.msg.substr(0, 23) == `https://www.youtube.com`){
+    
+    if (msg.msg.substr(0, 23) == `https://www.youtube.com`){
         act = `renderVideoLink`;
+    } else if (isImage(msg.msg)){
+        act = `renderImage`;
     } else {
         msg.msg = linkifyHtml(msg.msg, {
             defaultProtocol: `https`,
@@ -200,11 +201,13 @@ function command(socket, msg){
                     action: 'renderText',
                     date: now.format("HH:mm:ss"),
                     name: ``,
-                    msg:  `Your color is now <span style="color: ${mod};">${mod}</span>.`,
-                    color: `black`
+                    msg:  `${socket.name}'s color is now: <span style="color: ${mod};">${mod}</span>.`,
+                    color: `red`
                 }]
             }
-            socket.emit('addToChat', send);
+            for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
+                SOCKET_CONNECTIONS[i].emit('addToChat', send);
+            }
             socket.emit('changeInputFontColor', socket.color);
             break;
         case '/gif':
@@ -353,7 +356,7 @@ function changename(socket, mod){
                 date: now.format("HH:mm:ss"),
                 name: `${socket.name}:`,
                 msg:  `Use 1-20 characters for your name plz`,
-                color: socket.color
+                color: `red`
             }]
         };
         socket.emit('addToChat', send);
@@ -367,7 +370,7 @@ function changename(socket, mod){
                 date: now.format("HH:mm:ss"),
                 name: ``,
                 msg:  `<b>${oldname}</b> is now known as: <b>${socket.name}</b>`,
-                color: socket.color
+                color: `red`
             }]
         };
         for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {

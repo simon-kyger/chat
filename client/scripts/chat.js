@@ -285,30 +285,31 @@ $(document).ready(function(){
         this.renderImage = (args) => {
             let img = `<a href='${args.msg}' target='_blank'><img class='imgs' src='${args.msg}' target='_blank' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img></a>`;
             let link = `<a href='${args.msg}' target='_blank'>${args.msg}</a>`;
-            let div = $(`<div class='msg' style='color:${args.color};'>${args.date}<b> ${args.name} </b>${link}<br>${img}</div>`);
+            let div = $(`<div class='msg'>${args.date}<b> ${args.name} </b><span style='color:${args.color}'>${link}</span><br>${img}</div>`);
             div.appendTo(self.msgs);
             self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
             //lolfun $('.imgs').draggable({containment: $('.msgs')});
         }
         this.renderStaticImage = (args) => {
             let img = `<img class='imgs' src='data:image/png;base64,${args.image}' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img>`;
-            let div = `<div class='msg' style ='color:${args.color};'>${args.date}<b> ${args.name} </b>${img} </div>`
+            let div = `<div class='msg'>${args.date}<b> ${args.name} </b>${img} </div>`
             self.msgs.append(div);
             self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
         }
         this.renderCodeBlock = (args) => {
-            let div = `<div class='msg' style='color:${args.color};'>${args.date}<b> ${args.name} CODEBLOCK:</b>
-                      </div><pre style='white-space: pre-wrap;'><code class='code' style='border-radius: 10px;'>${args.msg.replace(/\n/g, '<br>')} </code></pre>`;
+            let div = `<div class='msg''>${args.date}<b> ${args.name} CODEBLOCK:</b>
+                      </div><pre style='white-space: pre-wrap;'><code class='code' style='border-radius: 10px;'>${args.msg}</code></pre>`;
             self.msgs.append(div);
             $('.code').each(function(i, block) {
               hljs.highlightBlock(block);
             });
         }
         this.renderVideo = (args) => {
-            let url = `https://www.youtube.com/embed/${args.msg}`;
+        	let url = `https://www.youtube.com/watch?v=${args.msg}`;
+            let embed = `https://www.youtube.com/embed/${args.msg}`;
             let link = `<a href='${url}'>${url}</a>`;
-            let iframe = `<iframe class='iframe' style='height: 300px; width: 500px' src='//www.youtube.com/embed/${args.msg}' allowfullscreen></iframe>`;
-            let div = `<div class='msg' style='color:${args.color};'>${args.date}<b> ${args.name} </b>${link}<br>${iframe}</div>`;
+            let iframe = `<iframe class='iframe' style='height: 300px; width: 500px' src='${embed}' allowfullscreen></iframe>`;
+            let div = `<div class='msg'>${args.date}<b> ${args.name} </b><span style='${args.color}'>${link}</span><br>${iframe}</div>`;
             self.msgs.append(div);
             self.videotoggle ? $('.iframe').show() : $('.iframe').hide();
         }
@@ -317,7 +318,7 @@ $(document).ready(function(){
         	let link = `<a href='${url}'>${url}</a>`;
         	let id = url.substr(32);
         	let iframe = `<iframe class='iframe' style='height: 300px; width: 500px' src='//www.youtube.com/embed/${id}' allowfullscreen></iframe>`;
-            let div = `<div class='msg' style='color:${args.color};'>${args.date}<b> ${args.name} </b>${link}<br>${iframe}</div>`;
+            let div = `<div class='msg'>${args.date}<b> ${args.name} </b><span style='${args.color}'>${link}</span><br>${iframe}</div>`;
             self.msgs.append(div);
             self.videotoggle ? $('.iframe').show() : $('.iframe').hide(); 
         }
