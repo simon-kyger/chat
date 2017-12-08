@@ -362,7 +362,7 @@ function changename(socket, mod){
                 date: now.format("HH:mm:ss"),
                 name: ``,
                 msg:  `<b>${oldname}</b> is now known as: <b>${socket.name}</b>`,
-                color: `white`
+                color: socket.color
             }]
         };
         for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {

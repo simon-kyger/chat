@@ -33,6 +33,9 @@ body{
     direction: rtl;
     text-align: left;
 }
+.code {
+    direction: ltr;
+}
 .msg{
     direction: ltr; 
 }
@@ -129,14 +132,14 @@ body{
 .cgroup{
     width:100%;
     height:5%;
-    overflow: hidden;
+    overflow-y: scroll;
 }
 .tab{
-    border: 1px solid black;
     cursor: pointer;
     width: 10%;
     float:left;
     height:100%;
+    margin-right:5px;
 }
 .closerX{
     width: 15px;
