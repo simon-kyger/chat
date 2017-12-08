@@ -4,7 +4,6 @@ $(document).ready(function(){
     var builder = function(){
         var self = this;
         this.chat = $(`<div id='chat' class='chat'>`);
-        this.chat.appendTo($('body'));
         this.inputcontainer = $(`<div id='inputcontainer' class='inputcontainer'>`);
         this.inputcontainer.appendTo(this.chat);
         this.cgroup = $(`<div id='cgroup' class='cgroup'>`);
@@ -153,6 +152,7 @@ $(document).ready(function(){
             //     $(this).css("font-size", (size.width * size.height)/20000 + "px"); 
             // }
         });
+        this.chat.appendTo($('body'));
     }
     let chat = new builder();
     builder.prototype.scrollBottom = function() {
@@ -312,6 +312,15 @@ $(document).ready(function(){
             self.msgs.append(div);
             self.videotoggle ? $('.iframe').show() : $('.iframe').hide();
         }
+        this.renderVideoLink = (args) => {
+        	let url = args.msg;
+        	let link = `<a href='${url}'>${url}</a>`;
+        	let id = url.substr(32);
+        	let iframe = `<iframe class='iframe' style='height: 300px; width: 500px' src='//www.youtube.com/embed/${id}' allowfullscreen></iframe>`;
+            let div = `<div class='msg' style='color:${args.color};'>${args.date}<b> ${args.name} </b>${link}<br>${iframe}</div>`;
+            self.msgs.append(div);
+            self.videotoggle ? $('.iframe').show() : $('.iframe').hide(); 
+        }
     };
 
 //a glorified animation
@@ -371,7 +380,7 @@ $(document).ready(function(){
                 data[i] = data[i].replace(/\n/g, '<br>');
             chat.onlineusers.append(`<div class='user' style='color:${data[i].color}; cursor: pointer'>${data[i]}</div>`);
         }
-        $('.user').on('click', function() {
+        $('.user').dblclick(function () {
             chat.curtab = $(this)[0].textContent;
             chat.msgs.empty();
             chat.msgs.append(chat.prevmsgs[chat.curtab]);

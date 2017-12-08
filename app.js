@@ -129,6 +129,8 @@ function chatMsg(socket, msg){
     let act = `renderText`;
     if (isImage(msg.msg)){
         act = `renderImage`;
+    } else if (msg.msg.substr(0, 23) == `https://www.youtube.com`){
+        act = `renderVideoLink`;
     } else {
         msg.msg = linkifyHtml(msg.msg, {
             defaultProtocol: `https`,
@@ -216,6 +218,9 @@ function command(socket, msg){
             break;
         case '/name':
             changename(socket, mod);
+            break;
+        case '/reddit':
+            redditrequest(socket, mod);
             break;
         case '/theme':
             if (mod == 'dark')
@@ -491,6 +496,17 @@ function giphyrequest(socket, mod){
                 socket.emit('addToChat', send);
             });
         }
+    });
+}
+
+function redditrequest(socket, mod){
+    const now = new moment();
+    let send;
+    let link = `https://www.reddit.com/.json`;
+    request.get(link, function (error, response, body) {
+        let query = JSON.parse(body);
+        let ret = query.data.children[0];
+        console.log(ret);
     });
 }
 
