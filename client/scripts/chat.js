@@ -46,6 +46,28 @@ $(document).ready(function(){
         this.newtab = function(args){
             self.tab = $(`<div id='tab${args.curtab}' class='tab'>${args.curtab}</div>`);
             self.tab.appendTo(self.cgroup);
+            if (args.sposition){
+                self.tab.height = self.tab.css('height');
+                self.tab.css('position', 'absolute');
+                self.tab.left = self.tab.css('left');
+                self.tab.top = self.tab.css('top');
+                self.tab.width = self.tab.css('width');
+                let dist = `${Object.keys(self.msgs).length*10}%`; 
+                self.tab.animate({
+                    top: $(args.sposition).parent().position().top,
+                    left: $(args.sposition).parent().position().left,
+                    width: '800px',
+                    height: '800px',
+                },0).animate({
+                    top: 0,
+                    left: dist,
+                    width: self.tab.width,
+                    height: self.tab.height,
+                }, function(){
+                    $(this).css('position', 'relative');
+                    $(this).css('left', 0);
+                }); 
+            }
             self.tab.css('backgroundColor', self.maincgroup.css('backgroundColor'));
             self.tab.css('color', self.maincgroup.css('color'));
             self.tabX = $(`<div id='tabX${args.curtab}' class='closerX'>X</div>`);
@@ -387,12 +409,13 @@ $(document).ready(function(){
                 data[i] = data[i].replace(/\n/g, '<br>');
             chat.onlineusers.append(`<div class='user' style='color:${data[i].color}; cursor: pointer'>${data[i]}</div>`);
         }
-        $('.user').dblclick(function () {
+        $('.user').dblclick(function (e) {
             chat.curtab = $(this)[0].textContent;
             if(chat.msgs[chat.curtab])
                 return;
             chat.newtab({
-                curtab: chat.curtab
+                curtab: chat.curtab,
+                sposition: e.target
             });
             chat.msgs[chat.curtab] = $(`<div id='${chat.curtab}' class='msgs'>`);
             chat.msgs[chat.curtab].css("color", chat.msgs['Main'][0].style.color);
