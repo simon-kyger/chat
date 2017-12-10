@@ -287,25 +287,25 @@ $(document).ready(function(){
 
     builder.RenderingObject = function(self) {
         this.renderText = (tab, args) => {
-            let div = `<div class='msg' style='background-color:${args.bgcolor}; text-shadow: ${args.textshadow};'>${args.date}<b> ${args.name} </b><span style='color:${args.color};'>${args.msg}</span></div>`;
+            let div = `<div class='msg' style='background-color:${args.bgcolor}; text-shadow: ${args.textshadow};'>${args.date} <span style='color:${args.color};'>${args.name} ${args.msg}</span></div>`;
             self.msgs[tab].append(div);
         },
         this.renderImage = (tab, args) => {
             let img = `<a href='${args.msg}' target='_blank'><img class='imgs' src='${args.msg}' target='_blank' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img></a>`;
             let link = `<a href='${args.msg}' target='_blank'>${args.msg}</a>`;
-            let div = $(`<div class='msg'>${args.date}<b> ${args.name} </b><span style='color:${args.color}'>${link}</span><br>${img}</div>`);
+            let div = $(`<div class='msg'>${args.date} <span style='color:${args.color}'>${args.name} ${link} </span><br>${img}</div>`);
             self.msgs[tab].append(div);
             self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
             //lolfun $('.imgs').draggable({containment: $('.msgs')});
         }
         this.renderStaticImage = (tab, args) => {
             let img = `<img class='imgs' src='data:image/png;base64,${args.image}' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img>`;
-            let div = `<div class='msg'>${args.date}<b> ${args.name} </b>${img} </div>`
+            let div = `<div class='msg'>${args.date} <span style='color:${args.color}'>${args.name} ${img} </span></div>`
             self.msgs[tab].append(div);
             self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
         }
         this.renderCodeBlock = (tab, args) => {
-            let div = `<div class='msg''>${args.date}<b> ${args.name} CODEBLOCK:</b>
+            let div = `<div class='msg''>${args.date} <span style='color:${args.color}'>${args.name} CODEBLOCK: </span>
                       </div><pre style='white-space: pre-wrap;'><code class='code' style='border-radius: 10px;'>${args.msg}</code></pre>`;
             self.msgs[tab].append(div);
             $('.code').each(function(i, block) {
@@ -317,7 +317,7 @@ $(document).ready(function(){
             let embed = `https://www.youtube.com/embed/${args.msg}`;
             let link = `<a href='${url}'>${url}</a>`;
             let iframe = `<iframe class='iframe' style='height: 300px; width: 500px' src='${embed}' allowfullscreen></iframe>`;
-            let div = `<div class='msg'>${args.date}<b> ${args.name} </b><span style='${args.color}'>${link}</span><br>${iframe}</div>`;
+            let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link} </span><br>${iframe}</div>`;
             self.msgs[tab].append(div);
             self.videotoggle ? $('.iframe').show() : $('.iframe').hide();
         }
@@ -326,7 +326,7 @@ $(document).ready(function(){
         	let link = `<a href='${url}'>${url}</a>`;
         	let id = url.substr(32);
         	let iframe = `<iframe class='iframe' style='height: 300px; width: 500px' src='//www.youtube.com/embed/${id}' allowfullscreen></iframe>`;
-            let div = `<div class='msg'>${args.date}<b> ${args.name} </b><span style='${args.color}'>${link}</span><br>${iframe}</div>`;
+            let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link}</span><br>${iframe}</div>`;
             self.msgs[tab].append(div);
             self.videotoggle ? $('.iframe').show() : $('.iframe').hide(); 
         }
@@ -448,47 +448,41 @@ $(document).ready(function(){
                 boxShadow: `0 0 10px 1000px rgb(255,255,255)`,
                 backgroundColor: 'white',
             });
-            chat.msgs.stop().animate({
-                color: 'black',
-                backgroundColor: 'white'
-            });
-            chat.textarea.stop().animate({
+            for (let elem in chat.msgs){
+                chat.msgs[elem].stop().animate({
+                    color: 'black',
+                    backgroundColor: 'white'
+                });
+            }
+            $(chat.textarea).stop().animate({
                 color: 'white',
                 backgroundColor: 'black'
             });
-            chat.inputcontainer.stop().animate({
+            $(chat.config).stop().animate({
+                color: 'black',
+                backgroundColor: 'white'
+            });
+            $(chat.istyping).stop().animate({
+                color: 'black',
+                backgroundColor: 'white'
+            });
+            $(chat.cgroup).stop().animate({
+                color: 'black',
+                backgroundColor: 'white'
+            });
+            $(chat.cgroup).children().stop().animate({
                 color: 'white',
                 backgroundColor: 'black'
             });
-            chat.config.stop().animate({
+            $(chat.onlineusers).stop().animate({
                 color: 'black',
                 backgroundColor: 'white'
             });
-            chat.istyping.stop().animate({
+            $(chat.inputcontainer).stop().animate({
                 color: 'black',
                 backgroundColor: 'white'
             });
-            chat.cgroup.stop().animate({
-                color: 'black',
-                backgroundColor: 'white'
-            });
-            chat.cgroup.children().stop().animate({
-                color: 'white',
-                backgroundColor: 'black'
-            });
-            chat.onlineusers.stop().animate({
-                color: 'black',
-                backgroundColor: 'white'
-            });
-            chat.inputcontainer.stop().animate({
-                color: 'black',
-                backgroundColor: 'white'
-            });
-            chat.istyping.stop().animate({
-                color: 'black',
-                backgroundColor: 'white'
-            });
-            chat.cfg.stop().animate({
+            $(chat.cfg).stop().animate({
                 color: 'white'
             });
             chat.textarea.addClass('whitephtext');

@@ -55,9 +55,9 @@ function init(socket){
     let send = {
         chatmessages: [{
             action: 'renderText',
-            date:  moment().format("HH:mm:ss"),
+            date:  `[${moment().format("HH:mm:ss")}]`,
             name: ``,
-            msg:  `User ${socket.name} has connected.`,
+            msg:  `[${socket.name}] has connected.`,
             color: socket.color
         }],
         curtab: 'Main'
@@ -76,9 +76,9 @@ function disconnects(socket){
     let send = {
         chatmessages: [{
             action: 'renderText',
-            date: moment().format("HH:mm:ss"),
+            date:  `[${moment().format("HH:mm:ss")}]`,
             name: ``,
-            msg:  `User ${socket.name} has disconnected.`,
+            msg:  `[${socket.name}] has disconnected.`,
             color: socket.color
         }],
         curtab: 'Main'
@@ -119,7 +119,6 @@ function istyping(socket, bools){
 //msg: object
 //returns: void
 function chatMsg(socket, msg){
-    const now = new moment();
     if (msg.msg.indexOf('<') > -1)
         msg.msg = msg.msg.replace(new RegExp(/</, 'g'), '&lt');
 
@@ -142,8 +141,8 @@ function chatMsg(socket, msg){
     let send = {
         chatmessages: [{
             action: act,
-            date: now.format("HH:mm:ss"),
-            name: `${socket.name}:`,
+            date:  `[${moment().format("HH:mm:ss")}]`,
+            name: `[${socket.name}]:`,
             msg:  msg.msg,
             color: socket.color,
         }],
@@ -178,7 +177,6 @@ function getIpOfName(name){
 //returns: void
 //description: directs commands sent to server by client.
 function command(socket, msg, curtab){
-    const now = new moment();
     let command = msg.substr(0, msg.indexOf(' ')) || msg;
     let mod = msg.substr(command.length+1);
     let send;
@@ -231,8 +229,8 @@ function command(socket, msg, curtab){
             send = {
                 chatmessages: [{
                     action: 'renderText',
-                    date: now.format("HH:mm:ss"),
-                    name: `${socket.name}:`,
+                    date:  `[${moment().format("HH:mm:ss")}]`,
+                    name: `[${socket.name}]:`,
                     msg:  `Unknown command: ${command}`,
                     color: `red`,
                 }],
@@ -246,13 +244,24 @@ function codeblock(socket, mod, curtab){
     let send = {
         chatmessages: [{
             action: 'renderCodeBlock',
-            date: now.format("HH:mm:ss"),
-            name: `${socket.name}:`,
+            date:  `[${moment().format("HH:mm:ss")}]`,
+            name: `[${socket.name}]:`,
             msg:  mod,
             color: socket.color
         }],
         curtab: curtab
     };
+    if (curtab !== 'Main'){
+        for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
+            if (SOCKET_CONNECTIONS[i].name == curtab){
+                send.curtab = socket.name;
+                SOCKET_CONNECTIONS[i].emit('addToChat', send);
+                send.curtab = curtab;
+                socket.emit('addToChat', send);
+                return;
+            }
+        }
+    }
     socket.emit('addToChat', send);
 }
 
@@ -261,7 +270,7 @@ function changecolor(socket, mod, curtab){
     let send = {
         chatmessages: [{
             action: 'renderText',
-            date: now.format("HH:mm:ss"),
+            date:  `[${moment().format("HH:mm:ss")}]`,
             name: ``,
             msg:  `${socket.name}'s color is now: <span style="color: ${mod};">${mod}</span>.`,
             color: `red`
@@ -289,14 +298,13 @@ function changecolor(socket, mod, curtab){
 //mod: string
 //description: part of command lib that will fetch mod from googlesapi
 function youtuberequest(socket, mod, curtab){
-    const now = new moment();
     let send;
     if (!keys.youtube){
         send = {
             chatmessages: [{
                 action: 'renderText',
-                date: now.format("HH:mm:ss"),
-                name: `${socket.name}:`,
+                date:  `[${moment().format("HH:mm:ss")}]`,
+                name: `[${socket.name}]:`,
                 msg:  `Server not configured for that command.`,
                 color: `red`
             }],
@@ -314,8 +322,8 @@ function youtuberequest(socket, mod, curtab){
             send = {
                 chatmessages: [{
                     action: 'renderVideo',
-                    date: now.format("HH:mm:ss"),
-                    name: `${socket.name}:`,
+                    date:  `[${moment().format("HH:mm:ss")}]`,
+                    name: `[${socket.name}]:`,
                     msg:  result.items[0].id.videoId,
                 }],
                 curtab: curtab
@@ -324,20 +332,20 @@ function youtuberequest(socket, mod, curtab){
             send = {
                 chatmessages: [{
                     action: 'renderText',
-                    date: now.format("HH:mm:ss"),
-                    name: `${socket.name}:`,
+                    date:  `[${moment().format("HH:mm:ss")}]`,
+                    name: ``,
                     msg:  `Youtube failed. This can happen easily if you match a channel owner's name.`,
                     color: `red`
                 },{
                     action: 'renderText',
-                    date: now.format("HH:mm:ss"),
-                    name: `${socket.name}:`,
+                    date:  `[${moment().format("HH:mm:ss")}]`,
+                    name: ``,
                     msg:  `Search query->'${mod}'.`,
                     color: `red`
                 },{
                     action: 'renderText',
-                    date: now.format("HH:mm:ss"),
-                    name: `${socket.name}:`,
+                    date:  `[${moment().format("HH:mm:ss")}]`,
+                    name: ``,
                     msg:  `Try refining your search pattern with more text.`,
                     color: `red`
                 }],
@@ -367,7 +375,6 @@ function youtuberequest(socket, mod, curtab){
 //mod: string
 //description: part of command lib that will allow a user to change their name
 function changename(socket, mod, curtab){
-    const now = new moment();
     let send;
     let allnames = getNames(SOCKET_CONNECTIONS);
     for (let i = 0; i<allnames.length; i++){
@@ -375,7 +382,7 @@ function changename(socket, mod, curtab){
             send = {
                 chatmessages: [{
                     action: 'renderText',
-                    date: now.format("HH:mm:ss"),
+                    date:  `[${moment().format("HH:mm:ss")}]`,
                     name: ``,
                     msg:  `Name '${mod}' is already in use.`,
                     color: 'red'
@@ -390,8 +397,8 @@ function changename(socket, mod, curtab){
         send = {
             chatmessages: [{
                 action: 'renderText',
-                date: now.format("HH:mm:ss"),
-                name: `${socket.name}:`,
+                date:  `[${moment().format("HH:mm:ss")}]`,
+                name: ``,
                 msg:  `Use 1-20 characters for your name plz`,
                 color: `red`
             }],
@@ -405,9 +412,9 @@ function changename(socket, mod, curtab){
         send = {
             chatmessages: [{
                 action: 'renderText',
-                date: now.format("HH:mm:ss"),
+                date:  `[${moment().format("HH:mm:ss")}]`,
                 name: ``,
-                msg:  `<b>${oldname}</b> is now known as: <b>${socket.name}</b>`,
+                msg:  `<b>[${oldname}]</b> is now known as: <b>[${socket.name}]</b>`,
                 color: `red`
             }],
             curtab: curtab
@@ -415,7 +422,6 @@ function changename(socket, mod, curtab){
         if (curtab !== 'Main'){
             for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
                 if (SOCKET_CONNECTIONS[i].name == curtab){
-                    console.log('triggered');
                     send.curtab = socket.name;
                     SOCKET_CONNECTIONS[i].emit('addToChat', send);
                     SOCKET_CONNECTIONS[i].emit('removeTab', oldname);
@@ -436,14 +442,13 @@ function changename(socket, mod, curtab){
 //mod: string
 //description: part of command lib that will fetch mod from giphy.com
 function giphyrequest(socket, mod, curtab){
-    const now = new moment();
     let send;
     if (!keys.giphy){
         send = {
             chatmessages: [{
                 action: 'renderText',
-                date: now.format("HH:mm:ss"),
-                name: `${socket.name}:`,
+                date:  `[${moment().format("HH:mm:ss")}]`,
+                name: `[${socket.name}]:`,
                 msg:  `Server not configured for that command.`,
                 color: `red`
             }],
@@ -457,13 +462,13 @@ function giphyrequest(socket, mod, curtab){
             send = {
                 chatmessages: [{
                     action: 'renderText',
-                    date: now.format("HH:mm:ss"),
+                    date:  `[${moment().format("HH:mm:ss")}]`,
                     name: ``,
                     msg:  `Giphy does not allow one to query with hashtags.`,
                     color: `red`
                 },{
                     action: 'renderText',
-                    date: now.format("HH:mm:ss"),
+                    date:  `[${moment().format("HH:mm:ss")}]`,
                     name: ``,
                     msg:  `Search query-> ${mod}`,
                     color: `red`
@@ -487,14 +492,14 @@ function giphyrequest(socket, mod, curtab){
             send = {
                 chatmessages: [{
                     action: 'renderText',
-                    date: now.format("HH:mm:ss"),
-                    name: `${socket.name}:`,
+                    date:  `[${moment().format("HH:mm:ss")}]`,
+                    name: ``,
                     msg:  `Giphy is having issues or is down apparently.`,
                     color: `red`
                 },{
                     action: 'renderText',
-                    date: now.format("HH:mm:ss"),
-                    name: `${socket.name}:`,
+                    date:  `[${moment().format("HH:mm:ss")}]`,
+                    name: ``,
                     msg:  `Try again later.`,
                     color: `red`
                 }],
@@ -515,20 +520,20 @@ function giphyrequest(socket, mod, curtab){
                 send = {
                     chatmessages: [{
                         action: 'renderText',
-                        date: now.format("HH:mm:ss"),
-                        name: `${socket.name}:`,
+                        date:  `[${moment().format("HH:mm:ss")}]`,
+                        name: ``,
                         msg:  `Giphy failed to return anything!`,
                         color: `red`
                     },{
                         action: 'renderText',
-                        date: now.format("HH:mm:ss"),
-                        name: `${socket.name}:`,
+                        date:  `[${moment().format("HH:mm:ss")}]`,
+                        name: ``,
                         msg:  `Search query->'${mod}'`,
                         color: `red`
                     },{
                         action: 'renderText',
-                        date: now.format("HH:mm:ss"),
-                        name: `${socket.name}:`,
+                        date:  `[${moment().format("HH:mm:ss")}]`,
+                        name: ``,
                         msg:  `Sorry about that, here's a sad puppy instead:`,
                         color: `red`
                     },{
@@ -546,8 +551,8 @@ function giphyrequest(socket, mod, curtab){
             send = {
                 chatmessages: [{
                     action: 'renderImage',
-                    date: now.format("HH:mm:ss"),
-                    name: `${socket.name}:`,
+                    date:  `[${moment().format("HH:mm:ss")}]`,
+                    name: `[${socket.name}]:`,
                     msg:  ret,
                 }],
                 curtab: curtab
@@ -571,7 +576,6 @@ function giphyrequest(socket, mod, curtab){
 }
 
 function redditrequest(socket, mod){
-    const now = new moment();
     let send;
     let link = `https://www.reddit.com/.json`;
     request.get(link, function (error, response, body) {
