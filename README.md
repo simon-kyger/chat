@@ -11,10 +11,10 @@ I am primarily a windows developer.  For help with linux getting started, refer 
 
 ## Windows users 
 
-1. Create or pull the files to a directory such as c:\users\{username}\desktop\chat
+1. Create or pull the files to a directory such as c:\users\\{username}\desktop\chat
 2. Install node (anywhere).
 3. Open a command prompt and issue the commands 
-   cd c:\users\{username}\desktop\chat
+   cd c:\users\\{username}\desktop\chat
    npm install
 
 ## Linux and Mac users
@@ -24,6 +24,19 @@ I am primarily a windows developer.  For help with linux getting started, refer 
 3. Use NVM (the Node Version Manager) to install and use the correct version 
    of NodeJS to use with this project
 
+## All Users [Optional]
+
+1. If you wish to be able to use the features /yt or /gif you'll need to add a directory at root level called:
+	
+	apikeys
+
+Inside of this directory, create .txt files called:
+
+	giphykey.txt
+	youtubekey.txt
+
+Inside of those files, put only the key itself without anything else.
+Don't forget to add ../apikeys in your .gitignore!
 
 # Running the project
 
@@ -36,7 +49,7 @@ By default, node knows to run under development mode.  so this will work out of 
 1. node app.js
 
 //if you want to specify or switch from production to development mode
-1. command prompt > cd c:\users\{username}\desktop\chat
+1. command prompt > cd c:\users\\{username}\desktop\chat
 2. set NODE_ENV=development
 3. node app.js
 
@@ -47,7 +60,7 @@ By default, node knows to run under development mode.  so this will work out of 
 
 ### Windows users
 This is assuming you're running on windows 10.
-1. command prompt > cd c:\users\{username}\desktop\chat 
+1. command prompt > cd c:\users\\{username}\desktop\chat 
 2. set NODE_ENV=production
 3. node app.js
 
