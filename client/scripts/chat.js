@@ -58,6 +58,7 @@ $(document).ready(function(){
                     self.msgs[msgsgrp].hide();
                 }
                 self.msgs[self.curtab].show();
+                self.textarea.focus();
             });
             self.tabX.on('click', function(e){
                 this.parentElement.remove();
@@ -68,23 +69,24 @@ $(document).ready(function(){
                     }
                 }
                 self.maincgroup.click();
+                self.textarea.focus();
             });
         }
 
         this.posts = [];
         this.position = 0;
         this.textarea.on('change keydown input paste', function(e){
-            //down
-            if (e.which == 40){
+            //up
+            if (e.which == 38 && $(this).get(0).value.length == 0){
                 self.position--;
-                if (self.position < -1)
-                    self.position = -1;
+                if (self.position < 0)
+                    self.position = 0;
                 this.value = self.posts[self.position] || '';
             }
-            //up
-            if (e.which == 38){
+            //down
+            if (e.which == 40 && this.selectionEnd == this.value.length){
                 self.position++;
-                if (self.position > self.posts.length)
+                if (self.position >= self.posts.length)
                     self.position = self.posts.length;
                 this.value = self.posts[self.position] || '';
             }
@@ -316,7 +318,7 @@ $(document).ready(function(){
         	let url = `https://www.youtube.com/watch?v=${args.msg}`;
             let embed = `https://www.youtube.com/embed/${args.msg}`;
             let link = `<a href='${url}'>${url}</a>`;
-            let iframe = `<iframe class='iframe' style='height: 300px; width: 500px' src='${embed}' allowfullscreen></iframe>`;
+            let iframe = `<iframe class='iframe' style='height: 300px; width: 400px' src='${embed}' allowfullscreen></iframe>`;
             let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link} </span><br>${iframe}</div>`;
             self.msgs[tab].append(div);
             self.videotoggle ? $('.iframe').show() : $('.iframe').hide();
@@ -325,7 +327,7 @@ $(document).ready(function(){
         	let url = args.msg;
         	let link = `<a href='${url}'>${url}</a>`;
         	let id = url.substr(32);
-        	let iframe = `<iframe class='iframe' style='height: 300px; width: 500px' src='//www.youtube.com/embed/${id}' allowfullscreen></iframe>`;
+        	let iframe = `<iframe class='iframe' style='height: 300px; width: 400px' src='//www.youtube.com/embed/${id}' allowfullscreen></iframe>`;
             let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link}</span><br>${iframe}</div>`;
             self.msgs[tab].append(div);
             self.videotoggle ? $('.iframe').show() : $('.iframe').hide(); 
@@ -400,6 +402,7 @@ $(document).ready(function(){
                 chat.msgs[msgsgrp].hide();
             }
             chat.msgs[chat.curtab].show();
+            chat.textarea.focus();
         });
     });
 

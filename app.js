@@ -24,9 +24,6 @@ let keys = {};
         .catch(err => console.log(err))
 });
 
-// This serves the static assets directory from '/'
-// will try to match resources specified after root ('/')
-// against explicit resource handlers 
 app.use('/', express.static(path.join(__dirname, 'client')));
 
 server.listen(port);
@@ -188,6 +185,9 @@ function command(socket, msg, curtab){
             changecolor(socket, mod, curtab);
             break;
         case '/gif':
+            giphyrequest(socket, mod, curtab);
+            break;
+        case '/giphy':
             giphyrequest(socket, mod, curtab);
             break;
         case '/help':
