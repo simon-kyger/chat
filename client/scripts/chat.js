@@ -8,8 +8,6 @@ $(document).ready(function(){
         this.inputcontainer.appendTo(this.chat);
         this.cgroup = $(`<div id='cgroup' class='cgroup'>`);
         this.cgroup.appendTo(this.chat);
-        this.msgs = $(`<div id='msgs' class='msgs'>`);
-        this.msgs.appendTo(this.chat);
         this.config = $(`<div id='config' class='config'>`);
         this.config.appendTo(this.chat);
         this.chatresizer = $(`<div id='chatresizer' class='resizer ui-resizable-handl ui-resizable-ne'>`);
@@ -24,26 +22,28 @@ $(document).ready(function(){
         this.textarea.appendTo(this.inputcontainer);
         this.istyping = $(`<div class='istyping'></div>`);
         this.istyping.appendTo(this.inputcontainer);
-        this.welcome = $(`<div class='redshadow'>Welcome to the proper lunch chat channel!</br></div>`);
-        this.welcome.appendTo(this.msgs);
-        this.githublink = $(`<div>&nbsp; &nbsp; github --> <a href='https://github.com/simon-kyger/chat' target='_blank'>https://github.com/simon-kyger/chat</a></br></div>`)
-        this.githublink.appendTo(this.msgs);
-        this.commandlist = $(`<div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>`);
-        this.commandlist.appendTo(this.msgs);
         this.onlineusers = $(`<div id='onlineusers' class='onlineusers'></div>`);
         this.onlineusers.appendTo(this.chat);
         this.maincgroup = $(`<div id='maincgroup' class='tab' style='width: 10%;'>Main</div>`);
         this.maincgroup.appendTo(this.cgroup);
-        this.prevmsgs = {};
         this.curtab = 'Main';
+        this.msgs = {};
+        this.msgs[this.curtab] = $(`<div id='${this.curtab}' class='msgs'>`);
+        this.msgs[this.curtab].appendTo(this.chat);
+        this.welcome = $(`<div class='redshadow'>Welcome to the proper lunch chat channel!</br></div>`);
+        this.welcome.appendTo(this.msgs[this.curtab]);
+        this.githublink = $(`<div>&nbsp; &nbsp; github --> <a href='https://github.com/simon-kyger/chat' target='_blank'>https://github.com/simon-kyger/chat</a></br></div>`)
+        this.githublink.appendTo(this.msgs[this.curtab]);
+        this.commandlist = $(`<div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>`);
+        this.commandlist.appendTo(this.msgs[this.curtab]);
         this.maincgroup.on('click', function(){
             self.curtab = 'Main';
-            self.msgs.empty();
-            self.msgs.append(self.prevmsgs['Main']);
+            for (let msgsgrp in self.msgs){
+                self.msgs[msgsgrp].hide();
+            }
+            self.msgs[self.curtab].show();
         });
         this.newtab = function(args){
-            if(args.curtab == 'Main')
-                return;
             self.tab = $(`<div id='tab${args.curtab}' class='tab'>${args.curtab}</div>`);
             self.tab.appendTo(self.cgroup);
             self.tab.css('backgroundColor', self.maincgroup.css('backgroundColor'));
@@ -54,11 +54,19 @@ $(document).ready(function(){
                 if (e.target !== this) //this is necessary because tabX rests inside, if user clicks that then ignore this event
                     return;
                 self.curtab = this.innerText.slice(0, -1);
-                self.msgs.empty();
-                self.msgs.append(self.prevmsgs[self.curtab]);
+                for (let msgsgrp in self.msgs){
+                    self.msgs[msgsgrp].hide();
+                }
+                self.msgs[self.curtab].show();
             });
             self.tabX.on('click', function(e){
                 this.parentElement.remove();
+                for (let msgsgrp in self.msgs){
+                    if(msgsgrp == e.target.id.substr(4)){
+                        chat.msgs[msgsgrp].remove();
+                        delete self.msgs[msgsgrp];
+                    }
+                }
                 self.maincgroup.click();
             });
         }
@@ -156,8 +164,8 @@ $(document).ready(function(){
     }
     let chat = new builder();
     builder.prototype.scrollBottom = function() {
-        this.msgs.stop().animate({
-            scrollTop: this.msgs[0].scrollHeight
+        this.msgs[this.curtab].stop().animate({
+            scrollTop: this.msgs[this.curtab][0].scrollHeight
         }, 1000); // SET SCROLLER TO BOTTOM
     }
 
@@ -217,7 +225,7 @@ $(document).ready(function(){
                     height: '75%',
                     width: '75%',
                 }, 1000, null, ()=> {
-                    this.msgs.stop().animate({
+                    this.msgs[this.curtab].stop().animate({
                         boxShadow: `1 1 1000px 100px 'silver'`
                     },400, null, ()=>{
                         //scrollbar crap
@@ -228,7 +236,7 @@ $(document).ready(function(){
                         },2000);
                         //for some reason using stop on msgs here gets squirley with above stylesheet changes
                         //leave this in without .stop()
-                        this.msgs.animate({
+                        $('.msgs').animate({
                             color: args.text,
                             backgroundColor: args.bgformatted
                             //doesn't work shamefully
@@ -278,48 +286,48 @@ $(document).ready(function(){
     }
 
     builder.RenderingObject = function(self) {
-        this.renderText = (args) => {
+        this.renderText = (tab, args) => {
             let div = `<div class='msg' style='background-color:${args.bgcolor}; text-shadow: ${args.textshadow};'>${args.date}<b> ${args.name} </b><span style='color:${args.color};'>${args.msg}</span></div>`;
-            self.msgs.append(div);
+            self.msgs[tab].append(div);
         },
-        this.renderImage = (args) => {
+        this.renderImage = (tab, args) => {
             let img = `<a href='${args.msg}' target='_blank'><img class='imgs' src='${args.msg}' target='_blank' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img></a>`;
             let link = `<a href='${args.msg}' target='_blank'>${args.msg}</a>`;
             let div = $(`<div class='msg'>${args.date}<b> ${args.name} </b><span style='color:${args.color}'>${link}</span><br>${img}</div>`);
-            div.appendTo(self.msgs);
+            self.msgs[tab].append(div);
             self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
             //lolfun $('.imgs').draggable({containment: $('.msgs')});
         }
-        this.renderStaticImage = (args) => {
+        this.renderStaticImage = (tab, args) => {
             let img = `<img class='imgs' src='data:image/png;base64,${args.image}' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img>`;
             let div = `<div class='msg'>${args.date}<b> ${args.name} </b>${img} </div>`
-            self.msgs.append(div);
+            self.msgs[tab].append(div);
             self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
         }
-        this.renderCodeBlock = (args) => {
+        this.renderCodeBlock = (tab, args) => {
             let div = `<div class='msg''>${args.date}<b> ${args.name} CODEBLOCK:</b>
                       </div><pre style='white-space: pre-wrap;'><code class='code' style='border-radius: 10px;'>${args.msg}</code></pre>`;
-            self.msgs.append(div);
+            self.msgs[tab].append(div);
             $('.code').each(function(i, block) {
               hljs.highlightBlock(block);
             });
         }
-        this.renderVideo = (args) => {
+        this.renderVideo = (tab, args) => {
         	let url = `https://www.youtube.com/watch?v=${args.msg}`;
             let embed = `https://www.youtube.com/embed/${args.msg}`;
             let link = `<a href='${url}'>${url}</a>`;
             let iframe = `<iframe class='iframe' style='height: 300px; width: 500px' src='${embed}' allowfullscreen></iframe>`;
             let div = `<div class='msg'>${args.date}<b> ${args.name} </b><span style='${args.color}'>${link}</span><br>${iframe}</div>`;
-            self.msgs.append(div);
+            self.msgs[tab].append(div);
             self.videotoggle ? $('.iframe').show() : $('.iframe').hide();
         }
-        this.renderVideoLink = (args) => {
+        this.renderVideoLink = (tab, args) => {
         	let url = args.msg;
         	let link = `<a href='${url}'>${url}</a>`;
         	let id = url.substr(32);
         	let iframe = `<iframe class='iframe' style='height: 300px; width: 500px' src='//www.youtube.com/embed/${id}' allowfullscreen></iframe>`;
             let div = `<div class='msg'>${args.date}<b> ${args.name} </b><span style='${args.color}'>${link}</span><br>${iframe}</div>`;
-            self.msgs.append(div);
+            self.msgs[tab].append(div);
             self.videotoggle ? $('.iframe').show() : $('.iframe').hide(); 
         }
     };
@@ -341,33 +349,29 @@ $(document).ready(function(){
 //net
     //data expects data.chatmessages[].properties
     socket.on('addToChat', (data) => {
-        if (!data.chatmessages[0].curtab)
-            data.chatmessages[0].curtab = 'Main';
+        if(data.curtab == undefined)
+            data.curtab = 'Main';
         //boolers is a check to see if tab exists
         let boolers = false;
-        for(let i=0; i<chat.cgroup.tabs().children().length; i++){
-            let temp = chat.cgroup.tabs().children()[i].innerText;
-            temp = temp.slice(0, -1);
-            if (temp == data.chatmessages[0].curtab)
+        for (let msgsgrp in chat.msgs){
+            if (msgsgrp == data.curtab)
                 boolers = true;
         }
-        //if the tab doesn't exist, and if theres an id
-        let shouldscroll = chat.msgs.scrollTop() >= (chat.msgs[0].scrollHeight - document.getElementsByClassName('msgs')[0].offsetHeight);
         let renderobj = new builder.RenderingObject(chat);
-        if(!boolers && data.chatmessages[0].id && data.chatmessages[0].curtab !== 'Main'){
-            chat.newtab({curtab: data.chatmessages[0].id});
-            for (let i=0; i<data.chatmessages.length; i++){
-                chat.prevmsgs[data.chatmessages[i].id] += `<div>${data.chatmessages[i].msg}</div>`; //this is terrible and needs to be refactored
-            }
-            return;
+        //if the tab doesn't exist create one and append a new message window
+        if(!boolers){
+            chat.newtab({curtab: data.curtab});
+            chat.msgs[data.curtab] = $(`<div id='${data.curtab}' class='msgs'>`);
+            chat.msgs[data.curtab].appendTo(chat.chat);
+            chat.msgs[data.curtab].hide();
+            data.curtab = data.curtab;
         }
         for (let i=0; i<data.chatmessages.length; i++){
             //evil dragons be here
-            renderobj[data.chatmessages[i].action](data.chatmessages[i]);
+            renderobj[data.chatmessages[i].action](data.curtab, data.chatmessages[i]);
         }
 
-        chat.prevmsgs[chat.curtab] = chat.msgs[0].innerHTML;
-
+        let shouldscroll = chat.msgs[chat.curtab].scrollTop() >= (chat.msgs[chat.curtab][0].scrollHeight - chat.msgs[chat.curtab][0].offsetHeight);
         if (shouldscroll)
             chat.scrollBottom();
     });
@@ -383,18 +387,39 @@ $(document).ready(function(){
         }
         $('.user').dblclick(function () {
             chat.curtab = $(this)[0].textContent;
-            chat.msgs.empty();
-            chat.msgs.append(chat.prevmsgs[chat.curtab]);
+            if(chat.msgs[chat.curtab])
+                return;
             chat.newtab({
-                curtab: $(this)[0].textContent,
-                id: $(this)[0].textContent
+                curtab: chat.curtab
             });
+            chat.msgs[chat.curtab] = $(`<div id='${chat.curtab}' class='msgs'>`);
+            chat.msgs[chat.curtab].css("color", chat.msgs['Main'][0].style.color);
+            chat.msgs[chat.curtab].css("backgroundColor", chat.msgs['Main'][0].style.backgroundColor);
+            chat.msgs[chat.curtab].appendTo(chat.chat);
+            for (let msgsgrp in chat.msgs){
+                chat.msgs[msgsgrp].hide();
+            }
+            chat.msgs[chat.curtab].show();
         });
     });
 
     //data expects string
     socket.on('changeInputFontColor', (data) => {
         chat.textarea.css('color', data);
+    });
+
+    //data expects string
+    socket.on('removeTab', (data) =>{
+        for (let msgsgrp in chat.msgs){
+            if (msgsgrp == data){
+                chat.msgs[msgsgrp].remove();
+                delete chat.msgs[msgsgrp];
+                $('.tab').each(function(i) {
+                    if (msgsgrp == this.id.substr(3))
+                        this.remove();
+                });
+            }
+        }
     });
 
     //data expects array

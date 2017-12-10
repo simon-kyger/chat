@@ -32,6 +32,7 @@ body{
     height:80%;
     direction: rtl;
     text-align: left;
+    position:absolute;
 }
 .code {
     direction: ltr;

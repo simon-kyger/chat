@@ -51,15 +51,16 @@ function init(socket){
     SOCKET_CONNECTIONS.push(socket);
     socket.name = gnameincrementer;
     gnameincrementer++;
+    console.log(`${socket.request.connection.remoteAddress} has connected.`);
     let send = {
         chatmessages: [{
             action: 'renderText',
             date:  moment().format("HH:mm:ss"),
             name: ``,
-            msg:  `User ${socket.request.connection.remoteAddress} has connected.`,
-            color: socket.color,
-            curtab: 'Main'
-        }]
+            msg:  `User ${socket.name} has connected.`,
+            color: socket.color
+        }],
+        curtab: 'Main'
     };
     for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
         SOCKET_CONNECTIONS[i].emit('addToChat', send);
@@ -76,11 +77,11 @@ function disconnects(socket){
         chatmessages: [{
             action: 'renderText',
             date: moment().format("HH:mm:ss"),
-            name: socket.name,
+            name: ``,
             msg:  `User ${socket.name} has disconnected.`,
-            color: socket.color,
-            curtab: 'Main'
-        }]
+            color: socket.color
+        }],
+        curtab: 'Main'
     };
     for (let i = 0; i < SOCKET_CONNECTIONS.length; i++){
         if(SOCKET_CONNECTIONS[i].id == socket.id){
@@ -123,7 +124,7 @@ function chatMsg(socket, msg){
         msg.msg = msg.msg.replace(new RegExp(/</, 'g'), '&lt');
 
     if (msg.msg.substr(0, 1) == '/'){
-        command(socket, msg.msg);
+        command(socket, msg.msg, msg.curtab);
         return;
     }
     let act = `renderText`;
@@ -145,15 +146,15 @@ function chatMsg(socket, msg){
             name: `${socket.name}:`,
             msg:  msg.msg,
             color: socket.color,
-            curtab: msg.curtab,
-            id: socket.name
-        }]
+        }],
     };
 
     if (msg.curtab !== 'Main'){
         for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
             if (SOCKET_CONNECTIONS[i].name == msg.curtab){
+                send.curtab = socket.name;
                 SOCKET_CONNECTIONS[i].emit('addToChat', send);
+                send.curtab = msg.curtab;
                 socket.emit('addToChat', send);
                 return;
             }
@@ -176,54 +177,32 @@ function getIpOfName(name){
 //msg: string
 //returns: void
 //description: directs commands sent to server by client.
-function command(socket, msg){
+function command(socket, msg, curtab){
     const now = new moment();
     let command = msg.substr(0, msg.indexOf(' ')) || msg;
     let mod = msg.substr(command.length+1);
     let send;
     switch(command){
         case '/code':
-            send = {
-                chatmessages: [{
-                    action: 'renderCodeBlock',
-                    date: now.format("HH:mm:ss"),
-                    name: `${socket.name}:`,
-                    msg:  mod,
-                    color: socket.color
-                }]
-            };
-            socket.emit('addToChat', send);
+            codeblock(socket, mod, curtab);
             break;
         case '/color':
-            socket.color = mod;
-            send = {
-                chatmessages: [{
-                    action: 'renderText',
-                    date: now.format("HH:mm:ss"),
-                    name: ``,
-                    msg:  `${socket.name}'s color is now: <span style="color: ${mod};">${mod}</span>.`,
-                    color: `red`
-                }]
-            }
-            for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
-                SOCKET_CONNECTIONS[i].emit('addToChat', send);
-            }
-            socket.emit('changeInputFontColor', socket.color);
+            changecolor(socket, mod, curtab);
             break;
         case '/gif':
-            giphyrequest(socket, mod);
+            giphyrequest(socket, mod, curtab);
             break;
         case '/help':
-            commandlist(socket, mod);
+            commandlist(socket, mod, curtab);
             break;
         case '/?':
-            commandlist(socket, mod);
+            commandlist(socket, mod, curtab);
             break;
         case '/name':
-            changename(socket, mod);
+            changename(socket, mod, curtab);
             break;
         case '/reddit':
-            redditrequest(socket, mod);
+            redditrequest(socket, mod, curtab);
             break;
         case '/theme':
             if (mod == 'dark')
@@ -237,16 +216,16 @@ function command(socket, msg){
             socket.emit('changeTheme', socket.theme);
             break;
         case '/vid':
-            youtuberequest(socket, mod);
+            youtuberequest(socket, mod, curtab);
             break;
         case '/video':
-            youtuberequest(socket, mod);
+            youtuberequest(socket, mod, curtab);
             break;
         case '/youtube':
-            youtuberequest(socket, mod);
+            youtuberequest(socket, mod, curtab);
             break;
         case '/yt':
-            youtuberequest(socket, mod);
+            youtuberequest(socket, mod, curtab);
             break;
         default:
             send = {
@@ -256,17 +235,60 @@ function command(socket, msg){
                     name: `${socket.name}:`,
                     msg:  `Unknown command: ${command}`,
                     color: `red`,
-                    curtab: msg.curtab
-                }]
+                }],
+                curtab: curtab
             };
             socket.emit('addToChat', send);
     }
 }
 
+function codeblock(socket, mod, curtab){
+    let send = {
+        chatmessages: [{
+            action: 'renderCodeBlock',
+            date: now.format("HH:mm:ss"),
+            name: `${socket.name}:`,
+            msg:  mod,
+            color: socket.color
+        }],
+        curtab: curtab
+    };
+    socket.emit('addToChat', send);
+}
+
+function changecolor(socket, mod, curtab){
+    socket.color = mod;
+    let send = {
+        chatmessages: [{
+            action: 'renderText',
+            date: now.format("HH:mm:ss"),
+            name: ``,
+            msg:  `${socket.name}'s color is now: <span style="color: ${mod};">${mod}</span>.`,
+            color: `red`
+        }],
+        curtab: curtab
+    }
+    if (curtab !== 'Main'){
+        for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
+            if (SOCKET_CONNECTIONS[i].name == curtab){
+                send.curtab = socket.name;
+                SOCKET_CONNECTIONS[i].emit('addToChat', send);
+                send.curtab = curtab;
+                socket.emit('addToChat', send);
+                return;
+            }
+        }
+    }
+    for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
+        SOCKET_CONNECTIONS[i].emit('addToChat', send);
+    }
+    socket.emit('changeInputFontColor', socket.color);
+}
+
 //socket: object
 //mod: string
 //description: part of command lib that will fetch mod from googlesapi
-function youtuberequest(socket, mod){
+function youtuberequest(socket, mod, curtab){
     const now = new moment();
     let send;
     if (!keys.youtube){
@@ -277,7 +299,8 @@ function youtuberequest(socket, mod){
                 name: `${socket.name}:`,
                 msg:  `Server not configured for that command.`,
                 color: `red`
-            }]
+            }],
+            curtab: curtab
         };
         socket.emit('addToChat', send);
         return;
@@ -294,7 +317,8 @@ function youtuberequest(socket, mod){
                     date: now.format("HH:mm:ss"),
                     name: `${socket.name}:`,
                     msg:  result.items[0].id.videoId,
-                }]
+                }],
+                curtab: curtab
             };
         } else {
             send = {
@@ -316,10 +340,22 @@ function youtuberequest(socket, mod){
                     name: `${socket.name}:`,
                     msg:  `Try refining your search pattern with more text.`,
                     color: `red`
-                }]
+                }],
+                curtab: curtab
             };
             socket.emit('addToChat', send);
             return;
+        }
+        if (curtab !== 'Main'){
+            for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
+                if (SOCKET_CONNECTIONS[i].name == curtab){
+                    send.curtab = socket.name;
+                    SOCKET_CONNECTIONS[i].emit('addToChat', send);
+                    send.curtab = curtab;
+                    socket.emit('addToChat', send);
+                    return;
+                }
+            }
         }
         for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
             SOCKET_CONNECTIONS[i].emit('addToChat', send);
@@ -330,7 +366,7 @@ function youtuberequest(socket, mod){
 //socket: object
 //mod: string
 //description: part of command lib that will allow a user to change their name
-function changename(socket, mod){
+function changename(socket, mod, curtab){
     const now = new moment();
     let send;
     let allnames = getNames(SOCKET_CONNECTIONS);
@@ -343,7 +379,8 @@ function changename(socket, mod){
                     name: ``,
                     msg:  `Name '${mod}' is already in use.`,
                     color: 'red'
-                }]
+                }],
+                curtab: curtab
             };
             socket.emit('addToChat', send);
             return;
@@ -357,7 +394,8 @@ function changename(socket, mod){
                 name: `${socket.name}:`,
                 msg:  `Use 1-20 characters for your name plz`,
                 color: `red`
-            }]
+            }],
+            curtab: curtab
         };
         socket.emit('addToChat', send);
         return;
@@ -371,8 +409,22 @@ function changename(socket, mod){
                 name: ``,
                 msg:  `<b>${oldname}</b> is now known as: <b>${socket.name}</b>`,
                 color: `red`
-            }]
+            }],
+            curtab: curtab
         };
+        if (curtab !== 'Main'){
+            for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
+                if (SOCKET_CONNECTIONS[i].name == curtab){
+                    console.log('triggered');
+                    send.curtab = socket.name;
+                    SOCKET_CONNECTIONS[i].emit('addToChat', send);
+                    SOCKET_CONNECTIONS[i].emit('removeTab', oldname);
+                    send.curtab = curtab;
+                    socket.emit('addToChat', send);
+                }
+            }
+        }
+        send.curtab = 'Main';
         for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
             SOCKET_CONNECTIONS[i].emit('addToChat', send);
             SOCKET_CONNECTIONS[i].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
@@ -383,7 +435,7 @@ function changename(socket, mod){
 //socket: object
 //mod: string
 //description: part of command lib that will fetch mod from giphy.com
-function giphyrequest(socket, mod){
+function giphyrequest(socket, mod, curtab){
     const now = new moment();
     let send;
     if (!keys.giphy){
@@ -394,7 +446,8 @@ function giphyrequest(socket, mod){
                 name: `${socket.name}:`,
                 msg:  `Server not configured for that command.`,
                 color: `red`
-            }]
+            }],
+            curtab: curtab
         };
         socket.emit('addToChat', send);
         return;
@@ -419,7 +472,8 @@ function giphyrequest(socket, mod){
                     date:   ``,
                     name:   ``,
                     image:  data.toString("base64"),
-                }]
+                }],
+                curtab: curtab
             };
             socket.emit('addToChat', send);
         });
@@ -443,7 +497,8 @@ function giphyrequest(socket, mod){
                     name: `${socket.name}:`,
                     msg:  `Try again later.`,
                     color: `red`
-                }]
+                }],
+                curtab: curtab
             };
 
             socket.emit('addToChat', send);
@@ -453,20 +508,7 @@ function giphyrequest(socket, mod){
         // would assign a new array named as 'collections' with a value of ret.data
 
         ret = ret.data[0];
-        if(ret){
-            ret = ret.images.original.url;
-            send = {
-                chatmessages: [{
-                    action: 'renderImage',
-                    date: now.format("HH:mm:ss"),
-                    name: `${socket.name}:`,
-                    msg:  ret,
-                }]
-            };
-            for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
-                SOCKET_CONNECTIONS[i].emit('addToChat', send);
-            }
-        } else {
+        if(!ret){
             //giphy is up, but no images came back or query was shit
             //static file send
             fs.readFile('./img/sadpuppy.jpg', function(err, data){
@@ -494,10 +536,36 @@ function giphyrequest(socket, mod){
                         date:   ``,
                         name:   ``,
                         image:  data.toString("base64"),
-                    }]
+                    }],
+                    curtab: curtab
                 };
                 socket.emit('addToChat', send);
             });
+        } else {
+            ret = ret.images.original.url;
+            send = {
+                chatmessages: [{
+                    action: 'renderImage',
+                    date: now.format("HH:mm:ss"),
+                    name: `${socket.name}:`,
+                    msg:  ret,
+                }],
+                curtab: curtab
+            };
+            if (curtab !== 'Main'){
+                for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
+                    if (SOCKET_CONNECTIONS[i].name == curtab){
+                        send.curtab = socket.name;
+                        SOCKET_CONNECTIONS[i].emit('addToChat', send);
+                        send.curtab = curtab;
+                        socket.emit('addToChat', send);
+                        return;
+                    }
+                }
+            }
+            for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
+                SOCKET_CONNECTIONS[i].emit('addToChat', send);
+            }
         }
     });
 }
@@ -533,7 +601,7 @@ function getNames(arg){
 //socket: object
 //mod: string
 //description: part of the command lib that retrieves all commands from the current build
-function commandlist(socket, mod){
+function commandlist(socket, mod, curtab){
     //if i had a db, it woudln't be this way, but since i don't want that added layer of bs, this will suffice
     let ret = `<br><b>COMMANDS:</b><br>`;
     ret += `<br><b>&uarr; &darr;</b> with input selected cycles through past posted messages.`;
@@ -565,7 +633,8 @@ function commandlist(socket, mod){
             date: '',
             name: '',
             msg: ret,
-        },]
+        }],
+        curtab: curtab
     };
     socket.emit('addToChat', send);
 }
