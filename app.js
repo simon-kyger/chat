@@ -89,6 +89,7 @@ function disconnects(socket){
     }
     SOCKET_CONNECTIONS.splice(temp, 1);
     for (let j =0; j < SOCKET_CONNECTIONS.length; j++){
+        SOCKET_CONNECTIONS[j].emit('removeTab', socket.name);
         SOCKET_CONNECTIONS[j].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
         SOCKET_CONNECTIONS[j].emit('ischattinglist', getUsersTyping());
     }

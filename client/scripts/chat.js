@@ -42,6 +42,7 @@ $(document).ready(function(){
                 self.msgs[msgsgrp].hide();
             }
             self.msgs[self.curtab].show();
+            self.textarea.focus();
         });
         this.newtab = function(args){
             self.tab = $(`<div id='tab${args.curtab}' class='tab'>${args.curtab}</div>`);
@@ -81,17 +82,16 @@ $(document).ready(function(){
                 }
                 self.msgs[self.curtab].show();
                 self.textarea.focus();
+                self.scrollBottom();
             });
             self.tabX.on('click', function(e){
                 this.parentElement.remove();
                 for (let msgsgrp in self.msgs){
                     if(msgsgrp == e.target.id.substr(4)){
-                        chat.msgs[msgsgrp].remove();
-                        delete self.msgs[msgsgrp];
+						chat.msgs[msgsgrp].remove();
+						delete self.msgs[msgsgrp];
                     }
                 }
-                self.maincgroup.click();
-                self.textarea.focus();
             });
         }
 
@@ -136,16 +136,12 @@ $(document).ready(function(){
         this.videotoggle.on('change', function() {
             self.videotoggle ? $('.iframe').hide() : $('.iframe').show();
             self.videotoggle = !self.videotoggle;
-            self.msgs.stop().animate({
-                scrollTop: self.msgs.scrollHeight
-            }, 0);
+            self.scrollBottom();
         });
         this.imagetoggle.on('change', function(){
             self.imagetoggle ? $('.imgs').hide() : $('.imgs').show();
             self.imagetoggle = !self.imagetoggle;
-            self.msgs.stop().animate({
-                scrollTop: self.msgs.scrollHeight
-            }, 0);
+            self.scrollBottom();
         });
         this.cfg.expanded = false;
         this.cfg.click(function(){
@@ -180,7 +176,7 @@ $(document).ready(function(){
             //     // handle fontsize here
             //     console.log(ui.size); // gives you the current size of the div
             //     var size = ui.size;
-            //     // something like this change the values according to your requirements
+            //		//this is ridiculous lol
             //     $(this).css("font-size", (size.width * size.height)/20000 + "px"); 
             // }
         });
@@ -190,7 +186,7 @@ $(document).ready(function(){
     builder.prototype.scrollBottom = function() {
         this.msgs[this.curtab].stop().animate({
             scrollTop: this.msgs[this.curtab][0].scrollHeight
-        }, 1000); // SET SCROLLER TO BOTTOM
+        }, 1000); // SET SCROLLER TO BOTTOM DOESNT WORK WITH DOUBLE YOUTUBE SEND :(
     }
 
 
@@ -200,7 +196,7 @@ $(document).ready(function(){
         let text;
         let cinput;
         if (args > 0)
-            text = 'black'
+            text = 'black';
         else
             text = 'white';
 
@@ -363,9 +359,8 @@ $(document).ready(function(){
         setInterval(()=> {
             $('.redshadow').animate({
                 opacity: 1.0
-            }, 500);
-            $('.redshadow').animate({
-                opacity: .5
+            }, 500).animate({
+                opacity: .2
             });
         }, 1000);
     });
