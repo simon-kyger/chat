@@ -92,10 +92,12 @@ $(document).ready(function(){
 						delete self.msgs[msgsgrp];
 					}
 				}
-				if (self.cgroup.children().length > 1 && this.parentElement.innertext.slice(0, -1) !== self.curtab)
+				if (this.parentElement.innerText.slice(0, -1) == self.curtab){
 					self.cgroup.children().next().click();
-				else
-					self.cgroup.children().last().click();
+				} else {
+					return;
+				}
+				self.cgroup.children().last().click();
             });
         }
 
