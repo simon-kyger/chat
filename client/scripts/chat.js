@@ -85,13 +85,17 @@ $(document).ready(function(){
                 self.scrollBottom();
             });
             self.tabX.on('click', function(e){
-                this.parentElement.remove();
-                for (let msgsgrp in self.msgs){
-                    if(msgsgrp == e.target.id.substr(4)){
+				this.parentElement.remove();
+				for (let msgsgrp in self.msgs){
+					if(msgsgrp == e.target.id.substr(4)){
 						chat.msgs[msgsgrp].remove();
 						delete self.msgs[msgsgrp];
-                    }
-                }
+					}
+				}
+				if (self.cgroup.children().length > 1 && this.parentElement.innertext.slice(0, -1) !== self.curtab)
+					self.cgroup.children().next().click();
+				else
+					self.cgroup.children().last().click();
             });
         }
 
