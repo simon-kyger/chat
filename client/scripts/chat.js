@@ -450,9 +450,10 @@ $(document).ready(function(){
                 curtab: chat.curtab,
                 sposition: e.target
             });
-            //format the tabs
+            //format all the tabs
             chat.cgroup.children().css('backgroundColor', chat.textarea.css('backgroundColor'));
             chat.cgroup.children().css('color', chat.textarea.css('color'));
+            //since the last one will always be selected because we're creating a new tab, color it as if it were selected
             chat.cgroup.children().last().css('backgroundColor', chat.msgs['Main'].css('backgroundColor'));
             chat.cgroup.children().last().css('color', chat.msgs['Main'].css('color'));
             //create the window
@@ -461,9 +462,11 @@ $(document).ready(function(){
             //format the window
             chat.msgs[chat.curtab].css("color", chat.msgs['Main'][0].style.color);
             chat.msgs[chat.curtab].css("backgroundColor", chat.msgs['Main'].css('backgroundColor'));
+            //hide all windows
             for (let msgsgrp in chat.msgs){
                 chat.msgs[msgsgrp].hide();
             }
+            //show the relevant window
             chat.msgs[chat.curtab].show();
             chat.textarea.focus();
         });
