@@ -24,7 +24,7 @@ $(document).ready(function(){
         this.istyping.appendTo(this.inputcontainer);
         this.onlineusers = $(`<div id='onlineusers' class='onlineusers'></div>`);
         this.onlineusers.appendTo(this.chat);
-        this.maincgroup = $(`<div id='maincgroup' class='tab' style='width: 10%;'>Main</div>`);
+        this.maincgroup = $(`<div id='maincgroup' class='tab' style='width: 10%';>Main</div>`);
         this.maincgroup.appendTo(this.cgroup);
         this.curtab = 'Main';
         this.msgs = {};
@@ -42,6 +42,12 @@ $(document).ready(function(){
                 self.msgs[msgsgrp].hide();
             }
             self.msgs[self.curtab].show();
+            for (let i = 0; i < self.cgroup.children().length; i++){
+                self.cgroup.children().css('backgroundColor', self.textarea.css('backgroundColor'));
+                self.cgroup.children().css('color', self.textarea.css('color'));
+            }
+            this.style.color = self.msgs.Main[0].style.color;
+            this.style.backgroundColor = self.msgs.Main[0].style.backgroundColor;
             self.textarea.focus();
         });
         this.newtab = function(args){
@@ -62,11 +68,12 @@ $(document).ready(function(){
                 },0).animate({
                     top: 0,
                     left: dist,
-                    width: self.tab.width,
-                    height: self.tab.height,
+                    width: `10%`,
+                    height: `10%`,
                 }, function(){
-                    $(this).css('position', 'relative');
+                    $(this).css('position', 'static');
                     $(this).css('left', 0);
+                    $(this).css('height', '100%');
                 }); 
             }
             self.tab.css('backgroundColor', self.maincgroup.css('backgroundColor'));
@@ -76,6 +83,14 @@ $(document).ready(function(){
             self.tab.on('click', function(e){
                 if (e.target !== this) //this is necessary because tabX rests inside, if user clicks that then ignore this event
                     return;
+                for (let i = 0; i < self.cgroup.children().length-1; i++){
+                	self.cgroup.children().css('backgroundColor', self.textarea.css('backgroundColor'));
+                	self.cgroup.children().css('color', self.textarea.css('color'));
+                }
+                this.style.backgroundColor = self.msgs.Main[0].style.backgroundColor;
+                this.style.color = self.msgs.Main[0].style.color;
+                self.maincgroup.css('backgroundColor', self.textarea.css('backgroundColor'));
+                self.maincgroup.css('color', self.textarea.css('color'));
                 self.curtab = this.innerText.slice(0, -1);
                 for (let msgsgrp in self.msgs){
                     self.msgs[msgsgrp].hide();
@@ -85,6 +100,15 @@ $(document).ready(function(){
                 self.scrollBottom();
             });
             self.tabX.on('click', function(e){
+				let el = self.cgroup.children().toArray()
+				if (this.parentElement.innerText.slice(0, -1) == self.curtab){
+					if ($(this.parentElement).is(':last-child')){
+						el[el.length-2].click();
+					} else {
+						let index = el.indexOf(this.parentElement);
+						el[index + 1].click();
+					}						
+				}
 				this.parentElement.remove();
 				for (let msgsgrp in self.msgs){
 					if(msgsgrp == e.target.id.substr(4)){
@@ -92,12 +116,6 @@ $(document).ready(function(){
 						delete self.msgs[msgsgrp];
 					}
 				}
-				if (this.parentElement.innerText.slice(0, -1) == self.curtab){
-					self.cgroup.children().next().click();
-				} else {
-					return;
-				}
-				self.cgroup.children().last().click();
             });
         }
 
@@ -283,18 +301,31 @@ $(document).ready(function(){
                         this.textarea.stop().animate({
                             backgroundColor: args.cinput,
                             color: args.text
-                        }, 1500);
+                        });
                         this.cgroup.stop().animate({
                             backgroundColor: args.shadow,
                         });
-                        this.cgroup.children().stop().animate({
-                            backgroundColor: args.cinput,
-                            color: args.text
-                        });
-                        if(args.text == 'white')
+                        for (let i =0; i<this.cgroup.children().length; i++){
+                        	let temp = this.cgroup.children()[i];
+                        	let temp2;
+                        	let lastchar = temp.innerText[temp.innerText.length-1];
+                        	if (lastchar == 'X')
+                        		temp2 = temp.innerText.slice(0, -1);
+                        	if (temp2 !== this.curtab)
+                        		temp.style.backgroundColor = args.cinput;
+                        	else
+                        		temp.style.backgroundColor = args.bgformatted;
+                        	if (args.text == 'white')
+                        		temp.style.color = 'white';
+                        	else
+                        		temp.style.color = 'black';
+                        }
+                        if(args.text == 'white'){
                             this.textarea.removeClass('blackphtext');
-                        else
+                            
+                        } else {
                             this.textarea.removeClass('whitephtext');
+                        }
                         this.textarea.addClass(`${args.text}phtext`);
                     });
                     this.config.stop().animate({
@@ -414,14 +445,22 @@ $(document).ready(function(){
             chat.curtab = $(this)[0].textContent;
             if(chat.msgs[chat.curtab])
                 return;
+            //create the tab
             chat.newtab({
                 curtab: chat.curtab,
                 sposition: e.target
             });
+            //format the tabs
+            chat.cgroup.children().css('backgroundColor', chat.textarea.css('backgroundColor'));
+            chat.cgroup.children().css('color', chat.textarea.css('color'));
+            chat.cgroup.children().last().css('backgroundColor', chat.msgs['Main'].css('backgroundColor'));
+            chat.cgroup.children().last().css('color', chat.msgs['Main'].css('color'));
+            //create the window
             chat.msgs[chat.curtab] = $(`<div id='${chat.curtab}' class='msgs'>`);
-            chat.msgs[chat.curtab].css("color", chat.msgs['Main'][0].style.color);
-            chat.msgs[chat.curtab].css("backgroundColor", chat.msgs['Main'][0].style.backgroundColor);
             chat.msgs[chat.curtab].appendTo(chat.chat);
+            //format the window
+            chat.msgs[chat.curtab].css("color", chat.msgs['Main'][0].style.color);
+            chat.msgs[chat.curtab].css("backgroundColor", chat.msgs['Main'].css('backgroundColor'));
             for (let msgsgrp in chat.msgs){
                 chat.msgs[msgsgrp].hide();
             }
