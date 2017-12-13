@@ -424,8 +424,8 @@ function changename(socket, mod, curtab){
             for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
                 if (SOCKET_CONNECTIONS[i].name == curtab){
                     send.curtab = socket.name;
-                    SOCKET_CONNECTIONS[i].emit('addToChat', send);
                     SOCKET_CONNECTIONS[i].emit('removeTab', oldname);
+                    SOCKET_CONNECTIONS[i].emit('addToChat', send);
                     send.curtab = curtab;
                     socket.emit('addToChat', send);
                 }

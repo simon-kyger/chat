@@ -416,11 +416,18 @@ $(document).ready(function(){
         let renderobj = new builder.RenderingObject(chat);
         //if the tab doesn't exist create one and append a new message window
         if(!boolers){
+        	//create the tab
             chat.newtab({curtab: data.curtab});
+            //format the tab
+            //no real sense to do this at this time because 
+            //create the window
             chat.msgs[data.curtab] = $(`<div id='${data.curtab}' class='msgs'>`);
             chat.msgs[data.curtab].appendTo(chat.chat);
+            //format the window
+            chat.msgs[data.curtab].css("color", chat.msgs['Main'][0].style.color);
+            chat.msgs[data.curtab].css("backgroundColor", chat.msgs['Main'].css('backgroundColor'));
+            //hide the window because we don't care about pms unless we click on it later.
             chat.msgs[data.curtab].hide();
-            data.curtab = data.curtab;
         }
         for (let i=0; i<data.chatmessages.length; i++){
             //evil dragons be here
@@ -478,6 +485,7 @@ $(document).ready(function(){
     });
 
     //data expects string
+    //this is buggy because we don't necessarily want to close the window when
     socket.on('removeTab', (data) =>{
         for (let msgsgrp in chat.msgs){
             if (msgsgrp == data){
@@ -487,6 +495,7 @@ $(document).ready(function(){
                     if (msgsgrp == this.id.substr(3))
                         this.remove();
                 });
+                chat.maincgroup.click();
             }
         }
     });
