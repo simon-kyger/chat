@@ -1,0 +1,8 @@
+{
+  "client" : {
+    "bootstrap": {
+      "modules" : "*",
+      "motd": "Greetings, Earthlings"
+    }
+  }
+}
