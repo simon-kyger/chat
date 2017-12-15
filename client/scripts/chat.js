@@ -1,8 +1,7 @@
 $(document).ready(function(){
 //globals
-    let socket = io();
+    let socket = io('http://localhost');
     var builder = function(){
-        var self = this;
         this.chat = $(`<div id='chat' class='chat'>`);
         this.inputcontainer = $(`<div id='inputcontainer' class='inputcontainer'>`);
         this.inputcontainer.appendTo(this.chat);
@@ -36,31 +35,31 @@ $(document).ready(function(){
         this.githublink.appendTo(this.msgs[this.curtab]);
         this.commandlist = $(`<div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>`);
         this.commandlist.appendTo(this.msgs[this.curtab]);
-        this.maincgroup.on('click', function(){
-            self.curtab = 'Main';
-            for (let msgsgrp in self.msgs){
-                self.msgs[msgsgrp].hide();
+        this.maincgroup.on('click', (e)=> {
+            this.curtab = 'Main';
+            for (let msgsgrp in this.msgs){
+                this.msgs[msgsgrp].hide();
             }
-            self.msgs[self.curtab].show();
-            for (let i = 0; i < self.cgroup.children().length; i++){
-                self.cgroup.children().css('backgroundColor', self.textarea.css('backgroundColor'));
-                self.cgroup.children().css('color', self.textarea.css('color'));
+            this.msgs[this.curtab].show();
+            for (let i = 0; i < this.cgroup.children().length; i++){
+                this.cgroup.children().css('backgroundColor', this.textarea.css('backgroundColor'));
+                this.cgroup.children().css('color', this.textarea.css('color'));
             }
-            this.style.color = self.msgs.Main[0].style.color;
-            this.style.backgroundColor = self.msgs.Main[0].style.backgroundColor;
-            self.textarea.focus();
+            e.target.style.color = this.msgs.Main[0].style.color;
+            e.target.style.backgroundColor = this.msgs.Main[0].style.backgroundColor;
+            this.textarea.focus();
         });
-        this.newtab = function(args){
-            self.tab = $(`<div id='tab${args.curtab}' class='tab'>${args.curtab}</div>`);
-            self.tab.appendTo(self.cgroup);
+        this.newtab = (args) => {
+            this.tab = $(`<div id='tab${args.curtab}' class='tab'>${args.curtab}</div>`);
+            this.tab.appendTo(this.cgroup);
             if (args.sposition){
-                self.tab.height = self.tab.css('height');
-                self.tab.css('position', 'absolute');
-                self.tab.left = self.tab.css('left');
-                self.tab.top = self.tab.css('top');
-                self.tab.width = self.tab.css('width');
-                let dist = `${Object.keys(self.msgs).length*10}%`; 
-                self.tab.animate({
+                this.tab.height = this.tab.css('height');
+                this.tab.css('position', 'absolute');
+                this.tab.left = this.tab.css('left');
+                this.tab.top = this.tab.css('top');
+                this.tab.width = this.tab.css('width');
+                let dist = `${Object.keys(this.msgs).length*10}%`; 
+                this.tab.animate({
                     top: $(args.sposition).parent().position().top,
                     left: $(args.sposition).parent().position().left,
                     width: '800px',
@@ -76,44 +75,44 @@ $(document).ready(function(){
                     $(this).css('height', '100%');
                 }); 
             }
-            self.tab.css('backgroundColor', self.maincgroup.css('backgroundColor'));
-            self.tab.css('color', self.maincgroup.css('color'));
-            self.tabX = $(`<div id='tabX${args.curtab}' class='closerX'>X</div>`);
-            self.tabX.appendTo(self.tab);
-            self.tab.on('click', function(e){
-                if (e.target !== this) //this is necessary because tabX rests inside, if user clicks that then ignore this event
-                    return;
-                for (let i = 0; i < self.cgroup.children().length-1; i++){
-                	self.cgroup.children().css('backgroundColor', self.textarea.css('backgroundColor'));
-                	self.cgroup.children().css('color', self.textarea.css('color'));
+            this.tab.css('backgroundColor', this.maincgroup.css('backgroundColor'));
+            this.tab.css('color', this.maincgroup.css('color'));
+            this.tabX = $(`<div id='tabX${args.curtab}' class='closerX'>X</div>`);
+            this.tabX.appendTo(this.tab);
+            this.tab.on('click', (e)=> {
+            	if (e.target !== e.currentTarget)
+            		return;
+                for (let i = 0; i < this.cgroup.children().length-1; i++){
+                	this.cgroup.children().css('backgroundColor', this.textarea.css('backgroundColor'));
+                	this.cgroup.children().css('color', this.textarea.css('color'));
                 }
-                this.style.backgroundColor = self.msgs.Main[0].style.backgroundColor;
-                this.style.color = self.msgs.Main[0].style.color;
-                self.maincgroup.css('backgroundColor', self.textarea.css('backgroundColor'));
-                self.maincgroup.css('color', self.textarea.css('color'));
-                self.curtab = this.innerText.slice(0, -1);
-                for (let msgsgrp in self.msgs){
-                    self.msgs[msgsgrp].hide();
+                e.target.style.backgroundColor = this.msgs.Main[0].style.backgroundColor;
+                e.target.style.color = this.msgs.Main[0].style.color;
+                this.maincgroup.css('backgroundColor', this.textarea.css('backgroundColor'));
+                this.maincgroup.css('color', this.textarea.css('color'));
+                this.curtab = e.target.innerText.slice(0, -1);
+                for (let msgsgrp in this.msgs){
+                    this.msgs[msgsgrp].hide();
                 }
-                self.msgs[self.curtab].show();
-                self.textarea.focus();
-                self.scrollBottom();
+                this.msgs[this.curtab].show();
+                this.textarea.focus();
+                this.scrollBottom();
             });
-            self.tabX.on('click', function(e){
-				let el = self.cgroup.children().toArray()
-				if (this.parentElement.innerText.slice(0, -1) == self.curtab){
-					if ($(this.parentElement).is(':last-child')){
+            this.tabX.on('click', (e) =>{
+				let el = this.cgroup.children().toArray()
+				if (e.target.parentElement.innerText.slice(0, -1) == this.curtab){
+					if ($(e.target.parentElement).is(':last-child')){
 						el[el.length-2].click();
 					} else {
-						let index = el.indexOf(this.parentElement);
+						let index = el.indexOf(e.target.parentElement);
 						el[index + 1].click();
 					}						
 				}
-				this.parentElement.remove();
-				for (let msgsgrp in self.msgs){
+				e.target.parentElement.remove();
+				for (let msgsgrp in this.msgs){
 					if(msgsgrp == e.target.id.substr(4)){
 						chat.msgs[msgsgrp].remove();
-						delete self.msgs[msgsgrp];
+						delete this.msgs[msgsgrp];
 					}
 				}
             });
@@ -121,72 +120,72 @@ $(document).ready(function(){
 
         this.posts = [];
         this.position = 0;
-        this.textarea.on('change keydown input paste', function(e){
+        this.textarea.on('change keydown input paste', (e)=>{
             //up
-            if (e.which == 38 && $(this).get(0).value.length == 0){
-                self.position--;
-                if (self.position < 0)
-                    self.position = 0;
-                this.value = self.posts[self.position] || '';
+            if (e.which == 38 && $(e.target).get(0).value.length == 0){
+                this.position--;
+                if (this.position < 0)
+                    this.position = 0;
+                e.target.value = this.posts[this.position] || '';
             }
             //down
-            if (e.which == 40 && this.selectionEnd == this.value.length){
-                self.position++;
-                if (self.position >= self.posts.length)
-                    self.position = self.posts.length;
-                this.value = self.posts[self.position] || '';
+            if (e.which == 40 && e.target.selectionEnd == e.target.value.length){
+                this.position++;
+                if (this.position >= this.posts.length)
+                    this.position = this.posts.length;
+                e.target.value = this.posts[this.position] || '';
             }
             if (e.which == 13 && !e.shiftKey)
                 e.preventDefault();
             //enter
 
-            if (e.which == 13 && !e.shiftKey && this.value.trim().length>0) {
+            if (e.which == 13 && !e.shiftKey && e.target.value.trim().length>0) {
                 e.preventDefault();
-                let msg = this.value.trim();
-                socket.emit('chatMsg', {msg: msg, curtab: self.curtab});
-                self.posts.push(msg);
-                self.position = self.posts.length;
-                this.value = ''; // CLEAR TEXTAREA
-                self.scrollBottom();
+                let msg = e.target.value.trim();
+                socket.emit('chatMsg', {msg: msg, curtab: this.curtab});
+                this.posts.push(msg);
+                this.position = this.posts.length;
+                e.target.value = ''; // CLEAR TEXTAREA
+                this.scrollBottom();
                 socket.chatting = false;
             }
             //any other key
-            if (this.value.length){
+            if (e.target.value.length){
                 socket.emit('istyping', 1);
             } else{
                 socket.emit('istyping', 0);
             }
         });
-        this.videotoggle.on('change', function() {
-            self.videotoggle ? $('.iframe').hide() : $('.iframe').show();
-            self.videotoggle = !self.videotoggle;
-            self.scrollBottom();
+        this.videotoggle.on('change', ()=> {
+            this.videotoggle ? $('.iframe').hide() : $('.iframe').show();
+            this.videotoggle = !this.videotoggle;
+            this.scrollBottom();
         });
-        this.imagetoggle.on('change', function(){
-            self.imagetoggle ? $('.imgs').hide() : $('.imgs').show();
-            self.imagetoggle = !self.imagetoggle;
-            self.scrollBottom();
+        this.imagetoggle.on('change', ()=> {
+            this.imagetoggle ? $('.imgs').hide() : $('.imgs').show();
+            this.imagetoggle = !this.imagetoggle;
+            this.scrollBottom();
         });
         this.cfg.expanded = false;
-        this.cfg.click(function(){
-            if (self.cfg.expanded){
-                self.config.animate({
+        this.cfg.click( ()=> {
+            if (this.cfg.expanded){
+                this.config.animate({
                     width: '0%',
                     height: '0%',
                     opacity: 0,
                     fontSize: '0',
                     borderWidth: '20px'
                 }, 500 );
-                self.cfg.expanded = false;
+                this.cfg.expanded = false;
             } else {
-                self.config.animate({
+                this.config.animate({
                     width: '20%',
                     height: '30%',
                     opacity: 0.8,
                     fontSize: '14',
                     borderWidth: '2px'
                 }, 500 );
-                self.cfg.expanded = true;
+                this.cfg.expanded = true;
             }
         });
         this.chat.draggable({
