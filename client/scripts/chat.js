@@ -1,7 +1,7 @@
 $(document).ready(function(){
 //globals
     let socket = io('http://localhost');
-    var builder = function(){
+    let builder = function(){
         this.chat = $(`<div id='chat' class='chat'>`);
         this.inputcontainer = $(`<div id='inputcontainer' class='inputcontainer'>`);
         this.inputcontainer.appendTo(this.chat);
@@ -35,127 +35,11 @@ $(document).ready(function(){
         this.githublink.appendTo(this.msgs[this.curtab]);
         this.commandlist = $(`<div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>`);
         this.commandlist.appendTo(this.msgs[this.curtab]);
-        this.maincgroup.on('click', (e)=> {
-            this.curtab = 'Main';
-            for (let msgsgrp in this.msgs){
-                this.msgs[msgsgrp].hide();
-            }
-            this.msgs[this.curtab].show();
-            for (let i = 0; i < this.cgroup.children().length; i++){
-                this.cgroup.children().css('backgroundColor', this.textarea.css('backgroundColor'));
-                this.cgroup.children().css('color', this.textarea.css('color'));
-            }
-            e.target.style.color = this.msgs.Main[0].style.color;
-            e.target.style.backgroundColor = this.msgs.Main[0].style.backgroundColor;
-            this.textarea.focus();
-        });
-        this.newtab = (args) => {
-            this.tab = $(`<div id='tab${args.curtab}' class='tab'>${args.curtab}</div>`);
-            this.tab.appendTo(this.cgroup);
-            if (args.sposition){
-                this.tab.height = this.tab.css('height');
-                this.tab.css('position', 'absolute');
-                this.tab.left = this.tab.css('left');
-                this.tab.top = this.tab.css('top');
-                this.tab.width = this.tab.css('width');
-                let dist = `${Object.keys(this.msgs).length*10}%`; 
-                this.tab.animate({
-                    top: $(args.sposition).parent().position().top,
-                    left: $(args.sposition).parent().position().left,
-                    width: '800px',
-                    height: '800px',
-                },0).animate({
-                    top: 0,
-                    left: dist,
-                    width: `10%`,
-                    height: `10%`,
-                }, function(){
-                    $(this).css('position', 'static');
-                    $(this).css('left', 0);
-                    $(this).css('height', '100%');
-                }); 
-            }
-            this.tab.css('backgroundColor', this.maincgroup.css('backgroundColor'));
-            this.tab.css('color', this.maincgroup.css('color'));
-            this.tabX = $(`<div id='tabX${args.curtab}' class='closerX'>X</div>`);
-            this.tabX.appendTo(this.tab);
-            this.tab.on('click', (e)=> {
-            	if (e.target !== e.currentTarget)
-            		return;
-                for (let i = 0; i < this.cgroup.children().length-1; i++){
-                	this.cgroup.children().css('backgroundColor', this.textarea.css('backgroundColor'));
-                	this.cgroup.children().css('color', this.textarea.css('color'));
-                }
-                e.target.style.backgroundColor = this.msgs.Main[0].style.backgroundColor;
-                e.target.style.color = this.msgs.Main[0].style.color;
-                this.maincgroup.css('backgroundColor', this.textarea.css('backgroundColor'));
-                this.maincgroup.css('color', this.textarea.css('color'));
-                this.curtab = e.target.innerText.slice(0, -1);
-                for (let msgsgrp in this.msgs){
-                    this.msgs[msgsgrp].hide();
-                }
-                this.msgs[this.curtab].show();
-                this.textarea.focus();
-                this.scrollBottom();
-            });
-            this.tabX.on('click', (e) =>{
-				let el = this.cgroup.children().toArray()
-				if (e.target.parentElement.innerText.slice(0, -1) == this.curtab){
-					if ($(e.target.parentElement).is(':last-child')){
-						el[el.length-2].click();
-					} else {
-						let index = el.indexOf(e.target.parentElement);
-						el[index + 1].click();
-					}						
-				}
-				e.target.parentElement.remove();
-				for (let msgsgrp in this.msgs){
-					if(msgsgrp == e.target.id.substr(4)){
-						chat.msgs[msgsgrp].remove();
-						delete this.msgs[msgsgrp];
-					}
-				}
-            });
-        }
-
+        this.maincgroup.on('click', (e)=> this.tabmainclick(e));
+        this.cfg.on('click', ()=> this.cfgexpand());
         this.posts = [];
         this.position = 0;
-        this.textarea.on('change keydown input paste', (e)=>{
-            //up
-            if (e.which == 38 && $(e.target).get(0).value.length == 0){
-                this.position--;
-                if (this.position < 0)
-                    this.position = 0;
-                e.target.value = this.posts[this.position] || '';
-            }
-            //down
-            if (e.which == 40 && e.target.selectionEnd == e.target.value.length){
-                this.position++;
-                if (this.position >= this.posts.length)
-                    this.position = this.posts.length;
-                e.target.value = this.posts[this.position] || '';
-            }
-            if (e.which == 13 && !e.shiftKey)
-                e.preventDefault();
-            //enter
-
-            if (e.which == 13 && !e.shiftKey && e.target.value.trim().length>0) {
-                e.preventDefault();
-                let msg = e.target.value.trim();
-                socket.emit('chatMsg', {msg: msg, curtab: this.curtab});
-                this.posts.push(msg);
-                this.position = this.posts.length;
-                e.target.value = ''; // CLEAR TEXTAREA
-                this.scrollBottom();
-                socket.chatting = false;
-            }
-            //any other key
-            if (e.target.value.length){
-                socket.emit('istyping', 1);
-            } else{
-                socket.emit('istyping', 0);
-            }
-        });
+        this.textarea.on('change keydown input paste', (e)=> this.submitmsg(e));
         this.videotoggle.on('change', ()=> {
             this.videotoggle ? $('.iframe').hide() : $('.iframe').show();
             this.videotoggle = !this.videotoggle;
@@ -167,27 +51,6 @@ $(document).ready(function(){
             this.scrollBottom();
         });
         this.cfg.expanded = false;
-        this.cfg.click( ()=> {
-            if (this.cfg.expanded){
-                this.config.animate({
-                    width: '0%',
-                    height: '0%',
-                    opacity: 0,
-                    fontSize: '0',
-                    borderWidth: '20px'
-                }, 500 );
-                this.cfg.expanded = false;
-            } else {
-                this.config.animate({
-                    width: '20%',
-                    height: '30%',
-                    opacity: 0.8,
-                    fontSize: '14',
-                    borderWidth: '2px'
-                }, 500 );
-                this.cfg.expanded = true;
-            }
-        });
         this.chat.draggable({
             containment: 'body'
         });
@@ -206,6 +69,150 @@ $(document).ready(function(){
         this.chat.appendTo($('body'));
     }
     let chat = new builder();
+
+    builder.prototype.tabmainclick = function(e){
+        this.curtab = 'Main';
+        for (let msgsgrp in this.msgs){
+            this.msgs[msgsgrp].hide();
+        }
+        this.msgs[this.curtab].show();
+        for (let i = 0; i < this.cgroup.children().length; i++){
+            this.cgroup.children().css('backgroundColor', this.textarea.css('backgroundColor'));
+            this.cgroup.children().css('color', this.textarea.css('color'));
+        }
+        e.target.style.color = this.msgs.Main[0].style.color;
+        e.target.style.backgroundColor = this.msgs.Main[0].style.backgroundColor;
+        this.textarea.focus();       
+    }
+
+    builder.prototype.cfgexpand = function(){
+        if (this.cfg.expanded){
+            this.config.animate({
+                width: '0%',
+                height: '0%',
+                opacity: 0,
+                fontSize: '0',
+                borderWidth: '20px'
+            }, 500 );
+            this.cfg.expanded = false;
+        } else {
+            this.config.animate({
+                width: '20%',
+                height: '30%',
+                opacity: 0.8,
+                fontSize: '14',
+                borderWidth: '2px'
+            }, 500 );
+            this.cfg.expanded = true;
+        }
+    }
+    
+    builder.prototype.submitmsg = function(e){
+        //up
+        if (e.which == 38 && $(e.target).get(0).value.length == 0){
+            this.position--;
+            if (this.position < 0)
+                this.position = 0;
+            e.target.value = this.posts[this.position] || '';
+        }
+        //down
+        if (e.which == 40 && e.target.selectionEnd == e.target.value.length){
+            this.position++;
+            if (this.position >= this.posts.length)
+                this.position = this.posts.length;
+            e.target.value = this.posts[this.position] || '';
+        }
+        if (e.which == 13 && !e.shiftKey)
+            e.preventDefault();
+        //enter
+
+        if (e.which == 13 && !e.shiftKey && e.target.value.trim().length>0) {
+            e.preventDefault();
+            let msg = e.target.value.trim();
+            socket.emit('chatMsg', {msg: msg, curtab: this.curtab});
+            this.posts.push(msg);
+            this.position = this.posts.length;
+            e.target.value = ''; // CLEAR TEXTAREA
+            this.scrollBottom();
+            socket.chatting = false;
+        }
+        //any other key
+        if (e.target.value.length){
+            socket.emit('istyping', 1);
+        } else{
+            socket.emit('istyping', 0);
+        }
+    }
+
+    builder.prototype.newtab = function(args){
+        this.tab = $(`<div id='tab${args.curtab}' class='tab'>${args.curtab}</div>`);
+        this.tab.appendTo(this.cgroup);
+        if (args.sposition){
+            this.tab.height = this.tab.css('height');
+            this.tab.css('position', 'absolute');
+            this.tab.left = this.tab.css('left');
+            this.tab.top = this.tab.css('top');
+            this.tab.width = this.tab.css('width');
+            let dist = `${Object.keys(this.msgs).length*10}%`; 
+            this.tab.animate({
+                top: $(args.sposition).parent().position().top,
+                left: $(args.sposition).parent().position().left,
+                width: '800px',
+                height: '800px',
+            },0).animate({
+                top: 0,
+                left: dist,
+                width: `10%`,
+                height: `10%`,
+            }, function(){
+                $(this).css('position', 'static');
+                $(this).css('left', 0);
+                $(this).css('height', '100%');
+            }); 
+        }
+        this.tab.css('backgroundColor', this.maincgroup.css('backgroundColor'));
+        this.tab.css('color', this.maincgroup.css('color'));
+        this.tabX = $(`<div id='tabX${args.curtab}' class='closerX'>X</div>`);
+        this.tabX.appendTo(this.tab);
+        this.tab.on('click', (e)=> {
+        	if (e.target !== e.currentTarget)
+        		return;
+            for (let i = 0; i < this.cgroup.children().length-1; i++){
+            	this.cgroup.children().css('backgroundColor', this.textarea.css('backgroundColor'));
+            	this.cgroup.children().css('color', this.textarea.css('color'));
+            }
+            e.target.style.backgroundColor = this.msgs.Main[0].style.backgroundColor;
+            e.target.style.color = this.msgs.Main[0].style.color;
+            this.maincgroup.css('backgroundColor', this.textarea.css('backgroundColor'));
+            this.maincgroup.css('color', this.textarea.css('color'));
+            this.curtab = e.target.innerText.slice(0, -1);
+            for (let msgsgrp in this.msgs){
+                this.msgs[msgsgrp].hide();
+            }
+            this.msgs[this.curtab].show();
+            this.textarea.focus();
+            this.scrollBottom();
+        });
+        this.tabX.on('click', (e) =>{
+			let el = this.cgroup.children().toArray()
+			if (e.target.parentElement.innerText.slice(0, -1) == this.curtab){
+				if ($(e.target.parentElement).is(':last-child')){
+					el[el.length-2].click();
+				} else {
+					let index = el.indexOf(e.target.parentElement);
+					el[index + 1].click();
+				}						
+			}
+			e.target.parentElement.remove();
+			for (let msgsgrp in this.msgs){
+				if(msgsgrp == e.target.id.substr(4)){
+					chat.msgs[msgsgrp].remove();
+					delete this.msgs[msgsgrp];
+				}
+			}
+        });
+    }
+
     builder.prototype.scrollBottom = function() {
         this.msgs[this.curtab].stop().animate({
             scrollTop: this.msgs[this.curtab][0].scrollHeight
