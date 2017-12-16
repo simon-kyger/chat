@@ -348,50 +348,50 @@ $(document).ready(function(){
         });
     }
 
-    builder.RenderingObject = function(self) {
-        this.renderText = (tab, args) => {
+    builder.prototype.render = {
+        renderText: function(tab, args){
             let div = `<div class='msg' style='background-color:${args.bgcolor}; text-shadow: ${args.textshadow};'>${args.date} <span style='color:${args.color};'>${args.name} ${args.msg}</span></div>`;
-            self.msgs[tab].append(div);
+            this.msgs[tab].append(div);
         },
-        this.renderImage = (tab, args) => {
+        renderImage: function(tab, args){
             let img = `<a href='${args.msg}' target='_blank'><img class='imgs' src='${args.msg}' target='_blank' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img></a>`;
             let link = `<a href='${args.msg}' target='_blank'>${args.msg}</a>`;
             let div = $(`<div class='msg'>${args.date} <span style='color:${args.color}'>${args.name} ${link} </span><br>${img}</div>`);
-            self.msgs[tab].append(div);
-            self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
+            this.msgs[tab].append(div);
+            this.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
             //lolfun $('.imgs').draggable({containment: $('.msgs')});
-        }
-        this.renderStaticImage = (tab, args) => {
+        },
+        renderStaticImage: function(tab, args){
             let img = `<img class='imgs' src='data:image/png;base64,${args.image}' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img>`;
             let div = `<div class='msg'>${args.date} <span style='color:${args.color}'>${args.name} ${img} </span></div>`
-            self.msgs[tab].append(div);
-            self.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
-        }
-        this.renderCodeBlock = (tab, args) => {
+            this.msgs[tab].append(div);
+            this.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
+        },
+        renderCodeBlock: function(tab, args){
             let div = `<div class='msg''>${args.date} <span style='color:${args.color}'>${args.name} CODEBLOCK: </span>
                       </div><pre style='white-space: pre-wrap;'><code class='code' style='border-radius: 10px;'>${args.msg}</code></pre>`;
-            self.msgs[tab].append(div);
+            this.msgs[tab].append(div);
             $('.code').each(function(i, block) {
               hljs.highlightBlock(block);
             });
-        }
-        this.renderVideo = (tab, args) => {
+        },
+        renderVideo: function(tab, args){
         	let url = `https://www.youtube.com/watch?v=${args.msg}`;
             let embed = `https://www.youtube.com/embed/${args.msg}`;
             let link = `<a href='${url}'>${url}</a>`;
             let iframe = `<iframe class='iframe' style='height: 300px; width: 400px' src='${embed}' allowfullscreen></iframe>`;
             let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link} </span><br>${iframe}</div>`;
-            self.msgs[tab].append(div);
-            self.videotoggle ? $('.iframe').show() : $('.iframe').hide();
-        }
-        this.renderVideoLink = (tab, args) => {
+            this.msgs[tab].append(div);
+            this.videotoggle ? $('.iframe').show() : $('.iframe').hide();
+        },
+        renderVideoLink: function(tab, args){
         	let url = args.msg;
         	let link = `<a href='${url}'>${url}</a>`;
         	let id = url.substr(32);
         	let iframe = `<iframe class='iframe' style='height: 300px; width: 400px' src='//www.youtube.com/embed/${id}' allowfullscreen></iframe>`;
             let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link}</span><br>${iframe}</div>`;
-            self.msgs[tab].append(div);
-            self.videotoggle ? $('.iframe').show() : $('.iframe').hide(); 
+            this.msgs[tab].append(div);
+            this.videotoggle ? $('.iframe').show() : $('.iframe').hide(); 
         }
     };
 
@@ -419,7 +419,6 @@ $(document).ready(function(){
             if (msgsgrp == data.curtab)
                 boolers = true;
         }
-        let renderobj = new builder.RenderingObject(chat);
         //if the tab doesn't exist create one and append a new message window
         if(!boolers){
         	//create the tab
@@ -438,7 +437,7 @@ $(document).ready(function(){
         let shouldscroll = chat.msgs[chat.curtab].scrollTop() >= (chat.msgs[chat.curtab][0].scrollHeight - chat.msgs[chat.curtab][0].offsetHeight);
         for (let i=0; i<data.chatmessages.length; i++){
             //evil dragons be here
-            renderobj[data.chatmessages[i].action](data.curtab, data.chatmessages[i]);
+            chat.render[data.chatmessages[i].action].call(chat, data.curtab, data.chatmessages[i]);
         }
 
         if (shouldscroll)
