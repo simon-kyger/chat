@@ -435,12 +435,12 @@ $(document).ready(function(){
             //hide the window because we don't care about pms unless we click on it later.
             chat.msgs[data.curtab].hide();
         }
+        let shouldscroll = chat.msgs[chat.curtab].scrollTop() >= (chat.msgs[chat.curtab][0].scrollHeight - chat.msgs[chat.curtab][0].offsetHeight);
         for (let i=0; i<data.chatmessages.length; i++){
             //evil dragons be here
             renderobj[data.chatmessages[i].action](data.curtab, data.chatmessages[i]);
         }
 
-        let shouldscroll = chat.msgs[chat.curtab].scrollTop() >= (chat.msgs[chat.curtab][0].scrollHeight - chat.msgs[chat.curtab][0].offsetHeight);
         if (shouldscroll)
             chat.scrollBottom();
     });
