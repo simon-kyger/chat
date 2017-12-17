@@ -283,6 +283,25 @@ $(document).ready(function(){
                             //doesn't work shamefully
                             //textShadow: args.shadow
                         },2000);
+                        this.cgroup.stop().animate({
+                            backgroundColor: args.shadow,
+                        });
+                        //this is shit but its a quick fix for v1.0
+                        for (let i =0; i<this.cgroup.children().length; i++){
+                            let temp = this.cgroup.children()[i];
+                            let temp2 = 'Main';
+                            let lastchar = temp.innerText[temp.innerText.length-1];
+                            if (lastchar == 'X')
+                                temp2 = temp.innerText.slice(0, -1);
+                            if (temp2 !== this.curtab)
+                                temp.style.backgroundColor = args.cinput;
+                            else
+                                temp.style.backgroundColor = args.bgformatted;
+                            if (args.text == 'white')
+                                temp.style.color = 'white';
+                            else
+                                temp.style.color = 'black';
+                        }
                         this.inputcontainer.stop().animate({
                             backgroundColor: args.shadow
                         });
@@ -299,24 +318,6 @@ $(document).ready(function(){
                             backgroundColor: args.cinput,
                             color: args.text
                         });
-                        this.cgroup.stop().animate({
-                            backgroundColor: args.shadow,
-                        });
-                        for (let i =0; i<this.cgroup.children().length; i++){
-                            let temp = this.cgroup.children()[i];
-                            let temp2;
-                            let lastchar = temp.innerText[temp.innerText.length-1];
-                            if (lastchar == 'X')
-                                temp2 = temp.innerText.slice(0, -1);
-                            if (temp2 !== this.curtab)
-                                temp.style.backgroundColor = args.cinput;
-                            else
-                                temp.style.backgroundColor = args.bgformatted;
-                            if (args.text == 'white')
-                                temp.style.color = 'white';
-                            else
-                                temp.style.color = 'black';
-                        }
                         if(args.text == 'white'){
                             this.textarea.removeClass('blackphtext');
                             
@@ -542,10 +543,21 @@ $(document).ready(function(){
                 color: 'black',
                 backgroundColor: 'white'
             });
-            $(chat.cgroup).children().stop().animate({
-                color: 'white',
-                backgroundColor: 'black'
-            });
+            //this is shit, but its a quick fix for v1.0
+            for (let i =0; i<chat.cgroup.children().length; i++){
+                let temp = chat.cgroup.children()[i];
+                let temp2 = 'Main';
+                let lastchar = temp.innerText[temp.innerText.length-1];
+                if (lastchar == 'X')
+                    temp2 = temp.innerText.slice(0, -1);
+                if (temp2 !== chat.curtab){
+                    temp.style.backgroundColor = 'black';
+                    temp.style.color = 'white';
+                } else{
+                    temp.style.backgroundColor = 'white';
+                    temp.style.color = 'black';
+                }
+            }
             $(chat.onlineusers).stop().animate({
                 color: 'black',
                 backgroundColor: 'white'
