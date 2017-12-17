@@ -74,10 +74,8 @@ $(document).ready(function(){
             this.msgs[msgsgrp].hide();
         }
         this.msgs[this.curtab].show();
-        for (let i = 0; i < this.cgroup.children().length; i++){
-            this.cgroup.children().css('backgroundColor', this.textarea.css('backgroundColor'));
-            this.cgroup.children().css('color', this.textarea.css('color'));
-        }
+        this.cgroup.children().css('backgroundColor', this.textarea.css('backgroundColor'));
+        this.cgroup.children().css('color', this.textarea.css('color'));
         e.target.style.color = this.msgs.Main[0].style.color;
         e.target.style.backgroundColor = this.msgs.Main[0].style.backgroundColor;
         this.textarea.focus();       
@@ -172,14 +170,10 @@ $(document).ready(function(){
         this.tab.on('click', (e)=> {
             if (e.target !== e.currentTarget)
                 return;
-            for (let i = 0; i < this.cgroup.children().length-1; i++){
-                this.cgroup.children().css('backgroundColor', this.textarea.css('backgroundColor'));
-                this.cgroup.children().css('color', this.textarea.css('color'));
-            }
+            this.cgroup.children().css('backgroundColor', this.textarea.css('backgroundColor'));
+            this.cgroup.children().css('color', this.textarea.css('color'));
             e.target.style.backgroundColor = this.msgs.Main[0].style.backgroundColor;
             e.target.style.color = this.msgs.Main[0].style.color;
-            this.maincgroup.css('backgroundColor', this.textarea.css('backgroundColor'));
-            this.maincgroup.css('color', this.textarea.css('color'));
             this.curtab = e.target.innerText.slice(0, -1);
             for (let msgsgrp in this.msgs){
                 this.msgs[msgsgrp].hide();
