@@ -4,6 +4,8 @@ $(document).ready(function(){
     let builder = function(){
         //properties
         this.chat = $(`<div id='chat' class='chat'>`);
+        this.chatresizer = $(`<div id='chatresizer' class='resizer ui-resizable-handl ui-resizable-ne'>`);
+        this.chatresizer.appendTo(this.chat);
         this.chat.draggable({
             containment: 'body'
         });
@@ -18,8 +20,6 @@ $(document).ready(function(){
         this.cgroup.appendTo(this.chat);
         this.config = $(`<div id='config' class='config'>`);
         this.config.appendTo(this.chat);
-        this.chatresizer = $(`<div id='chatresizer' class='resizer ui-resizable-handl ui-resizable-ne'>`);
-        this.chatresizer.appendTo(this.chat);
         this.videotoggle = $(`<input id='videotoggle' class='videotoggle' type='checkbox'>Hide Videos<br>`);
         this.videotoggle.appendTo(this.config);
         this.imagetoggle = $(`<input id='imagetoggle' class='imagetoggle' type='checkbox'>Hide Images</input>`);
