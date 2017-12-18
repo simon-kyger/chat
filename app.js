@@ -680,26 +680,30 @@ function getNames(arg){
 function commandlist(socket, mod, curtab){
     //if i had a db, it woudln't be this way, but since i don't want that added layer of bs, this will suffice
     let ret = `<br><b>COMMANDS:</b><br>`;
-    ret += `<br>Optional Arguments are in brackets []`;
-    ret += `<br><b>&uarr; &darr;</b> with input selected cycles through past posted messages.`;
+    ret += `<br>Optional Arguments are in brackets []<br>`;
     let commanddescriptions = {
-        code:   `<i>codeblock</i>                           -> Wraps <i>codeblock</i> in a codeblock.`,
-        color:  `<i>color</i>                               -> Changes color of your broadcasted messages.`,
-        gif:    `<b> /giphy </b> <i>search</i>              -> Retrieves first result from giphy <i>search</i>.`,
-        help:   `<b>/?</b> <i>command</i>                   -> Information about singular <i>command</i>. With no command specified, retrieves entire list.`,
-        ignore: `[<i>user</i>]                              -> Retrieves all ignored users. Arguments will add users to ignored list.`,
-        name:   `<i>identity</i>                            -> Changes your current identity to <i>identity</i>.`,
-        theme:  `[<i>dark | light | off |</i>]              -> Various theme options. Arguments are optional (will gen randomly).`,
-        yt:     `<b>/vid /video /youtube</b> <i>search</i>  -> Retrieves first result from a youtube <i>search</i>.`
+        arrowkeys:  `<b>&uarr; &darr;</b>                       -> Cycles through past posted messages.`,
+        code:       `<i>codeblock</i>                           -> Wraps <i>codeblock</i> in a codeblock.`,
+        color:      `<i>color</i>                               -> Changes color of your broadcasted messages.`,
+        gif:        `<b> /giphy </b> <i>search</i>              -> Retrieves first result from giphy <i>search</i>.`,
+        help:       `<b>/?</b> <i>command</i>                   -> Information about singular <i>command</i>. With no command specified, retrieves entire list.`,
+        ignore:     `[<i>user</i>]                              -> Retrieves all ignored users. Arguments will add users to ignored list.`,
+        name:       `<i>identity</i>                            -> Changes your current identity to <i>identity</i>.`,
+        theme:      `[<i>dark | light | off |</i>]              -> Various theme options. Arguments are optional (will gen randomly).`,
+        yt:         `<b>/vid /video /youtube</b> <i>search</i>  -> Retrieves first result from a youtube <i>search</i>.`
     }
     if (mod){
         if(mod in commanddescriptions)
-            ret = commanddescriptions[mod];
+            ret += `/<b>${mod}</b> ${commanddescriptions[mod]}`;
         else
             mod = 0;
     }
     if (!mod){
         for (let i in commanddescriptions){
+            if (i == 'arrowkeys'){
+                ret += `<br><b>${i}</b> ${commanddescriptions[i]}`;
+                continue;
+            }
             ret += `<br><b>/${i}</b> ${commanddescriptions[i]}`;
         }
     }
