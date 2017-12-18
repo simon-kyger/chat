@@ -292,6 +292,12 @@ function ignoreuser(socket, mod, curtab){
         socket.emit(`addToChat`, send);
         return;
     }
+    //check if you're trying yourself derp
+    if (temp.name == socket.name){
+        send.chatmessages[0].msg = `So you're trying to ignore yourself.  That's cool.  No.`;
+        socket.emit(`addToChat`, send);
+        return;
+    }
 
     //check if user already is in the list and remove it if they are
     for (let i=0; i<socket.ignore.length; i++){
