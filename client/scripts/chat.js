@@ -103,7 +103,7 @@ $(document).ready(function(){
     }   
     builder.prototype.submitmsg = function(e){
         //up
-        if (e.which == 38 && $(e.target).get(0).value.length == 0){
+        if (e.which == 38 && e.target.selectionStart == 0){
             this.position--;
             if (this.position < 0)
                 this.position = 0;
@@ -163,8 +163,8 @@ $(document).ready(function(){
                 $(this).css('height', '100%');
             }); 
         }
-        this.tab.css('backgroundColor', this.maincgroup.css('backgroundColor'));
-        this.tab.css('color', this.maincgroup.css('color'));
+        this.tab.css('backgroundColor', this.textarea.css('backgroundColor'));
+        this.tab.css('color', this.textarea.css('color'));
         this.tabX = $(`<div id='tabX${args.curtab}' class='closerX'>X</div>`);
         this.tabX.appendTo(this.tab);
         this.tab.on('click', (e)=> {
@@ -180,7 +180,9 @@ $(document).ready(function(){
             }
             this.msgs[this.curtab].show();
             this.textarea.focus();
-            this.scrollBottom();
+            let shouldscroll = this.msgs[this.curtab].scrollTop() >= (this.msgs[this.curtab][0].scrollHeight - this.msgs[this.curtab][0].offsetHeight);
+            if (shouldscroll)
+                this.scrollBottom();
         });
         this.tabX.on('click', (e) =>{
             let el = this.cgroup.children().toArray()
@@ -423,7 +425,6 @@ $(document).ready(function(){
             //evil dragons be here
             chat.render[data.chatmessages[i].action].call(chat, data.curtab, data.chatmessages[i]);
         }
-
         if (shouldscroll)
             chat.scrollBottom();
     });

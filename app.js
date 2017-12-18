@@ -47,6 +47,7 @@ io.sockets.on('connection', (socket) => {
 function init(socket){
     SOCKET_CONNECTIONS.push(socket);
     socket.name = gnameincrementer;
+    socket.ignore = [];
     gnameincrementer++;
     console.log(`${socket.request.connection.remoteAddress} has connected.`);
     let send = {
@@ -105,6 +106,7 @@ const getUsersTyping = () => {
     }, []);
 };
 
+//this needs to handle private messages, currently its echoing all users even in pms
 function istyping(socket, bools){
     socket.ischatting = !!bools;
     let ret = getUsersTyping();
@@ -120,37 +122,50 @@ function chatMsg(socket, msg){
     if (msg.msg.indexOf('<') > -1)
         msg.msg = msg.msg.replace(new RegExp(/</, 'g'), '&lt');
 
-    if (msg.msg.substr(0, 1) == '/'){
-        command(socket, msg.msg, msg.curtab);
-        return;
-    }
-    let act = `renderText`;
-    
-    if (msg.msg.substr(0, 23) == `https://www.youtube.com`){
-        act = `renderVideoLink`;
-    } else if (isImage(msg.msg)){
-        act = `renderImage`;
-    } else {
-        msg.msg = linkifyHtml(msg.msg, {
-            defaultProtocol: `https`,
-        });
-    }
-
     let send = {
         chatmessages: [{
-            action: act,
+            action: `renderText`,
             date:  `[${moment().format("HH:mm:ss")}]`,
             name: `[${socket.name}]:`,
             msg:  msg.msg,
             color: socket.color,
         }],
     };
+    for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
+        if (SOCKET_CONNECTIONS[i].name == msg.curtab){
+            let reciever = SOCKET_CONNECTIONS[i];
+            for (let j=0; j<reciever.ignore.length; j++){
+                if (reciever.ignore[j] == socket.name){
+                    send.chatmessages[0].msg = `User ${reciever.name} is ignoring you.`;
+                    send.curtab = msg.curtab || `Main`;
+                    send.chatmessages[0].color = `red`;
+                    socket.emit('addToChat', send)
+                    return;
+                }
+            }
+        }
+    }
+    if (msg.msg.substr(0, 1) == '/'){
+        command(socket, msg.msg, msg.curtab);
+        return;
+    }
+    
+    if (msg.msg.substr(0, 23) == `https://www.youtube.com`){
+        chat.chatmessages[0].act = `renderVideoLink`;
+    } else if (isImage(msg.msg)){
+        chat.chatmessages[0].act = `renderImage`;
+    } else {
+        msg.msg = linkifyHtml(msg.msg, {
+            defaultProtocol: `https`,
+        });
+    }
 
     if (msg.curtab !== 'Main'){
         for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
             if (SOCKET_CONNECTIONS[i].name == msg.curtab){
+                let reciever = SOCKET_CONNECTIONS[i];
                 send.curtab = socket.name;
-                SOCKET_CONNECTIONS[i].emit('addToChat', send);
+                reciever.emit('addToChat', send);
                 send.curtab = msg.curtab;
                 socket.emit('addToChat', send);
                 return;
@@ -197,6 +212,9 @@ function command(socket, msg, curtab){
         case '/?':
             commandlist(socket, mod, curtab);
             break;
+        case '/ignore':
+            ignoreuser(socket, mod, curtab);
+            break;
         case '/name':
             changename(socket, mod, curtab);
             break;
@@ -239,6 +257,59 @@ function command(socket, msg, curtab){
             };
             socket.emit('addToChat', send);
     }
+}
+
+function ignoreuser(socket, mod, curtab){
+    let send = {
+        chatmessages: [{
+            action: 'renderText',
+            date:  `[${moment().format("HH:mm:ss")}]`,
+            name: ``,
+            msg:  `You are now ignoring `,
+            color: `red`
+        }],
+        curtab: curtab
+    };
+    for(let i=0; i<socket.ignore.length; i++){
+        send.chatmessages[0].msg += socket.ignore[i];
+    }
+
+    //returning current ignore list if not ignoring anyone right now.
+    if (mod.length<1){
+        socket.emit(`addToChat`, send);
+        return;
+    }
+
+    //check if mod is an actual user
+    let temp;
+    for (let i=0; i<SOCKET_CONNECTIONS.length; i++){
+        if (SOCKET_CONNECTIONS[i].name == mod){
+            temp = SOCKET_CONNECTIONS[i];
+        }
+    }
+    if (!temp){
+        send.chatmessages[0].msg = `Could not find user by name of ${mod}`;
+        socket.emit(`addToChat`, send);
+        return;
+    }
+
+    //check if user already is in the list and remove it if they are
+    for (let i=0; i<socket.ignore.length; i++){
+        if (socket.ignore[i] == mod){
+            socket.ignore.splice(i, 1);
+            send.chatmessages[0].msg = `${socket.name} is no longer ignoring ${mod}`;
+            socket.emit('addToChat', send);
+            temp.emit('addToChat', send);
+            return;
+        }
+    }
+
+    //performing the ignore
+    socket.ignore.push(mod);
+    send.chatmessages[0].msg += ` ${mod}`;
+    socket.emit('addToChat', send);
+    send.chatmessages[0].msg = `User ${socket.name} is now ignoring you.`;
+    temp.emit('addToChat', send)
 }
 
 function codeblock(socket, mod, curtab){
