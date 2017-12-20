@@ -66,7 +66,10 @@ function init(socket){
     }
     send.chatmessages[0].msg = `Merry Christmas :D`
     socket.emit('addToChat', send);
-    let randomsearch = [`merry christmas dog gif`
+    let randomsearch = [`merry christmas dog gif`,
+                        `merry christmas rofl`,
+                        `merry christmas ernest`,
+                        `merry christmas funny`
     ];
     
     giphyrequest(socket, 
@@ -160,9 +163,9 @@ function chatMsg(socket, msg){
     }
     
     if (msg.msg.substr(0, 23) == `https://www.youtube.com`){
-        chat.chatmessages[0].act = `renderVideoLink`;
+        send.chatmessages[0].action = `renderVideoLink`;
     } else if (isImage(msg.msg)){
-        chat.chatmessages[0].act = `renderImage`;
+        send.chatmessages[0].action = `renderImage`;
     } else {
         msg.msg = linkifyHtml(msg.msg, {
             defaultProtocol: `https`,
