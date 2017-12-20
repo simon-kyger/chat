@@ -64,6 +64,15 @@ function init(socket){
         SOCKET_CONNECTIONS[i].emit('addToChat', send);
         SOCKET_CONNECTIONS[i].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
     }
+    send.chatmessages[0].msg = `Merry Christmas :D`
+    socket.emit('addToChat', send);
+    let randomsearch = [`merry christmas dog gif`
+    ];
+    
+    giphyrequest(socket, 
+        randomsearch[Math.floor(Math.random()*(randomsearch.length-1))],
+        'Main',
+        true);
 }
 
 //socket: object
@@ -519,7 +528,7 @@ function changename(socket, mod, curtab){
 //socket: object
 //mod: string
 //description: part of command lib that will fetch mod from giphy.com
-function giphyrequest(socket, mod, curtab){
+function giphyrequest(socket, mod, curtab, shenanigans){
     let send;
     if (!keys.giphy){
         send = {
@@ -645,6 +654,11 @@ function giphyrequest(socket, mod, curtab){
                         return;
                     }
                 }
+            }
+            if (shenanigans){
+                send.chatmessages[0].name = ``;
+                socket.emit('addToChat', send);
+                return;
             }
             for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
                 SOCKET_CONNECTIONS[i].emit('addToChat', send);

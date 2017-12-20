@@ -231,6 +231,7 @@ $(document).ready(function(){
     builder.prototype.randomizedstartinganimation = function(args, start) {
         //dragons be here
         args = this.getTheme(args);
+        let st = this.msgs[this.curtab].scrollTop();
         this.chat.stop().animate({
             top: `${Math.floor(Math.random()*99)}%`,
             left: `${Math.floor(Math.random()*99)}%`,
@@ -246,12 +247,15 @@ $(document).ready(function(){
                 this.textarea.stop().animate({
                     backgroundColor: '#e5e5e5'
                 }, 1500);
+                this.msgs[this.curtab].stop().animate({
+                	scrollTop: st
+                }, 1000); //this 1000 timelimit needs to match the following lines 1000 time limit, else the window may scroll irregularly
                 this.chat.stop().animate({
                     top: '10%',
                     left: '10%',
                     height: '75%',
                     width: '75%',
-                }, 1000, null, ()=> {
+                }, 1000, null, ()=> { // see above comment about modifying this 1000 time limit.
                     this.msgs[this.curtab].stop().animate({
                         boxShadow: `1 1 1000px 100px 'silver'`
                     },400, null, ()=>{
@@ -295,7 +299,6 @@ $(document).ready(function(){
                             color: args.text,
                             backgroundColor: args.bgformatted
                         });
-                        this.scrollBottom();
                     });
                     this.textarea.stop().animate({
                         backgroundColor: 'white'
@@ -465,7 +468,7 @@ $(document).ready(function(){
     });
 
     //data expects string
-    //this is buggy because we don't necessarily want to close the window when
+    //this is buggy because we don't necessarily want to close the window when someone logs out
     socket.on('removeTab', (data) =>{
         for (let msgsgrp in chat.msgs){
             if (msgsgrp == data){
