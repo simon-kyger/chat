@@ -49,9 +49,9 @@ $(document).ready(function(){
         this.cfg.expanded = false;
 
         //methods
-        this.maincgroup.on('click', (e)=> this.tabmainclick(e));
-        this.cfg.on('click', ()=> this.cfgexpand());
+        this.maincgroup.on('click', (e)=> this.tabclick(e));
         this.textarea.on('change keydown input paste', (e)=> this.submitmsg(e));
+        this.cfg.on('click', ()=> this.cfgexpand());
         this.videotoggle.on('change', ()=> this.videotoggler());
         this.imagetoggle.on('change', ()=> this.imagetoggler());
 
@@ -67,18 +67,6 @@ $(document).ready(function(){
         this.videotoggle ? $('.iframe').hide() : $('.iframe').show();
         this.videotoggle = !this.videotoggle;
         this.scrollBottom();
-    }
-    builder.prototype.tabmainclick = function(e){
-        this.curtab = 'Main';
-        for (let msgsgrp in this.msgs){
-            this.msgs[msgsgrp].hide();
-        }
-        this.msgs[this.curtab].show();
-        this.cgroup.children().css('backgroundColor', this.textarea.css('backgroundColor'));
-        this.cgroup.children().css('color', this.textarea.css('color'));
-        e.target.style.color = this.msgs.Main[0].style.color;
-        e.target.style.backgroundColor = this.msgs.Main[0].style.backgroundColor;
-        this.textarea.focus();       
     }
     builder.prototype.cfgexpand = function(){
         if (this.cfg.expanded){
@@ -167,41 +155,43 @@ $(document).ready(function(){
         this.tab.css('color', this.textarea.css('color'));
         this.tabX = $(`<div id='tabX${args.curtab}' class='closerX'>X</div>`);
         this.tabX.appendTo(this.tab);
-        this.tab.on('click', (e)=> {
-            if (e.target !== e.currentTarget)
-                return;
-            this.cgroup.children().css('backgroundColor', this.textarea.css('backgroundColor'));
-            this.cgroup.children().css('color', this.textarea.css('color'));
-            e.target.style.backgroundColor = this.msgs.Main[0].style.backgroundColor;
-            e.target.style.color = this.msgs.Main[0].style.color;
-            this.curtab = e.target.innerText.slice(0, -1);
-            for (let msgsgrp in this.msgs){
-                this.msgs[msgsgrp].hide();
+        this.tab.on('click', (e)=> this.tabclick(e));
+        this.tabX.on('click', (e) => this.tabXclick(e));
+    }
+    builder.prototype.tabclick = function(e){
+        if (e.target !== e.currentTarget)
+            return;
+        this.cgroup.children().css('backgroundColor', this.textarea.css('backgroundColor'));
+        this.cgroup.children().css('color', this.textarea.css('color'));
+        e.target.style.backgroundColor = this.msgs.Main[0].style.backgroundColor;
+        e.target.style.color = this.msgs.Main[0].style.color;
+        e.target.innerText.slice(-1) !== 'X' ? this.curtab = 'Main' : this.curtab = e.target.innerText.slice(0, -1);
+        for (let msgsgrp in this.msgs){
+            this.msgs[msgsgrp].hide();
+        }
+        this.msgs[this.curtab].show();
+        this.textarea.focus();
+        let shouldscroll = this.msgs[this.curtab].scrollTop() >= (this.msgs[this.curtab][0].scrollHeight - this.msgs[this.curtab][0].offsetHeight);
+        if (shouldscroll)
+            this.scrollBottom();
+    }
+    builder.prototype.tabXclick = function(e){
+        let el = this.cgroup.children().toArray()
+        if (e.target.parentElement.innerText.slice(0, -1) == this.curtab){
+            if ($(e.target.parentElement).is(':last-child')){
+                el[el.length-2].click();
+            } else {
+                let index = el.indexOf(e.target.parentElement);
+                el[index + 1].click();
+            }                       
+        }
+        e.target.parentElement.remove();
+        for (let msgsgrp in this.msgs){
+            if(msgsgrp == e.target.id.substr(4)){
+                chat.msgs[msgsgrp].remove();
+                delete this.msgs[msgsgrp];
             }
-            this.msgs[this.curtab].show();
-            this.textarea.focus();
-            let shouldscroll = this.msgs[this.curtab].scrollTop() >= (this.msgs[this.curtab][0].scrollHeight - this.msgs[this.curtab][0].offsetHeight);
-            if (shouldscroll)
-                this.scrollBottom();
-        });
-        this.tabX.on('click', (e) =>{
-            let el = this.cgroup.children().toArray()
-            if (e.target.parentElement.innerText.slice(0, -1) == this.curtab){
-                if ($(e.target.parentElement).is(':last-child')){
-                    el[el.length-2].click();
-                } else {
-                    let index = el.indexOf(e.target.parentElement);
-                    el[index + 1].click();
-                }                       
-            }
-            e.target.parentElement.remove();
-            for (let msgsgrp in this.msgs){
-                if(msgsgrp == e.target.id.substr(4)){
-                    chat.msgs[msgsgrp].remove();
-                    delete this.msgs[msgsgrp];
-                }
-            }
-        });
+        }
     }
     builder.prototype.scrollBottom = function() {
         this.msgs[this.curtab].stop().animate({
