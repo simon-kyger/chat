@@ -40,7 +40,7 @@ body{
 }
 .inputcontainer{
     width: 100%;
-    height: 10%;
+    height: calc(10% + 1px);
     font-family: 'Lucida Console';
     font-size: 14px;
     resize: none;
@@ -49,17 +49,19 @@ body{
     right: 0;
     left: 0;
     position: absolute;
+    display:table;
 }
 .inputcontainer .istyping{
-    bottom: 48px;
-    width: 80%;
-    height: 24px;
     position: absolute;
+    width: 80%;
+    height: 30%;
+    display: table-row;
+    top: 0px;
 }
 .inputcontainer .chatinput{
     position: absolute;
     width: 100%;
-    height: 48px;
+    height: 70%;
     left: 0;
     resize: none;
     overflow: hidden;
@@ -67,7 +69,17 @@ body{
     z-index: 5;
     box-sizing:border-box;
     border:none;
+    display:table-row;
 }
+.inputcontainer .cfg{
+    z-index: 999;
+    position: absolute;
+    right: 2%;
+    font-size: 30px;
+    bottom: 0px;
+    cursor: pointer;
+}
+
 .blackphtext::placeholder{
     color: black;
 }
@@ -75,15 +87,6 @@ body{
     color: white;
 }
 
-.inputcontainer .cfg{
-    z-index: 999;
-    position: absolute;
-    right: 2%;
-    font-size: 32px;
-    bottom: 4px;
-    cursor: pointer;
-    padding-top: 20px;
-}
 .config{
     position: absolute !important;
     bottom: 0px;

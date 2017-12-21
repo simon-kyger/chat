@@ -16,14 +16,14 @@ $(document).ready(function(){
         });
         this.cgroup = $(`<div id='cgroup' class='cgroup'>`);
         this.cgroup.appendTo(this.chat);
-        this.onlineusers = $(`<div id='onlineusers' class='onlineusers'></div>`);
-        this.onlineusers.appendTo(this.chat);
         this.maincgroup = $(`<div id='maincgroup' class='tab' style='width: 10%';>Main</div>`);
         this.maincgroup.appendTo(this.cgroup);
         this.curtab = 'Main';
         this.msgs = {};
         this.msgs[this.curtab] = $(`<div id='${this.curtab}' class='msgs'>`);
         this.msgs[this.curtab].appendTo(this.chat);
+        this.onlineusers = $(`<div id='onlineusers' class='onlineusers'></div>`);
+        this.onlineusers.appendTo(this.chat);
         this.welcome = $(`<div class='redshadow'>Welcome to the proper lunch chat channel!</br></div>`);
         this.welcome.appendTo(this.msgs[this.curtab]);
         this.githublink = $(`<div>&nbsp; &nbsp; github --> <a href='https://github.com/simon-kyger/chat' target='_blank'>https://github.com/simon-kyger/chat</a></br></div>`)
@@ -47,10 +47,10 @@ $(document).ready(function(){
         this.imagetoggle.appendTo(this.config);
         this.cfg = $(`<div id='cfg' class='cfg'>&#x2699;</div>`);
         this.cfg.appendTo(this.inputcontainer);
-        this.textarea = $(`<textarea id='chatinput' class='chatinput blackphtext' placeholder='Chat here! or /? for a list of commands.' autofocus='autofocus'></textarea>`);
-        this.textarea.appendTo(this.inputcontainer);
         this.istyping = $(`<div class='istyping'></div>`);
         this.istyping.appendTo(this.inputcontainer);
+        this.textarea = $(`<textarea id='chatinput' class='chatinput blackphtext' placeholder='Chat here! or /? for a list of commands.' autofocus='autofocus'></textarea>`);
+        this.textarea.appendTo(this.inputcontainer);
         this.posts = [];
         this.position = 0;
         this.blob = {};

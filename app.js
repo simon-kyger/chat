@@ -131,7 +131,6 @@ function istyping(socket, bools){
 //msg: object
 //returns: void
 function chatMsg(socket, msg){
-    console.log(msg.blob);
     if (msg.msg.indexOf('<') > -1)
         msg.msg = msg.msg.replace(new RegExp(/</, 'g'), '&lt');
 
