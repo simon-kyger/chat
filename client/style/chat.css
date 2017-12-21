@@ -29,7 +29,7 @@ body{
 .chat .msgs{
     overflow-y:scroll;
     width:80%;
-    height:80%;
+    height:86%;
     direction: rtl;
     text-align: left;
     position:absolute;
@@ -42,7 +42,7 @@ body{
 }
 .inputcontainer{
     width: 100%;
-    height: 15%;
+    height: 10%;
     font-family: 'Lucida Console';
     font-size: 14px;
     position: absolute !important;
@@ -54,7 +54,7 @@ body{
 }
 .istyping{
     position:absolute;
-    top: 0%;
+    bottom: 48px;
     width: 80%;
     line-height: 1.6;
     height: 25%;
@@ -63,7 +63,7 @@ body{
 .inputcontainer .chatinput{
     position: absolute;
     width: 100%;
-    height: 75%;
+    height: 48px;
     left: 0;
     resize: none;
     overflow: hidden;
@@ -84,9 +84,9 @@ body{
     position: absolute;
     right: 2%;
     font-size: 32px;
-    top: 60%;
-    transform: translateY(-50%);
+    bottom: 4px;
     cursor: pointer;
+    padding-top: 20px;
 }
 .config{
     position: absolute !important;
@@ -151,6 +151,15 @@ body{
     background-color: black;
     text-align: -webkit-center;
     float: right;
+}
+.imagepreview{
+    position: absolute;
+    z-index: 5;
+    bottom: 7%;
+    border-radius: 10px;
+}
+pre{
+    margin:0;
 }
 
 ::-webkit-scrollbar {

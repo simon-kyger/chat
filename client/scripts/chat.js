@@ -14,6 +14,9 @@ $(document).ready(function(){
                 'ne': this.chatresizer
             }
         });
+        this.imagepreview = $(`<canvas id='imagepreview' class='imagepreview'>`);
+        this.imagepreview.appendTo(this.chat);
+        this.imagepreview.hide();
         this.inputcontainer = $(`<div id='inputcontainer' class='inputcontainer'>`);
         this.inputcontainer.appendTo(this.chat);
         this.cgroup = $(`<div id='cgroup' class='cgroup'>`);
@@ -90,6 +93,29 @@ $(document).ready(function(){
         }
     }   
     builder.prototype.submitmsg = function(e){
+    	//paste
+		if (e.type =='paste'){
+			let items = e.originalEvent.clipboardData.items;
+			if(!items)
+				return;
+			let blob;
+			for (var i = 0; i < items.length; i++) {
+				if (items[i].type.indexOf("image") == -1) continue;
+				blob = items[i].getAsFile();
+			}
+			if (!blob)
+				return;
+			this.imagepreview.show('explode');
+			let ctx = this.imagepreview[0].getContext('2d');
+			let img = new Image();
+			img.onload = (e) => {
+				this.imagepreview[0].width = Math.sqrt(img.width)*5;
+				this.imagepreview[0].height = Math.sqrt(img.height)*5;
+				ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, Math.sqrt(img.width)*5, Math.sqrt(img.height)*5);
+			};
+			let URLObj = window.URL || window.webkitURL;
+			img.src = URLObj.createObjectURL(blob);
+		}
         //up
         if (e.which == 38 && e.target.selectionStart == 0){
             this.position--;
