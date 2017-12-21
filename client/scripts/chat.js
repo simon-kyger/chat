@@ -14,25 +14,8 @@ $(document).ready(function(){
                 'ne': this.chatresizer
             }
         });
-        this.imagepreview = $(`<canvas id='imagepreview' class='imagepreview'>`);
-        this.imagepreview.appendTo(this.chat);
-        this.imagepreview.hide();
-        this.inputcontainer = $(`<div id='inputcontainer' class='inputcontainer'>`);
-        this.inputcontainer.appendTo(this.chat);
         this.cgroup = $(`<div id='cgroup' class='cgroup'>`);
         this.cgroup.appendTo(this.chat);
-        this.config = $(`<div id='config' class='config'>`);
-        this.config.appendTo(this.chat);
-        this.videotoggle = $(`<input id='videotoggle' class='videotoggle' type='checkbox'>Hide Videos<br>`);
-        this.videotoggle.appendTo(this.config);
-        this.imagetoggle = $(`<input id='imagetoggle' class='imagetoggle' type='checkbox'>Hide Images</input>`);
-        this.imagetoggle.appendTo(this.config);
-        this.cfg = $(`<div id='cfg' class='cfg'>&#x2699;</div>`);
-        this.cfg.appendTo(this.inputcontainer);
-        this.textarea = $(`<textarea id='chatinput' class='chatinput blackphtext' placeholder='Chat here! or /? for a list of commands.' autofocus='autofocus'></textarea>`);
-        this.textarea.appendTo(this.inputcontainer);
-        this.istyping = $(`<div class='istyping'></div>`);
-        this.istyping.appendTo(this.inputcontainer);
         this.onlineusers = $(`<div id='onlineusers' class='onlineusers'></div>`);
         this.onlineusers.appendTo(this.chat);
         this.maincgroup = $(`<div id='maincgroup' class='tab' style='width: 10%';>Main</div>`);
@@ -47,8 +30,30 @@ $(document).ready(function(){
         this.githublink.appendTo(this.msgs[this.curtab]);
         this.commandlist = $(`<div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>`);
         this.commandlist.appendTo(this.msgs[this.curtab]);
+        this.imagepreview = $(`<div id='imagepreview' class='imagepreview'>`)
+        this.imagepreview.appendTo(this.chat);
+        this.imagepreviewcvs = $(`<canvas id='cvs'>`);
+        this.imagepreviewcvs.appendTo(this.imagepreview);
+        this.imagepreviewX = $(`<div class='tabX' style='float:right;'>X</div>`);
+        this.imagepreviewX.appendTo(this.imagepreview);
+        this.imagepreview.hide();
+        this.inputcontainer = $(`<div id='inputcontainer' class='inputcontainer'>`);
+        this.inputcontainer.appendTo(this.chat);
+        this.config = $(`<div id='config' class='config'>`);
+        this.config.appendTo(this.chat);
+        this.videotoggle = $(`<input id='videotoggle' class='videotoggle' type='checkbox'>Hide Videos<br>`);
+        this.videotoggle.appendTo(this.config);
+        this.imagetoggle = $(`<input id='imagetoggle' class='imagetoggle' type='checkbox'>Hide Images</input>`);
+        this.imagetoggle.appendTo(this.config);
+        this.cfg = $(`<div id='cfg' class='cfg'>&#x2699;</div>`);
+        this.cfg.appendTo(this.inputcontainer);
+        this.textarea = $(`<textarea id='chatinput' class='chatinput blackphtext' placeholder='Chat here! or /? for a list of commands.' autofocus='autofocus'></textarea>`);
+        this.textarea.appendTo(this.inputcontainer);
+        this.istyping = $(`<div class='istyping'></div>`);
+        this.istyping.appendTo(this.inputcontainer);
         this.posts = [];
         this.position = 0;
+        this.blob = {};
         this.cfg.expanded = false;
 
         //methods
@@ -98,15 +103,16 @@ $(document).ready(function(){
 			let items = e.originalEvent.clipboardData.items;
 			if(!items)
 				return;
-			let blob;
+            let blob;
 			for (var i = 0; i < items.length; i++) {
 				if (items[i].type.indexOf("image") == -1) continue;
 				blob = items[i].getAsFile();
 			}
 			if (!blob)
 				return;
-			this.imagepreview.show('explode');
-			let ctx = this.imagepreview[0].getContext('2d');
+			this.imagepreview.show();
+			let ctx = this.imagepreviewcvs[0].getContext('2d');
+            ctx.clearRect(0, 0, this.imagepreviewcvs[0].width, this.imagepreviewcvs[0].height);
 			let img = new Image();
 			img.onload = (e) => {
 				this.imagepreview[0].width = Math.sqrt(img.width)*5;
@@ -115,6 +121,11 @@ $(document).ready(function(){
 			};
 			let URLObj = window.URL || window.webkitURL;
 			img.src = URLObj.createObjectURL(blob);
+            this.blob = blob;
+            this.imagepreviewX.on('click', (e) => {
+                $(e.target).parent().hide();
+                this.blob = {};
+            });
 		}
         //up
         if (e.which == 38 && e.target.selectionStart == 0){
@@ -130,14 +141,24 @@ $(document).ready(function(){
                 this.position = this.posts.length;
             e.target.value = this.posts[this.position] || '';
         }
+        
+        //delete
+        if (e.which == 8 && e.target.selectionStart == 0){
+            this.imagepreview.hide();
+            this.blob = {};
+        }
+
+        //enter
         if (e.which == 13 && !e.shiftKey)
             e.preventDefault();
-        //enter
-
-        if (e.which == 13 && !e.shiftKey && e.target.value.trim().length>0) {
+        if (e.which == 13 && !e.shiftKey && (e.target.value.trim().length>0 || !$.isEmptyObject(this.blob))) {
             e.preventDefault();
             let msg = e.target.value.trim();
-            socket.emit('chatMsg', {msg: msg, curtab: this.curtab});
+            socket.emit('chatMsg', {
+                msg: msg, 
+                blob: this.blob, 
+                curtab: this.curtab
+            });
             this.posts.push(msg);
             this.position = this.posts.length;
             e.target.value = ''; // CLEAR TEXTAREA
@@ -179,7 +200,7 @@ $(document).ready(function(){
         }
         this.tab.css('backgroundColor', this.textarea.css('backgroundColor'));
         this.tab.css('color', this.textarea.css('color'));
-        this.tabX = $(`<div id='tabX${args.curtab}' class='closerX'>X</div>`);
+        this.tabX = $(`<div id='tabX${args.curtab}' class='tabX'>X</div>`);
         this.tabX.appendTo(this.tab);
         this.tab.on('click', (e)=> this.tabclick(e));
         this.tabX.on('click', (e) => this.tabXclick(e));
@@ -273,6 +294,9 @@ $(document).ready(function(){
                 this.textarea.stop().animate({
                     backgroundColor: '#e5e5e5'
                 }, 1500);
+                this.imagepreview.stop().animate({
+                    backgroundColor: args.cinput
+                });
                 this.msgs[this.curtab].stop().animate({
                 	scrollTop: st
                 }, 1000); //this 1000 timelimit needs to match the following lines 1000 time limit, else the window may scroll irregularly
@@ -398,6 +422,37 @@ $(document).ready(function(){
             let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link}</span><br>${iframe}</div>`;
             this.msgs[tab].append(div);
             this.videotoggle ? $('.iframe').show() : $('.iframe').hide(); 
+        },
+        renderBlob: function(tab, args){
+            let URLObj = window.URL || window.webkitURL;
+            let blob = new Blob([args.blob], {type: "image/png"});
+            let img = `<img class='blob' style='max-height: 300px; max-width: 300px;' src='${URLObj.createObjectURL(blob)}'/>`;
+            let div = `<div class='msg'><span style='${args.color}'>${args.name} ${args.msg}</span><br>${img}</div>`;
+            this.msgs[tab].append(div);
+            $('.blob').on('click', function(){
+                //do some other crazy shenanigans later :P
+            });
+            $(div).resizable();            
+            this.imagepreview.hide();
+            this.blob = {};
+        //to create a new canvas and render the image to that instead (for later purposes)
+            // var canvas = $('<canvas/>');
+            // canvas.addClass('msg');
+            // let ctx = canvas[0].getContext('2d');
+            // let img = new Image();
+            // img.onload = (e) => {
+            //     canvas.width = Math.sqrt(img.width)*5;
+            //     canvas.height = Math.sqrt(img.height)*5;
+            //     ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, Math.sqrt(img.width)*5, Math.sqrt(img.height)*5);
+            // };
+            // let URLObj = window.URL || window.webkitURL;
+            // let blob = new Blob([args.blob], {type: "image/png"});
+            // img.src = URLObj.createObjectURL(blob);
+            // let div = $(`<div class='msg'>${args.date} <span style='${args.color}'>${args.name} COLAB:</span><br></div>`);
+            // canvas.appendTo(div);
+            // this.msgs[tab].append(div);
+            // this.imagepreview.hide();
+            // this.blob = {};
         }
     };
     let chat = new builder();

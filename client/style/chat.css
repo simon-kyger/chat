@@ -16,7 +16,6 @@ body{
     height: 100vh;
 }
 .chat{
-    position:absolute !important;
     width: 50%;
     height: 50%;
     opacity: 1;
@@ -29,15 +28,14 @@ body{
 .chat .msgs{
     overflow-y:scroll;
     width:80%;
-    height:86%;
+    height:85%;
     direction: rtl;
     text-align: left;
-    position:absolute;
 }
 .code {
     direction: ltr;
 }
-.msg{
+.chat .msgs .msg{
     direction: ltr; 
 }
 .inputcontainer{
@@ -45,20 +43,18 @@ body{
     height: 10%;
     font-family: 'Lucida Console';
     font-size: 14px;
-    position: absolute !important;
     resize: none;
     color: white;
     bottom: 0;
     right: 0;
     left: 0;
+    position: absolute;
 }
-.istyping{
-    position:absolute;
+.inputcontainer .istyping{
     bottom: 48px;
     width: 80%;
-    line-height: 1.6;
-    height: 25%;
-    vertical-align: ;
+    height: 24px;
+    position: absolute;
 }
 .inputcontainer .chatinput{
     position: absolute;
@@ -114,6 +110,7 @@ body{
     z-index:2;
     cursor: nesw-resize;
 }
+
 .onlineusers{
     z-index: 1;
     top: 5%;
@@ -143,7 +140,8 @@ body{
     margin-right:5px;
     z-index:5;
 }
-.closerX{
+.tabX{
+    cursor: pointer;
     width: 15px;
     height: 15px;
     display:inline-block;
@@ -155,8 +153,8 @@ body{
 .imagepreview{
     position: absolute;
     z-index: 5;
-    bottom: 7%;
-    border-radius: 10px;
+    bottom: 48px;
+    border: 1px solid black;
 }
 pre{
     margin:0;

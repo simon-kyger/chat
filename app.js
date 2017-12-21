@@ -131,6 +131,7 @@ function istyping(socket, bools){
 //msg: object
 //returns: void
 function chatMsg(socket, msg){
+    console.log(msg.blob);
     if (msg.msg.indexOf('<') > -1)
         msg.msg = msg.msg.replace(new RegExp(/</, 'g'), '&lt');
 
@@ -166,6 +167,9 @@ function chatMsg(socket, msg){
         send.chatmessages[0].action = `renderVideoLink`;
     } else if (isImage(msg.msg)){
         send.chatmessages[0].action = `renderImage`;
+    } else if (Object.keys(msg.blob).length){
+        send.chatmessages[0].action = `renderBlob`;
+        send.chatmessages[0].blob = msg.blob;
     } else {
         msg.msg = linkifyHtml(msg.msg, {
             defaultProtocol: `https`,
