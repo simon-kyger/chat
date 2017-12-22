@@ -206,9 +206,9 @@ function getIpOfName(name){
 //returns: void
 //description: directs commands sent to server by client.
 function command(socket, msg, curtab){
-    msg = msg.trim();
-    let command = msg.substr(0, msg.indexOf('\n')) || msg.substr(0, msg.indexOf(' ')) || msg;
-    command = command.trim();
+    //match on first space or carriage return and get everything before that
+    let command = msg.split(/[\n\r\s]+/g)[0];
+    //get first char after command
     let mod = msg.substr(command.length+1).trim();
     let send;
     switch(command){

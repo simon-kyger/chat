@@ -427,7 +427,7 @@ $(document).ready(function(){
             let URLObj = window.URL || window.webkitURL;
             let blob = new Blob([args.blob], {type: "image/png"});
             let img = `<img class='blob' style='max-width: ${this.msgs[tab].width()}px;' src='${URLObj.createObjectURL(blob)}'/>`;
-            let div = `<div class='msg'><span style='${args.color}'>${args.name} ${args.msg}</span><br>${img}</div>`;
+            let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${args.msg}</span><br>${img}</div>`;
             this.msgs[tab].append(div);
             $('.blob').on('click', function(){
                 //do some other crazy shenanigans later :P
