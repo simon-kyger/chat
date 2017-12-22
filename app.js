@@ -143,6 +143,20 @@ function chatMsg(socket, msg){
             color: socket.color,
         }],
     };
+
+    if (msg.msg.substr(0, 23) == `https://www.youtube.com`){
+        send.chatmessages[0].action = `renderVideoLink`;
+    } else if (isImage(msg.msg)){
+        send.chatmessages[0].action = `renderImage`;
+    } else if (Object.keys(msg.blob).length){
+        send.chatmessages[0].action = `renderBlob`;
+        send.chatmessages[0].blob = msg.blob;
+    } else {
+        send.chatmessages[0].msg = linkifyHtml(msg.msg, {
+            defaultProtocol: `https`,
+        });
+    }
+
     for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
         if (SOCKET_CONNECTIONS[i].name == msg.curtab){
             let reciever = SOCKET_CONNECTIONS[i];
@@ -160,19 +174,6 @@ function chatMsg(socket, msg){
     if (msg.msg.substr(0, 1) == '/'){
         command(socket, msg.msg, msg.curtab);
         return;
-    }
-    
-    if (msg.msg.substr(0, 23) == `https://www.youtube.com`){
-        send.chatmessages[0].action = `renderVideoLink`;
-    } else if (isImage(msg.msg)){
-        send.chatmessages[0].action = `renderImage`;
-    } else if (Object.keys(msg.blob).length){
-        send.chatmessages[0].action = `renderBlob`;
-        send.chatmessages[0].blob = msg.blob;
-    } else {
-        msg.msg = linkifyHtml(msg.msg, {
-            defaultProtocol: `https`,
-        });
     }
 
     if (msg.curtab !== 'Main'){
@@ -205,8 +206,10 @@ function getIpOfName(name){
 //returns: void
 //description: directs commands sent to server by client.
 function command(socket, msg, curtab){
-    let command = msg.substr(0, msg.indexOf(' ')) || msg;
-    let mod = msg.substr(command.length+1);
+    msg = msg.trim();
+    let command = msg.substr(0, msg.indexOf('\n')) || msg.substr(0, msg.indexOf(' ')) || msg;
+    command = command.trim();
+    let mod = msg.substr(command.length+1).trim();
     let send;
     switch(command){
         case '/code':
@@ -344,6 +347,13 @@ function codeblock(socket, mod, curtab){
         }],
         curtab: curtab
     };
+    if (!mod){
+        send.chatmessages[0].action = 'renderText';
+        send.chatmessages[0].msg = `Enter some code after the mod. Example: /code function() { console.log('hi there');}`;
+        send.chatmessages[0].color = `red`;
+        socket.emit(`addToChat`, send);
+        return; 
+    }
     if (curtab !== 'Main'){
         for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
             if (SOCKET_CONNECTIONS[i].name == curtab){
@@ -355,7 +365,9 @@ function codeblock(socket, mod, curtab){
             }
         }
     }
-    socket.emit('addToChat', send);
+    for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
+        SOCKET_CONNECTIONS[i].emit('addToChat', send);
+    }
 }
 
 function changecolor(socket, mod, curtab){
