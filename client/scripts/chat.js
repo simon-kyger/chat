@@ -512,8 +512,11 @@ $(document).ready(function(){
                 data[i] = data[i].replace(/\n/g, '<br>');
             chat.onlineusers.append(`<div class='user' style='color:${data[i].color}; cursor: pointer'>${data[i]}</div>`);
         }
+        //this entire method should be a part of builder
         $('.user').dblclick(function (e) {
             chat.curtab = $(this)[0].textContent;
+            //this should be handled way better, as in when a user double clicks an already current speaking to tab
+            //it should just click on that tab and load those respective messages.
             if(chat.msgs[chat.curtab])
                 return;
             //create the tab
