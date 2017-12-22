@@ -639,8 +639,8 @@ $(document).ready(function(){
                 color: 'white'
             });
             chat.textarea.addClass('whitephtext');
-            document.styleSheets[0].cssRules[0].style.background = 'white';
-            document.styleSheets[0].cssRules[1].style.background = 'black';
+            document.styleSheets[0].cssRules[0].style.background = 'black';
+            document.styleSheets[0].cssRules[1].style.background = 'white';
         } else {
             let args = chat.getTheme(data);
             chat.randomizedstartinganimation(data);
