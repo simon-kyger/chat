@@ -102,10 +102,11 @@ $(document).ready(function(){
                 this.ctx.drawImage(this.img, 0, 0);
             };
             this.drawing.draggable({
-                handles: 'n, s, e, w, nw, ne, sw, se'
+                containment: 'body'
 	        });
 	        this.drawing.resizable({
 	        	alsoResize: this.div,
+                handles: 'all'
             })
             $('body')[0].onresize = (e)=>{
                 this.div.css('width', this.drawing.css('width'));
