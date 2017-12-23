@@ -108,7 +108,7 @@ $(document).ready(function(){
         this.drawingselection= $(`<div id='drawingselection' class='icondisplay'>⬚</div>`);
         this.drawingselection.appendTo(this.drawingtools);
         this.drawingselection.on('click', (e)=>{
-            console.log('square');
+            console.log('selecting');
         });
         this.drawingsquare= $(`<div id='drawingsquare' class='icondisplay'>◻</div>`);
         this.drawingsquare.appendTo(this.drawingtools);
