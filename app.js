@@ -13,7 +13,10 @@ const port = config.get('port');
 const youtubenode = require('youtube-node');
 const youtube = new youtubenode();
 const apiKeys = require('./apiKeys');
+const logger = require('morgan');
 let keys = {};
+
+
 // should really store api keys in .env.
 ['youtube', 'giphy'].forEach((path) => {
     apiKeys.getApiKey(path)
@@ -24,7 +27,13 @@ let keys = {};
         .catch(err => console.log(err))
 });
 
-app.use('/', express.static(path.join(__dirname, 'client')));
+if(process.env.NODE_ENV=== 'simon'){
+  app.use('/', express.static(path.join(__dirname, 'client')));
+} else{
+  app.use(logger('dev'));
+  app.use('/dist', express.static('dist'));
+  app.get('/', (req, res) =>  res.sendFile(path.join(__dirname,"./dist/index.html")))
+}
 
 server.listen(port);
 console.log(`Listening on port: ${port}`);
@@ -71,8 +80,8 @@ function init(socket){
                         `merry christmas ernest`,
                         `merry christmas funny`
     ];
-    
-    giphyrequest(socket, 
+
+    giphyrequest(socket,
         randomsearch[Math.floor(Math.random()*(randomsearch.length-1))],
         'Main',
         true);
@@ -352,7 +361,7 @@ function codeblock(socket, mod, curtab){
         send.chatmessages[0].msg = `Enter some code after the mod. Example: /code function() { console.log('hi there');}`;
         send.chatmessages[0].color = `red`;
         socket.emit(`addToChat`, send);
-        return; 
+        return;
     }
     if (curtab !== 'Main'){
         for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){

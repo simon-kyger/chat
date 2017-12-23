@@ -3,3 +3,7 @@ node_modules/
 apikeys/giphykey.txt
 apikeys/youtubekey.txt
 .idea/
+.cache
+yarn-error.log
+yarn.
+dist

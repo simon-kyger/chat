@@ -1,5 +1,11 @@
-$(document).ready(function(){
+import _ from 'lodash';
+import spencer from './fun';
+
+
+//$(document).ready(function(){
+
 //globals
+    spencer();
     let socket = io();
     let builder = function(){
         //properties
@@ -96,7 +102,7 @@ $(document).ready(function(){
             }, 500 );
             this.cfg.expanded = true;
         }
-    }   
+    }
     builder.prototype.submitmsg = function(e){
     	//paste
 		if (e.type =='paste'){
@@ -141,7 +147,7 @@ $(document).ready(function(){
                 this.position = this.posts.length;
             e.target.value = this.posts[this.position] || '';
         }
-        
+
         //delete
         if (e.which == 8 && e.target.selectionStart == 0){
             this.imagepreview.hide();
@@ -155,8 +161,8 @@ $(document).ready(function(){
             e.preventDefault();
             let msg = e.target.value.trim();
             socket.emit('chatMsg', {
-                msg: msg, 
-                blob: this.blob, 
+                msg: msg,
+                blob: this.blob,
                 curtab: this.curtab
             });
             this.posts.push(msg);
@@ -181,7 +187,7 @@ $(document).ready(function(){
             this.tab.left = this.tab.css('left');
             this.tab.top = this.tab.css('top');
             this.tab.width = this.tab.css('width');
-            let dist = `${Object.keys(this.msgs).length*10}%`; 
+            let dist = `${Object.keys(this.msgs).length*10}%`;
             this.tab.animate({
                 top: $(args.sposition).parent().position().top,
                 left: $(args.sposition).parent().position().left,
@@ -196,7 +202,7 @@ $(document).ready(function(){
                 $(this).css('position', 'static');
                 $(this).css('left', 0);
                 $(this).css('height', '100%');
-            }); 
+            });
         }
         this.tab.css('backgroundColor', this.textarea.css('backgroundColor'));
         this.tab.css('color', this.textarea.css('color'));
@@ -230,7 +236,7 @@ $(document).ready(function(){
             } else {
                 let index = el.indexOf(e.target.parentElement);
                 el[index + 1].click();
-            }                       
+            }
         }
         e.target.parentElement.remove();
         for (let msgsgrp in this.msgs){
@@ -359,7 +365,7 @@ $(document).ready(function(){
                         });
                         if(args.text == 'white'){
                             this.textarea.removeClass('blackphtext');
-                            
+
                         } else {
                             this.textarea.removeClass('whitephtext');
                         }
@@ -421,7 +427,7 @@ $(document).ready(function(){
             let iframe = `<iframe class='iframe' style='height: 300px; width: 400px' src='//www.youtube.com/embed/${id}' allowfullscreen></iframe>`;
             let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link}</span><br>${iframe}</div>`;
             this.msgs[tab].append(div);
-            this.videotoggle ? $('.iframe').show() : $('.iframe').hide(); 
+            this.videotoggle ? $('.iframe').show() : $('.iframe').hide();
         },
         renderBlob: function(tab, args){
             let URLObj = window.URL || window.webkitURL;
@@ -432,7 +438,7 @@ $(document).ready(function(){
             $('.blob').on('click', function(){
                 //do some other crazy shenanigans later :P
             });
-            $(div).resizable();            
+            $(div).resizable();
             this.imagepreview.hide();
             this.blob = {};
         //to create a new canvas and render the image to that instead (for later purposes)
@@ -484,7 +490,7 @@ $(document).ready(function(){
         	//create the tab
             chat.newtab({curtab: data.curtab});
             //format the tab
-            //no real sense to do this at this time because 
+            //no real sense to do this at this time because
             //create the window
             chat.msgs[data.curtab] = $(`<div id='${data.curtab}' class='msgs'>`);
             chat.msgs[data.curtab].appendTo(chat.chat);
@@ -649,4 +655,4 @@ $(document).ready(function(){
             chat.randomizedstartinganimation(data);
         }
     });
-});
+//});
