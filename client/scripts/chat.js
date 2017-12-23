@@ -68,6 +68,9 @@ $(document).ready(function(){
 	    this.drawings = (blob) => {
 	    	this.drawing = $(`<div id='drawing' class='chat'>`);
 	        this.drawing.appendTo($('body'));
+	        this.drawing.stop().animate({
+                boxShadow: `1 1 1000px 100px rgb(20, 0, 100)`
+            });
 	       	this.drawing.css('left', this.onlineusers.css('right'));
 	    	this.drawing.css('top', this.chat.css('top'));
 	    	this.drawingtools = $(`<div class='tools'>`);
