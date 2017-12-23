@@ -95,7 +95,7 @@ $(document).ready(function(){
             this.img.onload = (e) =>{
             	this.canvas[0].width = this.img.width;
             	this.canvas[0].height = this.img.height;
-                this.ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, 0, 0, this.img.width, this.img.height);
+                this.ctx.drawImage(this.img, 0, 0);
             };
             this.drawing.draggable({
 	            containment: 'body'
