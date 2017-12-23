@@ -60,61 +60,73 @@ $(document).ready(function(){
         this.textarea.on('change keydown input paste', (e)=> this.submitmsg(e));
         this.cfg.on('click', ()=> this.cfgexpand());
         this.videotoggle.on('change', ()=> this.videotoggler());
-        this.imagetoggle.on('change', ()=> this.imagetoggler());
-	    this.drawings = (blob) => {
-	    	this.drawing = $(`<div id='drawing' class='chat'>`);
-	        this.drawing.appendTo($('body'));
-            this.div = $(`<div style="overflow: scroll;"></div>`);
-            this.boxshad = [Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50]
-	        this.drawing.stop().animate({
+        this.imagetoggle.on('change', ()=> this.imagetoggler()); 
+        //body instances
+        this.chat.appendTo($('body'));
+    }
+    builder.prototype.drawings = function(e, blob){
+        if (this.drawing)
+            return;
+        this.drawing = $(`<div id='${blob.size}' class='chat'>`);
+        this.drawing.appendTo($('body'));
+        this.drawingcontainer = $(`<div style="overflow: scroll;"></div>`);
+        this.boxshad = [Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50]
+        this.drawing.stop().animate({
+            top: e.clientY,
+            left: e.clientX,
+            width: `0%`,
+            height: `0%`,
+        }, 0, null, ()=>{
+            this.drawing.stop().animate({
                 top: `25%`,
                 left: `25%`,
                 width: `50%`,
                 height: `50%`,
                 boxShadow: `1 1 1000px 100px rgb(${this.boxshad[0]}, ${this.boxshad[1]}, ${this.boxshad[2]})`
             }, 750, null, ()=>{
-                this.div.css('height', this.drawing.height());
-                this.div.css('width', this.drawing.width());
+                this.drawingcontainer.css('height', this.drawing.height());
+                this.drawingcontainer.css('width', this.drawing.width());
             });
-            this.drawingtools = $(`<div class='tools'>`);
-            this.drawingtools.appendTo(this.drawing);
-            this.drawingX = $(`<div id='drawingX' class='tabX'>X</div>`);
-            this.drawingX.appendTo(this.drawingtools);
-            this.drawingX.on('click', (e)=>{
-            	this.drawing.animate({
-                    top: `0%`,
-                    left: `0%`,
-                    width: `0%`,
-                    height: `0%`,
-                    opacity: `0`
-                }, ()=>this.drawing.remove());
+        });
+        this.drawingtools = $(`<div class='tools'>`);
+        this.drawingtools.appendTo(this.drawing);
+        this.drawingX = $(`<div id='drawingX' class='tabX'>X</div>`);
+        this.drawingX.appendTo(this.drawingtools);
+        this.drawingX.on('click', (e)=>{
+            this.drawing.animate({
+                top: `0%`,
+                left: `0%`,
+                width: `0%`,
+                height: `0%`,
+                opacity: `0`
+            }, (e)=>{
+                this.drawing.remove()
+                delete this.drawing;
             });
-            this.canvas = $('<canvas/>');
-            this.ctx = this.canvas[0].getContext('2d');
-            this.img = new Image();
-            this.URLObj = window.URL || window.webkitURL;
-            this.img.src = this.URLObj.createObjectURL(blob);
-            this.div.append(this.canvas);
-            this.drawing.append(this.div);
-            this.img.onload = (e) =>{
-            	this.canvas[0].width = this.img.width;
-            	this.canvas[0].height = this.img.height;
-                this.ctx.drawImage(this.img, 0, 0);
-            };
-            this.drawing.draggable({
-                containment: 'body'
-	        });
-	        this.drawing.resizable({
-	        	alsoResize: this.div,
-                handles: 'all'
-            })
-            $('body')[0].onresize = (e)=>{
-                this.div.css('width', this.drawing.css('width'));
-                this.div.css('height', this.drawing.css('height'));
-            }
-	    }
-        //body instances
-        this.chat.appendTo($('body'));
+        });
+        this.canvas = $('<canvas/>');
+        this.ctx = this.canvas[0].getContext('2d');
+        this.img = new Image();
+        this.URLObj = window.URL || window.webkitURL;
+        this.img.src = this.URLObj.createObjectURL(blob);
+        this.drawingcontainer.append(this.canvas);
+        this.drawing.append(this.drawingcontainer);
+        this.img.onload = (e) =>{
+            this.canvas[0].width = this.img.width;
+            this.canvas[0].height = this.img.height;
+            this.ctx.drawImage(this.img, 0, 0);
+        };
+        this.drawing.draggable({
+            containment: 'body'
+        });
+        this.drawing.resizable({
+            alsoResize: this.drawingcontainer,
+            handles: 'all'
+        })
+        $('body')[0].onresize = (e)=>{
+            this.drawingcontainer.css('width', this.drawing.css('width'));
+            this.drawingcontainer.css('height', this.drawing.css('height'));
+        }
     }
     builder.prototype.imagetoggler = function(){
         this.imagetoggle ? $('.imgs').hide() : $('.imgs').show();
@@ -477,12 +489,12 @@ $(document).ready(function(){
             let URLObj = window.URL || window.webkitURL;
             let blob = new Blob([args.blob], {type: "image/png"});
             let img = `<img class='blob' style='max-width: ${this.msgs[tab].width()}px;' src='${URLObj.createObjectURL(blob)}'/>`;
-            let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${args.msg}</span><br>${img}</div>`;
+            let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${args.msg}</span><br>COLLABORATE!<br>${img}</div>`;
             this.msgs[tab].append(div);            
             this.imagepreview.hide();
             this.blob = {};
             $('.blob').on('click', (e)=>{
-            	this.drawings(blob);
+            	this.drawings(e, blob);
             });
         }
     };
