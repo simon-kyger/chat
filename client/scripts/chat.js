@@ -4,8 +4,10 @@ $(document).ready(function(){
     let builder = function(){
         //properties
         this.chat = $(`<div id='chat' class='chat'>`);
+        this.tools = $(`<div class='tools'>`);
+        this.tools.appendTo(this.chat);
         this.chatresizer = $(`<div id='chatresizer' class='resizer ui-resizable-handl ui-resizable-ne'>`);
-        this.chatresizer.appendTo(this.chat);
+        this.chatresizer.appendTo(this.tools);
         this.chat.draggable({
             containment: 'body'
         });
@@ -53,6 +55,7 @@ $(document).ready(function(){
         this.textarea.appendTo(this.inputcontainer);
         this.posts = [];
         this.position = 0;
+        //storage for current blob
         this.blob = {};
         this.cfg.expanded = false;
 
@@ -62,8 +65,47 @@ $(document).ready(function(){
         this.cfg.on('click', ()=> this.cfgexpand());
         this.videotoggle.on('change', ()=> this.videotoggler());
         this.imagetoggle.on('change', ()=> this.imagetoggler());
-
-        //create this instance to the body
+	    this.drawings = (blob) => {
+	    	this.drawing = $(`<div id='drawing' class='chat'>`);
+	        this.drawing.appendTo($('body'));
+	       	this.drawing.css('left', this.onlineusers.css('right'));
+	    	this.drawing.css('top', this.chat.css('top'));
+	    	this.drawingtools = $(`<div class='tools'>`);
+	    	this.drawingtools.appendTo(this.drawing);
+	    	this.drawingresizer = $(`<div id='drawingresizer' class='resizer ui-resizable-handl ui-resizable-ne'>`);
+        	this.drawingresizer.appendTo(this.drawingtools);
+	    	this.drawingX = $(`<div id='drawingX' class='tabX'>X</div>`);
+        	this.drawingX.appendTo(this.drawingtools);
+        	this.drawingX.on('click', (e)=>{
+        		this.drawing.remove();
+        	});
+            this.canvas = $('<canvas/>');
+            this.ctx = this.canvas[0].getContext('2d');
+            this.img = new Image();
+            this.div = $(`<div style="overflow: scroll; backgroundColor"></div>`);
+            this.div.css('height', this.drawing.height());
+            this.div.css('width', this.drawing.width());
+            this.URLObj = window.URL || window.webkitURL;
+            this.img.src = this.URLObj.createObjectURL(blob);
+            this.div.append(this.canvas);
+            this.drawing.append(this.div);
+            this.img.onload = (e) =>{
+            	this.canvas[0].width = this.img.width;
+            	this.canvas[0].height = this.img.height;
+                this.ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, 0, 0, this.img.width, this.img.height);
+            };
+            this.drawing.draggable({
+	            containment: 'body'
+	        });
+	        this.drawing.resizable({
+	        	alsoResize: this.div,
+            	handles:{
+            		'ne': this.drawingresizer
+            	}
+            })
+            this.div.resizable();
+	    }
+        //body instances
         this.chat.appendTo($('body'));
     }
     builder.prototype.imagetoggler = function(){
@@ -428,31 +470,12 @@ $(document).ready(function(){
             let blob = new Blob([args.blob], {type: "image/png"});
             let img = `<img class='blob' style='max-width: ${this.msgs[tab].width()}px;' src='${URLObj.createObjectURL(blob)}'/>`;
             let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${args.msg}</span><br>${img}</div>`;
-            this.msgs[tab].append(div);
-            $('.blob').on('click', function(){
-                //do some other crazy shenanigans later :P
-            });
-            $(div).resizable();            
+            this.msgs[tab].append(div);            
             this.imagepreview.hide();
             this.blob = {};
-        //to create a new canvas and render the image to that instead (for later purposes)
-            // var canvas = $('<canvas/>');
-            // canvas.addClass('msg');
-            // let ctx = canvas[0].getContext('2d');
-            // let img = new Image();
-            // img.onload = (e) => {
-            //     canvas.width = Math.sqrt(img.width)*5;
-            //     canvas.height = Math.sqrt(img.height)*5;
-            //     ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, Math.sqrt(img.width)*5, Math.sqrt(img.height)*5);
-            // };
-            // let URLObj = window.URL || window.webkitURL;
-            // let blob = new Blob([args.blob], {type: "image/png"});
-            // img.src = URLObj.createObjectURL(blob);
-            // let div = $(`<div class='msg'>${args.date} <span style='${args.color}'>${args.name} COLAB:</span><br></div>`);
-            // canvas.appendTo(div);
-            // this.msgs[tab].append(div);
-            // this.imagepreview.hide();
-            // this.blob = {};
+            $('.blob').on('click', (e)=>{
+            	this.drawings(blob);
+            });
         }
     };
     let chat = new builder();
