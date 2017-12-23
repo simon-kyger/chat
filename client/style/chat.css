@@ -10,21 +10,25 @@
 }
 
 /*Please do not remove the above two rules at the top unless you know what you're doing */
-
-body{
-    margin: 0px;
-    height: 100vh;
+html, 
+body {
+    height: 100%;
+    overflow: hidden;
+    margin:0;
+    padding:0;
 }
 .chat{
     position: absolute !important;
-    width: 75%;
-    height: 75%;
+    width: 0%;
+    height: 0%;
+    left: 0px;
+    top: 0px;
     opacity: 1;
-    overflow:hidden;
     font-family: 'Lucida Console', 'Operator Mono Book'; /*derek's ubuntu font as a fallback for linux users*/
     font-size: 14px;
     box-shadow: 0px 0px 1px 1px #888888;
     word-wrap:break-word;
+    overflow: hidden;
 }
 .chat .msgs{
     overflow-y:scroll;
@@ -71,13 +75,13 @@ body{
     border:none;
     display:table-row;
 }
-.inputcontainer .cfg{
-    z-index: 999;
-    position: absolute;
+.cfg{
+    position: absolute !important;
     right: 2%;
     font-size: 30px;
-    bottom: 0px;
+    bottom: 2%;
     cursor: pointer;
+    z-index: 2;
 }
 
 .blackphtext::placeholder{
@@ -100,7 +104,7 @@ body{
     border-style: solid;
     border-width: 2px;
     background-color: rgb(200, 200, 200);
-    z-index: 6;
+    z-index: 1;
 }
 .resizer {
     width: 15px;
@@ -167,10 +171,15 @@ body{
     position: absolute;
     top: 0;
     right: 0;
+    z-index: 10;
 }
 
 pre{
     margin:0;
+}
+
+.ui-resizable-handle {
+
 }
 
 ::-webkit-scrollbar {
