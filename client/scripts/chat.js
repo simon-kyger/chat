@@ -104,6 +104,42 @@ $(document).ready(function(){
                 delete this.drawing;
             });
         });
+        //insert new icons here
+        this.drawingselection= $(`<div id='drawingselection' class='icondisplay'>⬚</div>`);
+        this.drawingselection.appendTo(this.drawingtools);
+        this.drawingselection.on('click', (e)=>{
+            console.log('square');
+        });
+        this.drawingsquare= $(`<div id='drawingsquare' class='icondisplay'>◻</div>`);
+        this.drawingsquare.appendTo(this.drawingtools);
+        this.drawingsquare.on('click', (e)=>{
+            console.log('square');
+        });
+        this.drawingline = $(`<div id='drawingline' class='icondisplay iconline'>╲</div>`);
+        this.drawingline.appendTo(this.drawingtools);
+        this.drawingline.on('click', (e)=>{
+            console.log('line');
+        });
+        this.drawingcircle = $(`<div id='drawingcircle' class='icondisplay'>⬤</div>`);
+        this.drawingcircle.appendTo(this.drawingtools);
+        this.drawingcircle.on('click', (e)=>{
+            console.log('circling');
+        });
+        this.drawingpencil = $(`<div id='drawingpencil' class='icondisplay'>✎</div>`);
+        this.drawingpencil.appendTo(this.drawingtools);
+        this.drawingpencil.on('click', (e)=>{
+            console.log('penciling');
+        });
+        this.drawingmove = $(`<div id='drawingmove' class='icondisplay'>🖑</div>`);
+        this.drawingmove.appendTo(this.drawingtools);
+        this.drawingmove.on('click', (e)=>{
+            console.log('moving');
+        });
+        this.drawingsave = $(`<div id='drawingsave' class='icondisplay'>💾</div>`);
+        this.drawingsave.appendTo(this.drawingtools);
+        this.drawingsave.on('click', (e)=>{
+            console.log('saving');
+        });
         this.canvas = $('<canvas/>');
         this.ctx = this.canvas[0].getContext('2d');
         this.img = new Image();

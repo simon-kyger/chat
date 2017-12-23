@@ -177,7 +177,16 @@ body {
 pre{
     margin:0;
 }
-
+.icondisplay{
+    display: inline;
+    cursor: pointer;
+    font-size: 20px;
+    float: left;
+}
+.iconline{
+    line-height: 1.9;
+    font-size: 16px;
+}
 .ui-resizable-handle {
 
 }
