@@ -160,6 +160,8 @@ $(document).ready(function(){
             handles: 'all'
         })
         $('body')[0].onresize = (e)=>{
+            if (!this.drawing)
+                return;
             this.drawingcontainer.css('width', this.drawing.css('width'));
             this.drawingcontainer.css('height', this.drawing.css('height'));
         }
@@ -482,7 +484,7 @@ $(document).ready(function(){
             this.msgs[tab].append(div);
         },
         renderImage: function(tab, args){
-            let img = `<a href='${args.msg}' target='_blank'><img class='imgs' src='${args.msg}' target='_blank' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img></a>`;
+            let img = `<a href='${args.msg}' target='_blank'><img class='imgs' src='${args.msg}' target='_blank' style='width: auto; max-height: 200px; max-width: 200px;border-radius: 10px;'></img></a>`;
             let link = `<a href='${args.msg}' target='_blank'>${args.msg}</a>`;
             let div = $(`<div class='msg'>${args.date} <span style='color:${args.color}'>${args.name} ${link} </span><br>${img}</div>`);
             this.msgs[tab].append(div);
@@ -490,7 +492,7 @@ $(document).ready(function(){
             //lolfun $('.imgs').draggable({containment: $('.msgs')});
         },
         renderStaticImage: function(tab, args){
-            let img = `<img class='imgs' src='data:image/png;base64,${args.image}' style='width: auto; max-height: 300px; max-width: 300px;border-radius: 10px;'></img>`;
+            let img = `<img class='imgs' src='data:image/png;base64,${args.image}' style='width: auto; max-height: 200px; max-width: 200px;border-radius: 10px;'></img>`;
             let div = `<div class='msg'>${args.date} <span style='color:${args.color}'>${args.name} ${img} </span></div>`
             this.msgs[tab].append(div);
             this.imagetoggle ? $('.imgs').show() : $('.imgs').hide();
@@ -507,7 +509,7 @@ $(document).ready(function(){
             let url = `https://www.youtube.com/watch?v=${args.msg}`;
             let embed = `https://www.youtube.com/embed/${args.msg}`;
             let link = `<a href='${url}'>${url}</a>`;
-            let iframe = `<iframe class='iframe' style='height: 300px; width: 400px' src='${embed}' allowfullscreen></iframe>`;
+            let iframe = `<iframe class='iframe' style='height: 200px; width: 300px' src='${embed}' allowfullscreen></iframe>`;
             let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link} </span><br>${iframe}</div>`;
             this.msgs[tab].append(div);
             this.videotoggle ? $('.iframe').show() : $('.iframe').hide();
@@ -516,7 +518,7 @@ $(document).ready(function(){
             let url = args.msg;
             let link = `<a href='${url}'>${url}</a>`;
             let id = url.substr(32);
-            let iframe = `<iframe class='iframe' style='height: 300px; width: 400px' src='//www.youtube.com/embed/${id}' allowfullscreen></iframe>`;
+            let iframe = `<iframe class='iframe' style='height: 200px; width: 300px' src='//www.youtube.com/embed/${id}' allowfullscreen></iframe>`;
             let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link}</span><br>${iframe}</div>`;
             this.msgs[tab].append(div);
             this.videotoggle ? $('.iframe').show() : $('.iframe').hide(); 
@@ -524,7 +526,7 @@ $(document).ready(function(){
         renderBlob: function(tab, args){
             let URLObj = window.URL || window.webkitURL;
             let blob = new Blob([args.blob], {type: "image/png"});
-            let img = `<img class='blob' style='max-width: ${this.msgs[tab].width()}px;' src='${URLObj.createObjectURL(blob)}'/>`;
+            let img = `<img class='blob' style='max-width: ${this.msgs[tab].width()}px; max-height: 200px;' src='${URLObj.createObjectURL(blob)}'/>`;
             let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${args.msg}</span><br>COLLABORATE!<br>${img}</div>`;
             this.msgs[tab].append(div);            
             this.imagepreview.hide();
