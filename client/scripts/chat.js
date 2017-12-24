@@ -41,8 +41,12 @@ $(document).ready(function(){
         this.config.appendTo(this.chat);
         this.videotoggle = $(`<input id='videotoggle' class='videotoggle' type='checkbox'>Hide Videos<br>`);
         this.videotoggle.appendTo(this.config);
-        this.imagetoggle = $(`<input id='imagetoggle' class='imagetoggle' type='checkbox'>Hide Images</input>`);
+        this.imagetoggle = $(`<input id='imagetoggle' class='imagetoggle' type='checkbox'>Hide Images<br>`);
         this.imagetoggle.appendTo(this.config);
+        this.autoplayvideos = $(`<input id='autoplayvideos' class='autoplayvideos' type='checkbox'>Autoplay Videos<br>`);
+        this.autoplayvideos.appendTo(this.config);
+        this.stopallvideos = $(`<button id='stopallvideos' class='stopallvideos' type='button'>Stop All Videos Now!</button><br>`);
+        this.stopallvideos.appendTo(this.config);
         this.istyping = $(`<div class='istyping'></div>`);
         this.istyping.appendTo(this.inputcontainer);
         this.textarea = $(`<textarea id='chatinput' class='chatinput blackphtext' placeholder='Chat here! or /? for a list of commands.' autofocus='autofocus'></textarea>`);
@@ -54,6 +58,8 @@ $(document).ready(function(){
         //storage for current blob
         this.blob = {};
         this.cfg.expanded = false;
+        //youtube autoplay config
+        this.autoplay = false;
 
         //methods
         this.maincgroup.on('click', (e)=> this.tabclick(e));
@@ -61,7 +67,12 @@ $(document).ready(function(){
         this.cfg.on('click', ()=> this.cfgexpand());
         this.videotoggle.on('change', ()=> this.videotoggler());
         this.imagetoggle.on('change', ()=> this.imagetoggler());
-
+        this.autoplayvideos.on('change', ()=> this.autoplay = !this.autoplay);
+        this.stopallvideos.on('click', ()=> {
+            for(let i = 0; i < ytplayers.length; i++) { 
+                ytplayers[i].pauseVideo();
+            }
+        });
         //body instances
         this.chat.appendTo($('body'));
     }
@@ -516,9 +527,12 @@ $(document).ready(function(){
             });
         },
         renderVideo: function(tab, args){
+            let autoplay = '';
+            if (this.autoplay)
+                autoplay = `&autoplay=1`;
             let url = `https://www.youtube.com/watch?v=${args.msg}`;
-            let embed = `https://www.youtube.com/embed/${args.msg}?enablejsapi=1`;
             let link = `<a href='${url}'>${url}</a>`;
+            let embed = `https://www.youtube.com/embed/${args.msg}?enablejsapi=1${autoplay}`;
             //about as random as possible
             let id = Math.random().toString(36).substring(2, 15)+(new Date()).getTime().toString(36);
             let iframe = `<iframe id='${id}' class='ytplayer' style='height: 200px; width: 300px' src='${embed}' allowfullscreen></iframe>`;
