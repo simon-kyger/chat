@@ -535,7 +535,7 @@ $(document).ready(function(){
             let embed = `https://www.youtube.com/embed/${args.msg}?enablejsapi=1${autoplay}`;
             //about as random as possible
             let id = Math.random().toString(36).substring(2, 15)+(new Date()).getTime().toString(36);
-            let iframe = `<iframe id='${id}' class='ytplayer' style='height: 200px; width: 300px' src='${embed}' allowfullscreen></iframe>`;
+            let iframe = `<iframe id='${id}' class='ytplayer' style='height: 250px; width: 350px' src='${embed}' allowfullscreen></iframe>`;
             let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link} </span><br>${iframe}</div>`;
             this.msgs[tab].append(div);
             onYouTubeIframeAPIReady(id);
