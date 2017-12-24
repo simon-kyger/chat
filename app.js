@@ -136,9 +136,13 @@ function chatMsg(socket, msg){
             color: socket.color,
         }],
     };
-
-    if (msg.msg.substr(0, 23) == `https://www.youtube.com`){
-        send.chatmessages[0].action = `renderVideoLink`;
+    https://youtu.be/sRcoJNnF8KA?t=1
+    if (msg.msg.substr(0, 32) == `https://www.youtube.com/watch?v=`){
+        send.chatmessages[0].action = `renderVideo`;
+        send.chatmessages[0].msg = msg.msg.substr(32);
+    } else if (msg.msg.substr(0, 17) == `https://youtu.be/`){
+        send.chatmessages[0].action = `renderVideo`;
+        send.chatmessages[0].msg = msg.msg.substr(17);
     } else if (isImage(msg.msg)){
         send.chatmessages[0].action = `renderImage`;
     } else if (Object.keys(msg.blob).length){
@@ -149,6 +153,7 @@ function chatMsg(socket, msg){
             defaultProtocol: `https`,
         });
     }
+    console.log(send.chatmessages[0].action);
 
     for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
         if (SOCKET_CONNECTIONS[i].name == msg.curtab){

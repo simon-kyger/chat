@@ -527,17 +527,6 @@ $(document).ready(function(){
             onYouTubeIframeAPIReady(id);
             this.videotoggle ? $('.iframe').show() : $('.iframe').hide();
         },
-        renderVideoLink: function(tab, args){
-            let url = args.msg;
-            let link = `<a href='${url}'>${url}</a>`;
-            let ytid = url.substr(32);
-            let id = Math.random().toString(36).substring(2, 15)+(new Date()).getTime().toString(36);
-            let iframe = `<iframe id='${id}' class='ytplayer' style='height: 200px; width: 300px' src='//www.youtube.com/embed/${ytid}' allowfullscreen></iframe>`;
-            let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link}</span><br>${iframe}</div>`;
-            onYouTubeIframeAPIReady(args.date);
-            this.msgs[tab].append(id);
-            this.videotoggle ? $('.iframe').show() : $('.iframe').hide(); 
-        },
         renderBlob: function(tab, args){
             let URLObj = window.URL || window.webkitURL;
             let blob = new Blob([args.blob], {type: "image/png"});
