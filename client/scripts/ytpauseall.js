@@ -9,17 +9,16 @@ function onYouTubeIframeAPIReady(id){
         return;
     let player = new YT.Player(id, {
         events : {
-            'onStateChange' : ytChangeState
+            'onStateChange' : function(e){
+	            if (e.data == YT.PlayerState.PLAYING) {
+			        $.each(ytplayers, function() {
+			            if (this.getPlayerState() == YT.PlayerState.PLAYING && this.getIframe().id != e.target.getIframe().id) { 
+			                this.pauseVideo();
+			            }
+			        });
+			    }
+            }
         }
     });
     ytplayers.push(player);
 };
-function ytChangeState(e){
-	if (e.data == YT.PlayerState.PLAYING) {
-        $.each(ytplayers, function() {
-            if (this.getPlayerState() == YT.PlayerState.PLAYING && this.getIframe().id != e.target.getIframe().id) { 
-                this.pauseVideo();
-            }
-        });
-    }
-} 
