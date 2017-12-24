@@ -69,7 +69,7 @@ $(document).ready(function(){
             return;
         this.drawing = $(`<div id='${blob.size}' class='chat'>`);
         this.drawing.appendTo($('body'));
-        this.drawingcontainer = $(`<div class='dragscroll' style="overflow: scroll;"></div>`);
+        this.drawingcontainer = $(`<div style="overflow: scroll;"></div>`);
         this.boxshad = [Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50]
         this.drawing.stop().animate({
             top: e.clientY,
@@ -92,14 +92,15 @@ $(document).ready(function(){
         this.drawingtools.appendTo(this.drawing);
         this.drawingX = $(`<div id='drawingX' class='tabX'>X</div>`);
         this.drawingX.appendTo(this.drawingtools);
-        this.drawingX.on('click', (e)=>{
+        this.drawingX.on('click', ()=>{
             this.drawing.animate({
-                top: `0%`,
-                left: `0%`,
+                //e is from the initial invocation of drawings() aka the mini global e
+                top: e.clientY,
+                left: e.clientX,
                 width: `0%`,
                 height: `0%`,
                 opacity: `0`
-            }, (e)=>{
+            }, ()=>{
                 this.drawing.remove()
                 delete this.drawing;
             });
@@ -128,19 +129,16 @@ $(document).ready(function(){
         this.drawingpencil = $(`<div id='drawingpencil' class='icondisplay'>✎</div>`);
         this.drawingpencil.appendTo(this.drawingtools);
         this.drawingpencil.on('click', (e)=>{
-            console.log('penciling');
         });
         this.drawingmove = $(`<div id='drawingmove' class='icondisplay iconmove'>✣</div>`);
         this.drawingmove.appendTo(this.drawingtools);
         this.drawingmove.on('click', (e)=>{
+            this.drawingcontainer.removeClass();
             if (this.drawing.data('uiDraggable').options.disabled) { 
-                this.drawing.draggable('enable')
-                this.drawing[0].style.cursor = 'auto';
-                this.drawingcontainer.removeClass('dragscroll');
+                this.drawing.draggable('enable');
                 dragscroll.reset();
             } else {
                 this.drawing.draggable('disable');
-                this.drawing[0].style.cursor = 'move';
                 this.drawingcontainer.addClass('dragscroll');
                 dragscroll.reset();
             }
