@@ -13,6 +13,8 @@ const port = config.get('port');
 const youtubenode = require('youtube-node');
 const youtube = new youtubenode();
 const apiKeys = require('./apiKeys');
+const ytsongs = require('./devplaylists/ytsongs.json');
+
 let keys = {};
 // should really store api keys in .env.
 ['youtube', 'giphy'].forEach((path) => {
@@ -136,7 +138,7 @@ function chatMsg(socket, msg){
             color: socket.color,
         }],
     };
-    
+
     if (msg.msg.substr(0, 32) == `https://www.youtube.com/watch?v=`){
         send.chatmessages[0].action = `renderVideo`;
         send.chatmessages[0].msg = msg.msg.substr(32);
@@ -763,33 +765,5 @@ function commandlist(socket, mod, curtab){
 }
 
 function ytfavorites(){
-    let list = [`avgn powerglove`,
-                        `nitro fun checkpoint`,
-                        `pegboard nerds try this`,
-                        `pendulum 9000 miles`,
-                        `pixl this time`,
-                        `rob gasser move`,
-                        `caravan palace lone digger`,
-                        `muzzy children of hell`,
-                        `stone temple pilots unglued`,
-                        `muse map of problematique`,
-                        `ronald jenkees magnetic moment`,
-                        `michael jackson thriller egbert remix`,
-                        `paul oakenfold ready steady go`,
-                        `junkie xl def beat`,
-                        `stabbing westward save yourself`,
-                        `crystal method name of the game`,
-                        `korn got the life`,
-                        `thomas the tank engine tf2 notorious big`,
-                        `deadmau5 suite 03`,
-                        `rob dougan clubbed to death`,
-                        `nhato aurora`,
-                        `atlas plugged truth be known`,
-                        `binding of isaac 8 bit sacrificial`,
-                        `breakdown noisestorm`,
-                        `hi jack aspekt`,
-                        `jedidja dancing water`,
-                        `orjan nilsen between the rays`
-    ];
-    return list[Math.floor(Math.random()*(list.length-1))];
+    return ytsongs[Math.floor(Math.random()*(ytsongs.length-1))];
 }
