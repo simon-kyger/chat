@@ -60,10 +60,12 @@ $(document).ready(function(){
         this.textarea.on('change keydown input paste', (e)=> this.submitmsg(e));
         this.cfg.on('click', ()=> this.cfgexpand());
         this.videotoggle.on('change', ()=> this.videotoggler());
-        this.imagetoggle.on('change', ()=> this.imagetoggler()); 
+        this.imagetoggle.on('change', ()=> this.imagetoggler());
+
         //body instances
         this.chat.appendTo($('body'));
     }
+
     builder.prototype.drawings = function(e, blob){
         if (this.drawing)
             return;
@@ -515,20 +517,25 @@ $(document).ready(function(){
         },
         renderVideo: function(tab, args){
             let url = `https://www.youtube.com/watch?v=${args.msg}`;
-            let embed = `https://www.youtube.com/embed/${args.msg}`;
+            let embed = `https://www.youtube.com/embed/${args.msg}?enablejsapi=1`;
             let link = `<a href='${url}'>${url}</a>`;
-            let iframe = `<iframe class='iframe' style='height: 200px; width: 300px' src='${embed}' allowfullscreen></iframe>`;
+            //about as random as possible
+            let id = Math.random().toString(36).substring(2, 15)+(new Date()).getTime().toString(36);
+            let iframe = `<iframe id='${id}' class='ytplayer' style='height: 200px; width: 300px' src='${embed}' allowfullscreen></iframe>`;
             let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link} </span><br>${iframe}</div>`;
             this.msgs[tab].append(div);
+            onYouTubeIframeAPIReady(id);
             this.videotoggle ? $('.iframe').show() : $('.iframe').hide();
         },
         renderVideoLink: function(tab, args){
             let url = args.msg;
             let link = `<a href='${url}'>${url}</a>`;
-            let id = url.substr(32);
-            let iframe = `<iframe class='iframe' style='height: 200px; width: 300px' src='//www.youtube.com/embed/${id}' allowfullscreen></iframe>`;
+            let ytid = url.substr(32);
+            let id = Math.random().toString(36).substring(2, 15)+(new Date()).getTime().toString(36);
+            let iframe = `<iframe id='${id}' class='ytplayer' style='height: 200px; width: 300px' src='//www.youtube.com/embed/${ytid}' allowfullscreen></iframe>`;
             let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link}</span><br>${iframe}</div>`;
-            this.msgs[tab].append(div);
+            onYouTubeIframeAPIReady(args.date);
+            this.msgs[tab].append(id);
             this.videotoggle ? $('.iframe').show() : $('.iframe').hide(); 
         },
         renderBlob: function(tab, args){

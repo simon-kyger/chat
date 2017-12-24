@@ -64,6 +64,7 @@ function init(socket){
         SOCKET_CONNECTIONS[i].emit('addToChat', send);
         SOCKET_CONNECTIONS[i].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
     }
+    //for live sending of new stuff, this can be jerry rigged later
     send.chatmessages[0].msg = `Check out this youtube video one of our devs likes:`
     socket.emit('addToChat', send);
     youtuberequest(socket, ytfavorites(),'Main', true);
@@ -774,7 +775,7 @@ function ytfavorites(){
                         `stabbing westward save yourself`,
                         `crystal method name of the game`,
                         `korn got the life`,
-                        `notorious big thomas the tank engine`,
+                        `thomas the tank engine tf2 notorious big`,
                         `deadmau5 suite 03`,
                         `rob dougan clubbed to death`,
                         `nhato aurora`,
