@@ -136,7 +136,7 @@ function chatMsg(socket, msg){
             color: socket.color,
         }],
     };
-    https://youtu.be/sRcoJNnF8KA?t=1
+    
     if (msg.msg.substr(0, 32) == `https://www.youtube.com/watch?v=`){
         send.chatmessages[0].action = `renderVideo`;
         send.chatmessages[0].msg = msg.msg.substr(32);
