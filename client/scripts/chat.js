@@ -193,7 +193,7 @@ $(document).ready(function(){
         this.scrollBottom();
     }
     builder.prototype.videotoggler = function(){
-        this.videotoggle ? $('.iframe').hide() : $('.iframe').show();
+        this.videotoggle ? $('.ytplayer').hide() : $('.ytplayer').show();
         this.videotoggle = !this.videotoggle;
         this.scrollBottom();
     }
@@ -539,7 +539,7 @@ $(document).ready(function(){
             let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link} </span><br>${iframe}</div>`;
             this.msgs[tab].append(div);
             onYouTubeIframeAPIReady(id);
-            this.videotoggle ? $('.iframe').show() : $('.iframe').hide();
+            this.videotoggle ? $('.ytplayer').show() : $('.ytplayer').hide();
         },
         renderBlob: function(tab, args){
             let URLObj = window.URL || window.webkitURL;
