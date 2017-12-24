@@ -69,7 +69,7 @@ $(document).ready(function(){
             return;
         this.drawing = $(`<div id='${blob.size}' class='chat'>`);
         this.drawing.appendTo($('body'));
-        this.drawingcontainer = $(`<div style="overflow: scroll;"></div>`);
+        this.drawingcontainer = $(`<div class='dragscroll' style="overflow: scroll;"></div>`);
         this.boxshad = [Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50]
         this.drawing.stop().animate({
             top: e.clientY,
@@ -130,10 +130,20 @@ $(document).ready(function(){
         this.drawingpencil.on('click', (e)=>{
             console.log('penciling');
         });
-        this.drawingmove = $(`<div id='drawingmove' class='icondisplay'>🖑</div>`);
+        this.drawingmove = $(`<div id='drawingmove' class='icondisplay iconmove'>✣</div>`);
         this.drawingmove.appendTo(this.drawingtools);
         this.drawingmove.on('click', (e)=>{
-            console.log('moving');
+            if (this.drawing.data('uiDraggable').options.disabled) { 
+                this.drawing.draggable('enable')
+                this.drawing[0].style.cursor = 'auto';
+                this.drawingcontainer.removeClass('dragscroll');
+                dragscroll.reset();
+            } else {
+                this.drawing.draggable('disable');
+                this.drawing[0].style.cursor = 'move';
+                this.drawingcontainer.addClass('dragscroll');
+                dragscroll.reset();
+            }
         });
         this.drawingsave = $(`<div id='drawingsave' class='icondisplay'>💾</div>`);
         this.drawingsave.appendTo(this.drawingtools);

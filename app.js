@@ -64,18 +64,9 @@ function init(socket){
         SOCKET_CONNECTIONS[i].emit('addToChat', send);
         SOCKET_CONNECTIONS[i].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
     }
-    send.chatmessages[0].msg = `Merry Christmas :D`
+    send.chatmessages[0].msg = `Check out this youtube video one of our devs likes:`
     socket.emit('addToChat', send);
-    let randomsearch = [`merry christmas dog gif`,
-                        `merry christmas rofl`,
-                        `merry christmas ernest`,
-                        `merry christmas funny`
-    ];
-    
-    giphyrequest(socket, 
-        randomsearch[Math.floor(Math.random()*(randomsearch.length-1))],
-        'Main',
-        true);
+    youtuberequest(socket, ytfavorites(),'Main', true);
 }
 
 //socket: object
@@ -100,6 +91,7 @@ function disconnects(socket){
         }
         SOCKET_CONNECTIONS[i].emit('addToChat', send);
     }
+    console.log(`${socket.request.connection.remoteAddress} has disconnected.`);
     SOCKET_CONNECTIONS.splice(temp, 1);
     for (let j =0; j < SOCKET_CONNECTIONS.length; j++){
         SOCKET_CONNECTIONS[j].emit('removeTab', socket.name);
@@ -402,7 +394,7 @@ function changecolor(socket, mod, curtab){
 //socket: object
 //mod: string
 //description: part of command lib that will fetch mod from googlesapi
-function youtuberequest(socket, mod, curtab){
+function youtuberequest(socket, mod, curtab, shenanigans){
     let send;
     if (!keys.youtube){
         send = {
@@ -469,6 +461,11 @@ function youtuberequest(socket, mod, curtab){
                     return;
                 }
             }
+        }
+        if (shenanigans){
+            send.chatmessages[0].name = ``;
+            socket.emit('addToChat', send);
+            return;
         }
         for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
             SOCKET_CONNECTIONS[i].emit('addToChat', send);
@@ -757,4 +754,36 @@ function commandlist(socket, mod, curtab){
         curtab: curtab
     };
     socket.emit('addToChat', send);
+}
+
+function ytfavorites(){
+    let list = [`avgn powerglove`,
+                        `nitro fun checkpoint`,
+                        `pegboard nerds try this`,
+                        `pendulum 9000 miles`,
+                        `pixl this time`,
+                        `rob gasser move`,
+                        `caravan palace lone digger`,
+                        `muzzy children of hell`,
+                        `stone temple pilots unglued`,
+                        `muse map of problematique`,
+                        `ronald jenkees magnetic moment`,
+                        `michael jackson thriller egbert remix`,
+                        `paul oakenfold ready steady go`,
+                        `junkie xl def beat`,
+                        `stabbing westward save yourself`,
+                        `crystal method name of the game`,
+                        `korn got the life`,
+                        `notorious big thomas the tank engine`,
+                        `deadmau5 suite 03`,
+                        `rob dougan clubbed to death`,
+                        `nhato aurora`,
+                        `atlas plugged truth be known`,
+                        `binding of isaac 8 bit sacrificial`,
+                        `breakdown noisestorm`,
+                        `hi jack aspekt`,
+                        `jedidja dancing water`,
+                        `orjan nilsen between the rays`
+    ];
+    return list[Math.floor(Math.random()*(list.length-1))];
 }
