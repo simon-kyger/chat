@@ -69,9 +69,11 @@ $(document).ready(function(){
         this.imagetoggle.on('change', ()=> this.imagetoggler());
         this.autoplayvideos.on('change', ()=> this.autoplay = !this.autoplay);
         this.stopallvideos.on('click', ()=> {
-            for(let i = 0; i < ytplayers.length; i++) { 
-                ytplayers[i].pauseVideo();
-            }
+            $.each(ytplayers, function(e) {
+                if (this.getPlayerState() == YT.PlayerState.PLAYING) { 
+                    this.pauseVideo();
+                }
+            });
         });
         //body instances
         this.chat.appendTo($('body'));
@@ -105,7 +107,7 @@ $(document).ready(function(){
         this.drawingtools.appendTo(this.drawing);
         this.drawingX = $(`<div id='drawingX' class='tabX'>X</div>`);
         this.drawingX.appendTo(this.drawingtools);
-        this.drawingX.on('click', ()=>{
+        this.drawingX.on('click', (e2)=>{
             this.drawing.animate({
                 //e is from the initial invocation of drawings() aka the mini global e
                 top: e.clientY,
@@ -121,31 +123,34 @@ $(document).ready(function(){
         //insert new icons here
         this.drawingselection= $(`<div id='drawingselection' class='icondisplay'>⬚</div>`);
         this.drawingselection.appendTo(this.drawingtools);
-        this.drawingselection.on('click', (e)=>{
+        this.drawingselection.on('click', (e2)=>{
             console.log('selecting');
         });
         this.drawingsquare= $(`<div id='drawingsquare' class='icondisplay'>◻</div>`);
         this.drawingsquare.appendTo(this.drawingtools);
-        this.drawingsquare.on('click', (e)=>{
+        this.drawingsquare.on('click', (e2)=>{
             console.log('square');
         });
         this.drawingline = $(`<div id='drawingline' class='icondisplay iconline'>╲</div>`);
         this.drawingline.appendTo(this.drawingtools);
-        this.drawingline.on('click', (e)=>{
+        this.drawingline.on('click', (e2)=>{
             console.log('line');
         });
         this.drawingcircle = $(`<div id='drawingcircle' class='icondisplay'>⬤</div>`);
         this.drawingcircle.appendTo(this.drawingtools);
-        this.drawingcircle.on('click', (e)=>{
+        this.drawingcircle.on('click', (e2)=>{
             console.log('circling');
         });
         this.drawingpencil = $(`<div id='drawingpencil' class='icondisplay'>✎</div>`);
         this.drawingpencil.appendTo(this.drawingtools);
-        this.drawingpencil.on('click', (e)=>{
+        this.drawingpencil.on('click', (e2)=>{
+            this.canvas.addEventListener('mousedown', ev_canvas, false);
+            this.canvas.addEventListener('mousemove', ev_canvas, false);
+            this.canvas.addEventListener('mouseup',   ev_canvas, false);
         });
         this.drawingmove = $(`<div id='drawingmove' class='icondisplay iconmove'>✣</div>`);
         this.drawingmove.appendTo(this.drawingtools);
-        this.drawingmove.on('click', (e)=>{
+        this.drawingmove.on('click', (e2)=>{
             this.drawingcontainer.removeClass();
             if (this.drawing.data('uiDraggable').options.disabled) { 
                 this.drawing.draggable('enable');
@@ -158,7 +163,7 @@ $(document).ready(function(){
         });
         this.drawingsave = $(`<div id='drawingsave' class='icondisplay'>💾</div>`);
         this.drawingsave.appendTo(this.drawingtools);
-        this.drawingsave.on('click', (e)=>{
+        this.drawingsave.on('click', (e2)=>{
             console.log('saving');
         });
         this.canvas = $('<canvas/>');
