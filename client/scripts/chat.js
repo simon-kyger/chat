@@ -1,6 +1,40 @@
 import _ from 'lodash';
 import awesomeCursor from 'jquery-awesome-cursor';
 $.awesomeCursor = awesomeCursor;
+
+let yttag = document.createElement('script');
+yttag.id = 'iframe-demo';
+yttag.src = 'https://www.youtube.com/iframe_api';
+let firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(yttag, firstScriptTag);
+var ytplayers = [];
+function onYouTubeIframeAPIReady(divid, videoid){
+    if (!divid)
+        return;
+    let player = new YT.Player(divid, {
+        playervars : {
+            'origin': 'http://youtube.com'
+        },
+        width: `350px`,
+        height: `250px`,
+        videoId: videoid,
+        events : {
+            'onStateChange' : function(e){
+	            if (e.data == YT.PlayerState.PLAYING) {
+			        $.each(ytplayers, function() {
+			            if (this.getPlayerState() == YT.PlayerState.PLAYING && this.getIframe().id != e.target.getIframe().id) { 
+			                this.pauseVideo();
+			            }
+			        });
+			    }
+            }
+        }
+    });
+    ytplayers.push(player);
+};
+
+
+
 //globals
 let socket = io();
 let builder = function(){
@@ -534,26 +568,14 @@ builder.prototype.render = {
         });
     },
     renderVideo: function(tab, args){
-        let autoplay = '';
-        if (this.autoplay)
-            autoplay = `&autoplay=1`;
         let url = `https://www.youtube.com/watch?v=${args.msg}`;
         let link = `<a href='${url}'>${url}</a>`;
-        let embed = `https://www.youtube.com/embed/${args.msg}?enablejsapi=1${autoplay}`;
         //about as random as possible
         let id = Math.random().toString(36).substring(2, 15)+(new Date()).getTime().toString(36);
-        let iframe = `<iframe id='${id}' class='ytplayer' style='width: 350px; height: 250px;' src='${embed}' allowfullscreen></iframe>`;
-        let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link} </span><br>${iframe}</div>`;
+        let inner = `<div id=${id}></div>`;
+        let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link} </span><br>${inner}</div>`;
         this.msgs[tab].append(div);
-        this.videotoggle ? $('.iframe').show() : $('.iframe').hide();
-    },
-    renderVideoLink: function(tab, args){
-        let url = args.msg;
-        let link = `<a href='${url}'>${url}</a>`;
-        let id = url.substr(32);
-        let iframe = `<iframe class='iframe' style='height: 300px; width: 400px' src='//www.youtube.com/embed/${id}' allowfullscreen></iframe>`;
-        let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${link}</span><br>${iframe}</div>`;
-        this.msgs[tab].append(div);
+        onYouTubeIframeAPIReady(id, args.msg);
         this.videotoggle ? $('.iframe').show() : $('.iframe').hide();
     },
     renderBlob: function(tab, args){
