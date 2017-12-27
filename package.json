@@ -12,6 +12,7 @@
     "http": "0.0.0",
     "is-image": "^2.0.0",
     "jquery": "^3.2.1",
+    "jquery-awesome-cursor": "^0.3.1",
     "jsdom": "^11.4.0",
     "linkifyjs": "^2.1.5",
     "lodash": "^4.17.4",

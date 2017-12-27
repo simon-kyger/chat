@@ -46,12 +46,12 @@ node app.js
 ### Windows users
 This is assuming you're running on windows 10.
 By default, node knows to run under development mode.  so this will work out of the box:
-1. node app.js
+1. npm run dev
 
 //if you want to specify or switch from production to development mode
 1. command prompt > cd c:\users\\{username}\desktop\chat
 2. set NODE_ENV=development
-3. node app.js
+3. npm run dev
 
 ### Linux and Mac users 
 1. NODE_ENV=development node app.js
@@ -62,7 +62,7 @@ By default, node knows to run under development mode.  so this will work out of 
 This is assuming you're running on windows 10.
 1. command prompt > cd c:\users\\{username}\desktop\chat 
 2. set NODE_ENV=production
-3. node app.js
+3. npm run dev
 
 ### Linux and Mac users 
 1. NODE_ENV=production node app.js
