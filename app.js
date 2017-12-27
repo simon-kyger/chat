@@ -243,6 +243,9 @@ function command(socket, msg, curtab){
         case '/name':
             changename(socket, mod, curtab);
             break;
+        case '/price':
+            price(socket, mod, curtab);
+            break;
         case '/reddit':
             redditrequest(socket, mod, curtab);
             break;
@@ -404,6 +407,47 @@ function changecolor(socket, mod, curtab){
         SOCKET_CONNECTIONS[i].emit('addToChat', send);
     }
     socket.emit('changeInputFontColor', socket.color);
+}
+
+function price(socket, mod, curtab, shenanigans){
+    let send = {
+        chatmessages: [{
+            action: 'renderText',
+            date:  `[${moment().format("HH:mm:ss")}]`,
+            name: `[${socket.name}]:`,
+        }],
+        curtab: curtab
+    };
+    mod = mod.toUpperCase();
+    let link = `https://min-api.cryptocompare.com/data/price?fsym=${mod}&tsyms=USD`;
+    request.get(link, function(error, response, body){
+        if (error){
+            console.log(error)
+            return;
+        }
+        body = JSON.parse(body);
+        if (body.USD){
+            send.chatmessages[0].msg = `Price of ${mod}: <b>$${body.USD}</b>`;
+        } else {
+            send.chatmessages[0].msg = `Unable to retrieve ->'${mod}'. Example usage: /price BTC.`;
+            send.chatmessages[0].color = `red`;
+        }
+        if (curtab !== 'Main'){
+            for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
+                if (SOCKET_CONNECTIONS[i].name == curtab){
+                    send.curtab = socket.name;
+                    SOCKET_CONNECTIONS[i].emit('addToChat', send);
+                    send.curtab = curtab;
+                    socket.emit('addToChat', send);
+                    return;
+                }
+            }
+        }
+
+        for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
+            SOCKET_CONNECTIONS[i].emit('addToChat', send);
+        }
+    });
 }
 
 //socket: object
@@ -741,6 +785,7 @@ function commandlist(socket, mod, curtab){
         help:       `<b>/?</b> <i>command</i>                   -> Information about singular <i>command</i>. With no command specified, retrieves entire list.`,
         ignore:     `[<i>user</i>]                              -> Retrieves all ignored users. Arguments will add users to ignored list.`,
         name:       `<i>identity</i>                            -> Changes your current identity to <i>identity</i>.`,
+        price:      `<i>coinid</i>                              -> Retrieves cryptocoin price in USDollars of <i>coinid</i>.`,
         theme:      `[<i>dark | light | off |</i>]              -> Various theme options. Arguments are optional (will gen randomly).`,
         yt:         `<b>/vid /video /youtube</b> <i>search</i>  -> Retrieves first result from a youtube <i>search</i>.`
     }
