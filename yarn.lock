@@ -878,9 +878,9 @@ concurrently@^3.5.1:
     supports-color "^3.2.3"
     tree-kill "^1.1.0"
 
-config@^1.28.1:
-  version "1.28.1"
-  resolved "https://registry.yarnpkg.com/config/-/config-1.28.1.tgz#7625d2a1e4c90f131d8a73347982d93c3873282d"
+config@^1.29.0:
+  version "1.29.0"
+  resolved "https://registry.yarnpkg.com/config/-/config-1.29.0.tgz#f89190095ec8cfe886ea52b7d3d96cadfa577b7f"
   dependencies:
     json5 "0.4.0"
     os-homedir "1.0.2"
@@ -1573,6 +1573,10 @@ finalhandler@1.1.0:
 flatten@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/flatten/-/flatten-1.0.2.tgz#dae46a9d78fbe25292258cc1e780a41d95c03782"
+
+font-awesome@4.x:
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/font-awesome/-/font-awesome-4.7.0.tgz#8fa8cf0411a1a31afd07b06d2902bb9fc815a133"
 
 for-in@^1.0.1, for-in@^1.0.2:
   version "1.0.2"
@@ -2276,6 +2280,12 @@ isstream@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
 
+jquery-awesome-cursor@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/jquery-awesome-cursor/-/jquery-awesome-cursor-0.3.1.tgz#d6971a32b4624610bcebcac0903b001561d05eca"
+  optionalDependencies:
+    font-awesome "4.x"
+
 jquery@>=1.9.0, jquery@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.2.1.tgz#5c4d9de652af6cd0a770154a631bba12b015c787"
@@ -2654,7 +2664,7 @@ mixin-deep@^1.2.0:
   dependencies:
     minimist "0.0.8"
 
-moment@^2.19.2:
+moment@^2.20.1:
   version "2.20.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.20.1.tgz#d6eb1a46cbcc14a2b2f9434112c1ff8907f313fd"
 

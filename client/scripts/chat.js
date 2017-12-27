@@ -1,233 +1,205 @@
 import _ from 'lodash';
-import awesomeCursor from 'jquery-awesome-cursor';
-$.awesomeCursor = awesomeCursor;
+import yt from './yt';
 
-let yttag = document.createElement('script');
-yttag.id = 'iframe-demo';
-yttag.src = 'https://www.youtube.com/iframe_api';
-let firstScriptTag = document.getElementsByTagName('script')[0];
-firstScriptTag.parentNode.insertBefore(yttag, firstScriptTag);
-var ytplayers = [];
-function onYouTubeIframeAPIReady(divid, videoid){
-    if (!divid)
-        return;
-    let player = new YT.Player(divid, {
-        playervars : {
-            'origin': 'http://youtube.com'
-        },
-        width: `350px`,
-        height: `250px`,
-        videoId: videoid,
-        events : {
-            'onStateChange' : function(e){
-	            if (e.data == YT.PlayerState.PLAYING) {
-			        $.each(ytplayers, function() {
-			            if (this.getPlayerState() == YT.PlayerState.PLAYING && this.getIframe().id != e.target.getIframe().id) { 
-			                this.pauseVideo();
-			            }
-			        });
-			    }
-            }
-        }
-    });
-    ytplayers.push(player);
-};
+let onYouTubeIframeAPIReady = yt().yt;
+let ytplayers = yt().ytplayers;
 
-
-
+import {builder, drawings}  from './builder'
 //globals
 let socket = io();
-let builder = function(){
-    //properties
-    this.chat = $(`<div id='chat' class='chat'>`);
-    this.tools = $(`<div class='tools'>`);
-    this.tools.appendTo(this.chat);
-    this.chat.draggable({
-        containment: 'body',
-    });
-    this.chat.resizable({
-        handles: 'all'
-    });
-    this.cgroup = $(`<div id='cgroup' class='cgroup'>`);
-    this.cgroup.appendTo(this.chat);
-    this.maincgroup = $(`<div id='maincgroup' class='tab' style='width: 10%';>Main</div>`);
-    this.maincgroup.appendTo(this.cgroup);
-    this.curtab = 'Main';
-    this.msgs = {};
-    this.msgs[this.curtab] = $(`<div id='${this.curtab}' class='msgs'>`);
-    this.msgs[this.curtab].appendTo(this.chat);
-    this.onlineusers = $(`<div id='onlineusers' class='onlineusers'></div>`);
-    this.onlineusers.appendTo(this.chat);
-    this.welcome = $(`<div class='redshadow'>Welcome to the proper lunch chat channel!</br></div>`);
-    this.welcome.appendTo(this.msgs[this.curtab]);
-    this.githublink = $(`<div>&nbsp; &nbsp; github --> <a href='https://github.com/simon-kyger/chat' target='_blank'>https://github.com/simon-kyger/chat</a></br></div>`)
-    this.githublink.appendTo(this.msgs[this.curtab]);
-    this.commandlist = $(`<div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>`);
-    this.commandlist.appendTo(this.msgs[this.curtab]);
-    this.imagepreview = $(`<div id='imagepreview' class='imagepreview'>`)
-    this.imagepreview.appendTo(this.chat);
-    this.imagepreviewcvs = $(`<canvas id='cvs'>`);
-    this.imagepreviewcvs.appendTo(this.imagepreview);
-    this.imagepreviewX = $(`<div class='tabX' style='float:right;'>X</div>`);
-    this.imagepreviewX.appendTo(this.imagepreview);
-    this.imagepreview.hide();
-    this.inputcontainer = $(`<div id='inputcontainer' class='inputcontainer'>`);
-    this.inputcontainer.appendTo(this.chat);
-    this.config = $(`<div id='config' class='config'>`);
-    this.config.appendTo(this.chat);
-    this.videotoggle = $(`<input id='videotoggle' class='videotoggle' type='checkbox'>Hide Videos<br>`);
-    this.videotoggle.appendTo(this.config);
-    this.imagetoggle = $(`<input id='imagetoggle' class='imagetoggle' type='checkbox'>Hide Images<br>`);
-    this.imagetoggle.appendTo(this.config);
-    this.autoplayvideos = $(`<input id='autoplayvideos' class='autoplayvideos' type='checkbox'>Autoplay Videos<br>`);
-    this.autoplayvideos.appendTo(this.config);
-    this.stopallvideos = $(`<button id='stopallvideos' class='stopallvideos' type='button'>Stop All Videos Now!</button><br>`);
-    this.stopallvideos.appendTo(this.config);
-    this.istyping = $(`<div class='istyping'></div>`);
-    this.istyping.appendTo(this.inputcontainer);
-    this.textarea = $(`<textarea id='chatinput' class='chatinput blackphtext' placeholder='Chat here! or /? for a list of commands.' autofocus='autofocus'></textarea>`);
-    this.textarea.appendTo(this.inputcontainer);
-    this.cfg = $(`<div id='cfg' class='cfg'>&#x2699;</div>`);
-    this.cfg.appendTo(this.inputcontainer);
-    this.posts = [];
-    this.position = 0;
-    //storage for current blob
-    this.blob = {};
-    this.cfg.expanded = false;
-    //youtube autoplay config
-    this.autoplay = false;
+//let builder = builder;
+// let builder = function(){
+//     //properties
+//     this.chat = $(`<div id='chat' class='chat'>`);
+//     this.tools = $(`<div class='tools'>`);
+//     this.tools.appendTo(this.chat);
+//     this.chat.draggable({
+//         containment: 'body',
+//     });
+//     this.chat.resizable({
+//         handles: 'all'
+//     });
+//     this.cgroup = $(`<div id='cgroup' class='cgroup'>`);
+//     this.cgroup.appendTo(this.chat);
+//     this.maincgroup = $(`<div id='maincgroup' class='tab' style='width: 10%';>Main</div>`);
+//     this.maincgroup.appendTo(this.cgroup);
+//     this.curtab = 'Main';
+//     this.msgs = {};
+//     this.msgs[this.curtab] = $(`<div id='${this.curtab}' class='msgs'>`);
+//     this.msgs[this.curtab].appendTo(this.chat);
+//     this.onlineusers = $(`<div id='onlineusers' class='onlineusers'></div>`);
+//     this.onlineusers.appendTo(this.chat);
+//     this.welcome = $(`<div class='redshadow'>Welcome to the proper lunch chat channel!</br></div>`);
+//     this.welcome.appendTo(this.msgs[this.curtab]);
+//     this.githublink = $(`<div>&nbsp; &nbsp; github --> <a href='https://github.com/simon-kyger/chat' target='_blank'>https://github.com/simon-kyger/chat</a></br></div>`)
+//     this.githublink.appendTo(this.msgs[this.curtab]);
+//     this.commandlist = $(`<div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>`);
+//     this.commandlist.appendTo(this.msgs[this.curtab]);
+//     this.imagepreview = $(`<div id='imagepreview' class='imagepreview'>`)
+//     this.imagepreview.appendTo(this.chat);
+//     this.imagepreviewcvs = $(`<canvas id='cvs'>`);
+//     this.imagepreviewcvs.appendTo(this.imagepreview);
+//     this.imagepreviewX = $(`<div class='tabX' style='float:right;'>X</div>`);
+//     this.imagepreviewX.appendTo(this.imagepreview);
+//     this.imagepreview.hide();
+//     this.inputcontainer = $(`<div id='inputcontainer' class='inputcontainer'>`);
+//     this.inputcontainer.appendTo(this.chat);
+//     this.config = $(`<div id='config' class='config'>`);
+//     this.config.appendTo(this.chat);
+//     this.videotoggle = $(`<input id='videotoggle' class='videotoggle' type='checkbox'>Hide Videos<br>`);
+//     this.videotoggle.appendTo(this.config);
+//     this.imagetoggle = $(`<input id='imagetoggle' class='imagetoggle' type='checkbox'>Hide Images<br>`);
+//     this.imagetoggle.appendTo(this.config);
+//     this.autoplayvideos = $(`<input id='autoplayvideos' class='autoplayvideos' type='checkbox'>Autoplay Videos<br>`);
+//     this.autoplayvideos.appendTo(this.config);
+//     this.stopallvideos = $(`<button id='stopallvideos' class='stopallvideos' type='button'>Stop All Videos Now!</button><br>`);
+//     this.stopallvideos.appendTo(this.config);
+//     this.istyping = $(`<div class='istyping'></div>`);
+//     this.istyping.appendTo(this.inputcontainer);
+//     this.textarea = $(`<textarea id='chatinput' class='chatinput blackphtext' placeholder='Chat here! or /? for a list of commands.' autofocus='autofocus'></textarea>`);
+//     this.textarea.appendTo(this.inputcontainer);
+//     this.cfg = $(`<div id='cfg' class='cfg'>&#x2699;</div>`);
+//     this.cfg.appendTo(this.inputcontainer);
+//     this.posts = [];
+//     this.position = 0;
+//     //storage for current blob
+//     this.blob = {};
+//     this.cfg.expanded = false;
+//     //youtube autoplay config
+//     this.autoplay = false;
+//
+//     //methods
+//     this.maincgroup.on('click', (e)=> this.tabclick(e));
+//     this.textarea.on('change keydown input paste', (e)=> this.submitmsg(e));
+//     this.cfg.on('click', ()=> this.cfgexpand());
+//     this.videotoggle.on('change', ()=> this.videotoggler());
+//     this.imagetoggle.on('change', ()=> this.imagetoggler());
+//     this.autoplayvideos.on('change', ()=> this.autoplay = !this.autoplay);
+//     this.stopallvideos.on('click', ()=> {
+//         $.each(ytplayers, function(e) {
+//             if (this.getPlayerState() == YT.PlayerState.PLAYING) {
+//                 this.pauseVideo();
+//             }
+//         });
+//     });
+//     //body instances
+//     this.chat.appendTo($('body'));
+// }
 
-    //methods
-    this.maincgroup.on('click', (e)=> this.tabclick(e));
-    this.textarea.on('change keydown input paste', (e)=> this.submitmsg(e));
-    this.cfg.on('click', ()=> this.cfgexpand());
-    this.videotoggle.on('change', ()=> this.videotoggler());
-    this.imagetoggle.on('change', ()=> this.imagetoggler());
-    this.autoplayvideos.on('change', ()=> this.autoplay = !this.autoplay);
-    this.stopallvideos.on('click', ()=> {
-        $.each(ytplayers, function(e) {
-            if (this.getPlayerState() == YT.PlayerState.PLAYING) {
-                this.pauseVideo();
-            }
-        });
-    });
-    //body instances
-    this.chat.appendTo($('body'));
-}
-
-builder.prototype.drawings = function(e, blob){
-    if (this.drawing)
-        return;
-    this.drawing = $(`<div id='${blob.size}' class='chat'>`);
-    this.drawing.appendTo($('body'));
-    this.drawingcontainer = $(`<div style="overflow: scroll;"></div>`);
-    this.boxshad = [Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50]
-    this.drawing.stop().animate({
-        top: e.clientY,
-        left: e.clientX,
-        width: `0%`,
-        height: `0%`,
-    }, 0, null, ()=>{
-        this.drawing.stop().animate({
-            top: `25%`,
-            left: `25%`,
-            width: `50%`,
-            height: `50%`,
-            boxShadow: `1 1 1000px 100px rgb(${this.boxshad[0]}, ${this.boxshad[1]}, ${this.boxshad[2]})`
-        }, 750, null, ()=>{
-            this.drawingcontainer.css('height', this.drawing.height());
-            this.drawingcontainer.css('width', this.drawing.width());
-        });
-    });
-    this.drawingtools = $(`<div class='tools'>`);
-    this.drawingtools.appendTo(this.drawing);
-    this.drawingX = $(`<div id='drawingX' class='tabX'>X</div>`);
-    this.drawingX.appendTo(this.drawingtools);
-    this.drawingX.on('click', (e2)=>{
-        this.drawing.animate({
-            //e is from the initial invocation of drawings() aka the mini global e
-            top: e.clientY,
-            left: e.clientX,
-            width: `0%`,
-            height: `0%`,
-            opacity: `0`
-        }, ()=>{
-            this.drawing.remove()
-            delete this.drawing;
-        });
-    });
-    //insert new icons here
-    this.drawingselection= $(`<div id='drawingselection' class='icondisplay'>⬚</div>`);
-    this.drawingselection.appendTo(this.drawingtools);
-    this.drawingselection.on('click', (e2)=>{
-        console.log('selecting');
-    });
-    this.drawingsquare= $(`<div id='drawingsquare' class='icondisplay'>◻</div>`);
-    this.drawingsquare.appendTo(this.drawingtools);
-    this.drawingsquare.on('click', (e2)=>{
-        console.log('square');
-    });
-    this.drawingline = $(`<div id='drawingline' class='icondisplay iconline'>╲</div>`);
-    this.drawingline.appendTo(this.drawingtools);
-    this.drawingline.on('click', (e2)=>{
-        console.log('line');
-    });
-    this.drawingcircle = $(`<div id='drawingcircle' class='icondisplay'>⬤</div>`);
-    this.drawingcircle.appendTo(this.drawingtools);
-    this.drawingcircle.on('click', (e2)=>{
-        console.log('circling');
-    });
-    this.drawingpencil = $(`<div id='drawingpencil' class='icondisplay'>✎</div>`);
-    this.drawingpencil.appendTo(this.drawingtools);
-    this.drawingpencil.on('click', (e2)=>{
-        this.canvas.addEventListener('mousedown', ev_canvas, false);
-        this.canvas.addEventListener('mousemove', ev_canvas, false);
-        this.canvas.addEventListener('mouseup',   ev_canvas, false);
-    });
-    this.drawingmove = $(`<div id='drawingmove' class='icondisplay iconmove'>✣</div>`);
-    this.drawingmove.appendTo(this.drawingtools);
-    this.drawingmove.on('click', (e2)=>{
-        this.drawingcontainer.removeClass();
-        if (this.drawing.data('uiDraggable').options.disabled) {
-            this.drawing.draggable('enable');
-            dragscroll.reset();
-        } else {
-            this.drawing.draggable('disable');
-            this.drawingcontainer.addClass('dragscroll');
-            dragscroll.reset();
-        }
-    });
-    this.drawingsave = $(`<div id='drawingsave' class='icondisplay'>💾</div>`);
-    this.drawingsave.appendTo(this.drawingtools);
-    this.drawingsave.on('click', (e2)=>{
-        console.log('saving');
-    });
-    this.canvas = $('<canvas/>');
-    this.ctx = this.canvas[0].getContext('2d');
-    this.img = new Image();
-    this.URLObj = window.URL || window.webkitURL;
-    this.img.src = this.URLObj.createObjectURL(blob);
-    this.drawingcontainer.append(this.canvas);
-    this.drawing.append(this.drawingcontainer);
-    this.img.onload = (e) =>{
-        this.canvas[0].width = this.img.width;
-        this.canvas[0].height = this.img.height;
-        this.ctx.drawImage(this.img, 0, 0);
-    };
-    this.drawing.draggable({
-        containment: 'body'
-    });
-    this.drawing.resizable({
-        alsoResize: this.drawingcontainer,
-        handles: 'all'
-    })
-    $('body')[0].onresize = (e)=>{
-        if (!this.drawing)
-            return;
-        this.drawingcontainer.css('width', this.drawing.css('width'));
-        this.drawingcontainer.css('height', this.drawing.css('height'));
-    }
-}
+builder.prototype.drawings = drawings;
+// builder.prototype.drawings = function(e, blob){
+//     if (this.drawing)
+//         return;
+//     this.drawing = $(`<div id='${blob.size}' class='chat'>`);
+//     this.drawing.appendTo($('body'));
+//     this.drawingcontainer = $(`<div style="overflow: scroll;"></div>`);
+//     this.boxshad = [Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50]
+//     this.drawing.stop().animate({
+//         top: e.clientY,
+//         left: e.clientX,
+//         width: `0%`,
+//         height: `0%`,
+//     }, 0, null, ()=>{
+//         this.drawing.stop().animate({
+//             top: `25%`,
+//             left: `25%`,
+//             width: `50%`,
+//             height: `50%`,
+//             boxShadow: `1 1 1000px 100px rgb(${this.boxshad[0]}, ${this.boxshad[1]}, ${this.boxshad[2]})`
+//         }, 750, null, ()=>{
+//             this.drawingcontainer.css('height', this.drawing.height());
+//             this.drawingcontainer.css('width', this.drawing.width());
+//         });
+//     });
+//     this.drawingtools = $(`<div class='tools'>`);
+//     this.drawingtools.appendTo(this.drawing);
+//     this.drawingX = $(`<div id='drawingX' class='tabX'>X</div>`);
+//     this.drawingX.appendTo(this.drawingtools);
+//     this.drawingX.on('click', (e2)=>{
+//         this.drawing.animate({
+//             //e is from the initial invocation of drawings() aka the mini global e
+//             top: e.clientY,
+//             left: e.clientX,
+//             width: `0%`,
+//             height: `0%`,
+//             opacity: `0`
+//         }, ()=>{
+//             this.drawing.remove()
+//             delete this.drawing;
+//         });
+//     });
+//     //insert new icons here
+//     this.drawingselection= $(`<div id='drawingselection' class='icondisplay'>⬚</div>`);
+//     this.drawingselection.appendTo(this.drawingtools);
+//     this.drawingselection.on('click', (e2)=>{
+//         console.log('selecting');
+//     });
+//     this.drawingsquare= $(`<div id='drawingsquare' class='icondisplay'>◻</div>`);
+//     this.drawingsquare.appendTo(this.drawingtools);
+//     this.drawingsquare.on('click', (e2)=>{
+//         console.log('square');
+//     });
+//     this.drawingline = $(`<div id='drawingline' class='icondisplay iconline'>╲</div>`);
+//     this.drawingline.appendTo(this.drawingtools);
+//     this.drawingline.on('click', (e2)=>{
+//         console.log('line');
+//     });
+//     this.drawingcircle = $(`<div id='drawingcircle' class='icondisplay'>⬤</div>`);
+//     this.drawingcircle.appendTo(this.drawingtools);
+//     this.drawingcircle.on('click', (e2)=>{
+//         console.log('circling');
+//     });
+//     this.drawingpencil = $(`<div id='drawingpencil' class='icondisplay'>✎</div>`);
+//     this.drawingpencil.appendTo(this.drawingtools);
+//     this.drawingpencil.on('click', (e2)=>{
+//         this.canvas.addEventListener('mousedown', ev_canvas, false);
+//         this.canvas.addEventListener('mousemove', ev_canvas, false);
+//         this.canvas.addEventListener('mouseup',   ev_canvas, false);
+//     });
+//     this.drawingmove = $(`<div id='drawingmove' class='icondisplay iconmove'>✣</div>`);
+//     this.drawingmove.appendTo(this.drawingtools);
+//     this.drawingmove.on('click', (e2)=>{
+//         this.drawingcontainer.removeClass();
+//         if (this.drawing.data('uiDraggable').options.disabled) {
+//             this.drawing.draggable('enable');
+//             dragscroll.reset();
+//         } else {
+//             this.drawing.draggable('disable');
+//             this.drawingcontainer.addClass('dragscroll');
+//             dragscroll.reset();
+//         }
+//     });
+//     this.drawingsave = $(`<div id='drawingsave' class='icondisplay'>💾</div>`);
+//     this.drawingsave.appendTo(this.drawingtools);
+//     this.drawingsave.on('click', (e2)=>{
+//         console.log('saving');
+//     });
+//     this.canvas = $('<canvas/>');
+//     this.ctx = this.canvas[0].getContext('2d');
+//     this.img = new Image();
+//     this.URLObj = window.URL || window.webkitURL;
+//     this.img.src = this.URLObj.createObjectURL(blob);
+//     this.drawingcontainer.append(this.canvas);
+//     this.drawing.append(this.drawingcontainer);
+//     this.img.onload = (e) =>{
+//         this.canvas[0].width = this.img.width;
+//         this.canvas[0].height = this.img.height;
+//         this.ctx.drawImage(this.img, 0, 0);
+//     };
+//     this.drawing.draggable({
+//         containment: 'body'
+//     });
+//     this.drawing.resizable({
+//         alsoResize: this.drawingcontainer,
+//         handles: 'all'
+//     })
+//     $('body')[0].onresize = (e)=>{
+//         if (!this.drawing)
+//             return;
+//         this.drawingcontainer.css('width', this.drawing.css('width'));
+//         this.drawingcontainer.css('height', this.drawing.css('height'));
+//     }
+// }
 builder.prototype.imagetoggler = function(){
     this.imagetoggle ? $('.imgs').hide() : $('.imgs').show();
     this.imagetoggle = !this.imagetoggle;
@@ -595,7 +567,7 @@ builder.prototype.render = {
         });
     }
 };
-let chat = new builder();
+let chat = new builder(ytplayers);
 
 //a glorified animation
 chat.randomizedstartinganimation(0, 0);
