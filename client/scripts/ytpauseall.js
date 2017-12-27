@@ -8,6 +8,9 @@ function onYouTubeIframeAPIReady(id){
     if (!id)
         return;
     let player = new YT.Player(id, {
+        playervars : {
+            'referer': 'http://youtube.com'
+        },
         events : {
             'onStateChange' : function(e){
 	            if (e.data == YT.PlayerState.PLAYING) {

@@ -10,8 +10,6 @@ const linkifyHtml = require('linkifyjs/html');
 const isImage = require('is-image');
 const config = require('config');
 const port = config.get('port');
-const youtubenode = require('youtube-node');
-const youtube = new youtubenode();
 const apiKeys = require('./apiKeys');
 const ytsongs = require('./devplaylists/ytsongs.json');
 
@@ -21,7 +19,6 @@ let keys = {};
     apiKeys.getApiKey(path)
         .then(key => {
             keys[path] = key;
-            if (path === 'youtube') youtube.setKey(key);
         })
         .catch(err => console.log(err))
 });
@@ -418,18 +415,20 @@ function youtuberequest(socket, mod, curtab, shenanigans){
         socket.emit('addToChat', send);
         return;
     }
-    youtube.search(mod, 1, function(error, result){
+    let link=`https://www.googleapis.com/youtube/v3/search/?q=${mod}&maxResults=1&part=snippet&key=${keys.youtube}`
+    request.get(link, function(error, response, body){
         if(error){
             console.log(error);
             return;
         }
-        if (result.items.length && result.items[0].id.videoId){
+        body = JSON.parse(body);
+        if (body.items[0] && body.items[0].id.videoId){
             send = {
                 chatmessages: [{
                     action: 'renderVideo',
                     date:  `[${moment().format("HH:mm:ss")}]`,
                     name: `[${socket.name}]:`,
-                    msg:  result.items[0].id.videoId,
+                    msg:  body.items[0].id.videoId,
                 }],
                 curtab: curtab
             };
