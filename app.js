@@ -75,7 +75,6 @@ function init(socket){
     //for live sending of new stuff, this can be jerry rigged later
     send.chatmessages[0].msg = `Check out this youtube video one of our devs likes:`
     socket.emit('addToChat', send);
-<<<<<<< HEAD
     let randomsearch = [`merry christmas dog gif`,
                         `merry christmas rofl`,
                         `merry christmas ernest`,
@@ -86,9 +85,6 @@ function init(socket){
         randomsearch[Math.floor(Math.random()*(randomsearch.length-1))],
         'Main',
         true);
-=======
-    youtuberequest(socket, ytfavorites(),'Main', true);
->>>>>>> 35070f893b6988fe6fbc4948420336d572763689
 }
 
 //socket: object
