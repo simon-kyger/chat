@@ -1,0 +1,221 @@
+/* Please do not move these two rules at the top unless you know what you're doing */
+::-webkit-scrollbar-thumb {
+  background: #ffffff;
+  border: 0px none #ffffff;
+  border-radius: 0px;
+}
+::-webkit-scrollbar-track {
+  border: 0px none #ffffff;
+  border-radius: 0px;
+}
+
+/*Please do not remove the above two rules at the top unless you know what you're doing */
+html, 
+body {
+    height: 100%;
+    overflow: hidden;
+    margin:0;
+    padding:0;
+}
+.chat{
+    position: absolute !important;
+    width: 0%;
+    height: 0%;
+    left: 0px;
+    top: 0px;
+    opacity: 1;
+    font-family: 'Lucida Console', 'Operator Mono Book'; /*derek's ubuntu font as a fallback for linux users*/
+    font-size: 14px;
+    box-shadow: 0px 0px 1px 1px #888888;
+    word-wrap:break-word;
+    overflow: hidden;
+}
+.chat .msgs{
+    overflow-y:scroll;
+    width:80%;
+    height:85%;
+    direction: rtl;
+    text-align: left;
+}
+.code {
+    direction: ltr;
+}
+.chat .msgs .msg{
+    direction: ltr; 
+}
+.inputcontainer{
+    width: 100%;
+    height: calc(10% + 1px);
+    font-family: 'Lucida Console';
+    font-size: 14px;
+    resize: none;
+    color: white;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    position: absolute;
+    display:table;
+}
+.inputcontainer .istyping{
+    position: absolute;
+    width: 80%;
+    height: 30%;
+    display: table-row;
+    top: 0px;
+}
+.inputcontainer .chatinput{
+    position: absolute;
+    width: 100%;
+    height: 70%;
+    left: 0;
+    resize: none;
+    overflow: hidden;
+    bottom: 0px;
+    box-sizing:border-box;
+    border:none;
+    display:table-row;
+}
+.cfg{
+    position: absolute !important;
+    right: 2%;
+    font-size: 30px;
+    bottom: 2%;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.blackphtext::placeholder{
+    color: black;
+}
+.whitephtext::placeholder{
+    color: white;
+}
+
+.config{
+    position: absolute !important;
+    bottom: 0px;
+    right: 0px;
+    font-size: 14px;
+    width: 0%;
+    height: 0%;
+    opacity: 0;
+    border-color: rgb(0, 0, 0);
+    font-family: monospace;
+    border-style: solid;
+    border-width: 2px;
+    background-color: rgb(200, 200, 200);
+    z-index: 1;
+}
+.resizer {
+    width: 15px;
+    height: 15px;
+    background-color: #333333;
+    border: 1px solid #000000;
+    top: 0px;
+    right: 0px;
+    z-index:2;
+    cursor: nesw-resize;
+    display: inline-block;
+}
+
+.onlineusers{
+    top: 5%;
+    right: 0px;
+    position: absolute;
+    opacity: 0;
+    width: 20%;
+    height: 85%;
+    max-height: 85%;
+    overflow-y: scroll;
+}
+.redshadow{
+    text-shadow: 2px 2px 8px #FF0000;
+    font-weight: bold;
+}
+.cgroup{
+    width:100%;
+    height:5%;
+    overflow-y: scroll;
+}
+.tab{
+    cursor: pointer;
+    width: 10%;
+    float:left;
+    height:100%;
+    margin-right:5px;
+    z-index:5;
+}
+.tabX{
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
+    background-color: #333333;
+    border: 1px solid #000000;
+    display: inline-block;
+    color: white;
+    background-color: black;
+    text-align: -webkit-center;
+    float: right;
+}
+.imagepreview{
+    position: absolute;
+    z-index: 5;
+    bottom: 48px;
+    border: 1px solid black;
+}
+
+.blob{
+    cursor: pointer;
+}
+.tools{
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    background-color: white;
+}
+
+pre{
+    margin:0;
+}
+.icondisplay{
+    display: inline;
+    cursor: pointer;
+    font-size: 20px;
+    float: left;
+}
+.iconline{
+    line-height: 1.9;
+    font-size: 16px;
+}
+.ui-resizable-handle {
+
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-button {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* for coloring the scrollbar on hover
+    ::-webkit-scrollbar-thumb:hover {
+      background: #000000;
+    }
+    ::-webkit-scrollbar-thumb:active {
+      background: #000000;
+    }
+
+    ::-webkit-scrollbar-track:hover {
+      background: #ffffff;
+    }
+    ::-webkit-scrollbar-track:active {
+      background: #ffffff;
+    }
+*/
