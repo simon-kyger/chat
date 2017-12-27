@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "dependencies": {
-    "config": "^1.28.1",
+    "config": "^1.29.0",
     "delivery": "0.0.6",
     "express": "^4.16.2",
     "fs": "0.0.1-security",
@@ -15,7 +15,7 @@
     "jsdom": "^11.4.0",
     "linkifyjs": "^2.1.5",
     "lodash": "^4.17.4",
-    "moment": "^2.19.2",
+    "moment": "^2.20.1",
     "morgan": "^1.9.0",
     "npm-install-all": "^1.1.21",
     "request": "^2.83.0",

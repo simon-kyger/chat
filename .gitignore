@@ -7,3 +7,4 @@ apikeys/youtubekey.txt
 yarn-error.log
 yarn.
 dist
+config/local.json
