@@ -510,11 +510,6 @@ builder.prototype.render = {
     renderText: function(tab, args){
         let div = `<div class='msg' style='background-color:${args.bgcolor}; text-shadow: ${args.textshadow};'>${args.date} <span style='color:${args.color};'>${args.name} ${args.msg}</span></div>`;
         this.msgs[tab].append(div);
-        $('.msgs').hover(()=>{
-        	this.chat.draggable('disable');
-        }, ()=>{
-        	this.chat.draggable('enable');
-        });
     },
     renderImage: function(tab, args){
         let img = `<a href='${args.msg}' target='_blank'><img class='imgs' src='${args.msg}' target='_blank' style='width: auto; max-width: 350px; max-height: 250px; border-radius: 10px;'></img></a>`;
@@ -537,12 +532,6 @@ builder.prototype.render = {
         $('.code').each(function(i, block) {
           hljs.highlightBlock(block);
         });
-        $('.code').hover(()=>{
-        	this.chat.draggable('disable');
-        }, ()=>{
-        	this.chat.draggable('enable');
-        });
-
     },
     renderVideo: function(tab, args){
         let autoplay = '';
@@ -628,6 +617,11 @@ socket.on('addToChat', (data) => {
         //evil dragons be here
         chat.render[data.chatmessages[i].action].call(chat, data.curtab, data.chatmessages[i]);
     }
+    $('.msgs').hover(()=>{
+    	chat.chat.draggable('disable');
+    }, ()=>{
+    	chat.chat.draggable('enable');
+    });
     if (shouldscroll)
         chat.scrollBottom();
 });
