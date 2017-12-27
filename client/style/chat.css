@@ -10,20 +10,25 @@
 }
 
 /*Please do not remove the above two rules at the top unless you know what you're doing */
-
-body{
-    margin: 0px;
-    height: 100vh;
+html, 
+body {
+    height: 100%;
+    overflow: hidden;
+    margin:0;
+    padding:0;
 }
 .chat{
-    width: 50%;
-    height: 50%;
+    position: absolute !important;
+    width: 0%;
+    height: 0%;
+    left: 0px;
+    top: 0px;
     opacity: 1;
-    overflow:hidden;
     font-family: 'Lucida Console', 'Operator Mono Book'; /*derek's ubuntu font as a fallback for linux users*/
     font-size: 14px;
     box-shadow: 0px 0px 1px 1px #888888;
     word-wrap:break-word;
+    overflow: hidden;
 }
 .chat .msgs{
     overflow-y:scroll;
@@ -66,18 +71,17 @@ body{
     resize: none;
     overflow: hidden;
     bottom: 0px;
-    z-index: 5;
     box-sizing:border-box;
     border:none;
     display:table-row;
 }
-.inputcontainer .cfg{
-    z-index: 999;
-    position: absolute;
+.cfg{
+    position: absolute !important;
     right: 2%;
     font-size: 30px;
-    bottom: 0px;
+    bottom: 2%;
     cursor: pointer;
+    z-index: 2;
 }
 
 .blackphtext::placeholder{
@@ -100,7 +104,7 @@ body{
     border-style: solid;
     border-width: 2px;
     background-color: rgb(200, 200, 200);
-    z-index: 6;
+    z-index: 1;
 }
 .resizer {
     width: 15px;
@@ -109,13 +113,12 @@ body{
     border: 1px solid #000000;
     top: 0px;
     right: 0px;
-    position: absolute !important;
     z-index:2;
     cursor: nesw-resize;
+    display: inline-block;
 }
 
 .onlineusers{
-    z-index: 1;
     top: 5%;
     right: 0px;
     position: absolute;
@@ -146,7 +149,9 @@ body{
     cursor: pointer;
     width: 15px;
     height: 15px;
-    display:inline-block;
+    background-color: #333333;
+    border: 1px solid #000000;
+    display: inline-block;
     color: white;
     background-color: black;
     text-align: -webkit-center;
@@ -158,17 +163,42 @@ body{
     bottom: 48px;
     border: 1px solid black;
 }
+
+.blob{
+    cursor: pointer;
+}
+.tools{
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    background-color: white;
+}
+
 pre{
     margin:0;
 }
+.icondisplay{
+    display: inline;
+    cursor: pointer;
+    font-size: 20px;
+    float: left;
+}
+.iconline{
+    line-height: 1.9;
+    font-size: 16px;
+}
+.ui-resizable-handle {
+
+}
 
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 4px;
+  width: 10px;
+  height: 10px;
 }
 ::-webkit-scrollbar-button {
-  width: 0px;
-  height: 0px;
+  width: 10px;
+  height: 10px;
 }
 ::-webkit-scrollbar-corner {
   background: transparent;

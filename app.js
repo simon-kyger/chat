@@ -10,10 +10,10 @@ const linkifyHtml = require('linkifyjs/html');
 const isImage = require('is-image');
 const config = require('config');
 const port = config.get('port');
-const youtubenode = require('youtube-node');
-const youtube = new youtubenode();
 const apiKeys = require('./apiKeys');
 const logger = require('morgan');
+const ytsongs = require('./devplaylists/ytsongs.json');
+
 let keys = {};
 
 
@@ -22,7 +22,6 @@ let keys = {};
     apiKeys.getApiKey(path)
         .then(key => {
             keys[path] = key;
-            if (path === 'youtube') youtube.setKey(key);
         })
         .catch(err => console.log(err))
 });
@@ -73,8 +72,10 @@ function init(socket){
         SOCKET_CONNECTIONS[i].emit('addToChat', send);
         SOCKET_CONNECTIONS[i].emit('updateUsers', getNames(SOCKET_CONNECTIONS));
     }
-    send.chatmessages[0].msg = `Merry Christmas :D`
+    //for live sending of new stuff, this can be jerry rigged later
+    send.chatmessages[0].msg = `Check out this youtube video one of our devs likes:`
     socket.emit('addToChat', send);
+<<<<<<< HEAD
     let randomsearch = [`merry christmas dog gif`,
                         `merry christmas rofl`,
                         `merry christmas ernest`,
@@ -85,6 +86,9 @@ function init(socket){
         randomsearch[Math.floor(Math.random()*(randomsearch.length-1))],
         'Main',
         true);
+=======
+    youtuberequest(socket, ytfavorites(),'Main', true);
+>>>>>>> 35070f893b6988fe6fbc4948420336d572763689
 }
 
 //socket: object
@@ -109,6 +113,7 @@ function disconnects(socket){
         }
         SOCKET_CONNECTIONS[i].emit('addToChat', send);
     }
+    console.log(`${socket.request.connection.remoteAddress} has disconnected.`);
     SOCKET_CONNECTIONS.splice(temp, 1);
     for (let j =0; j < SOCKET_CONNECTIONS.length; j++){
         SOCKET_CONNECTIONS[j].emit('removeTab', socket.name);
@@ -153,8 +158,12 @@ function chatMsg(socket, msg){
         }],
     };
 
-    if (msg.msg.substr(0, 23) == `https://www.youtube.com`){
-        send.chatmessages[0].action = `renderVideoLink`;
+    if (msg.msg.substr(0, 32) == `https://www.youtube.com/watch?v=`){
+        send.chatmessages[0].action = `renderVideo`;
+        send.chatmessages[0].msg = msg.msg.substr(32);
+    } else if (msg.msg.substr(0, 17) == `https://youtu.be/`){
+        send.chatmessages[0].action = `renderVideo`;
+        send.chatmessages[0].msg = msg.msg.substr(17);
     } else if (isImage(msg.msg)){
         send.chatmessages[0].action = `renderImage`;
     } else if (Object.keys(msg.blob).length){
@@ -165,6 +174,7 @@ function chatMsg(socket, msg){
             defaultProtocol: `https`,
         });
     }
+    console.log(send.chatmessages[0].action);
 
     for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
         if (SOCKET_CONNECTIONS[i].name == msg.curtab){
@@ -411,7 +421,7 @@ function changecolor(socket, mod, curtab){
 //socket: object
 //mod: string
 //description: part of command lib that will fetch mod from googlesapi
-function youtuberequest(socket, mod, curtab){
+function youtuberequest(socket, mod, curtab, shenanigans){
     let send;
     if (!keys.youtube){
         send = {
@@ -427,18 +437,20 @@ function youtuberequest(socket, mod, curtab){
         socket.emit('addToChat', send);
         return;
     }
-    youtube.search(mod, 1, function(error, result){
+    let link=`https://www.googleapis.com/youtube/v3/search/?q=${mod}&maxResults=1&part=snippet&key=${keys.youtube}`
+    request.get(link, function(error, response, body){
         if(error){
             console.log(error);
             return;
         }
-        if (result.items.length && result.items[0].id.videoId){
+        body = JSON.parse(body);
+        if (body.items[0] && body.items[0].id.videoId){
             send = {
                 chatmessages: [{
                     action: 'renderVideo',
                     date:  `[${moment().format("HH:mm:ss")}]`,
                     name: `[${socket.name}]:`,
-                    msg:  result.items[0].id.videoId,
+                    msg:  body.items[0].id.videoId,
                 }],
                 curtab: curtab
             };
@@ -478,6 +490,11 @@ function youtuberequest(socket, mod, curtab){
                     return;
                 }
             }
+        }
+        if (shenanigans){
+            send.chatmessages[0].name = ``;
+            socket.emit('addToChat', send);
+            return;
         }
         for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
             SOCKET_CONNECTIONS[i].emit('addToChat', send);
@@ -766,4 +783,8 @@ function commandlist(socket, mod, curtab){
         curtab: curtab
     };
     socket.emit('addToChat', send);
+}
+
+function ytfavorites(){
+    return ytsongs[Math.floor(Math.random()*(ytsongs.length-1))];
 }
