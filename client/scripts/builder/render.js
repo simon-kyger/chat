@@ -67,9 +67,6 @@ export default {
         let img = `<img class='blob' style='max-width: ${this.msgs[tab].width()}px;' src='${URLObj.createObjectURL(blob)}'/>`;
         let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${args.msg}</span><br>${img}</div>`;
         this.msgs[tab].append(div);
-        $('.blob').on('click', function(){
-            //do some other crazy shenanigans later :P
-        });
         $(div).resizable();
         this.imagepreview.hide();
         this.blob = {};
