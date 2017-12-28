@@ -1,6 +1,7 @@
-export default function(ytplayers){
+export default function(socket){
     //properties
-    //this.ytplayers = ytplayers;
+    this.socket = socket;
+    this.ytplayers = [];
     this.chat = $(`<div id='chat' class='chat'>`);
     this.tools = $(`<div class='tools'>`);
     this.tools.appendTo(this.chat);
@@ -67,9 +68,7 @@ export default function(ytplayers){
     this.imagetoggle.on('change', ()=> this.imagetoggler());
     this.autoplayvideos.on('change', ()=> this.autoplay = !this.autoplay);
     this.stopallvideos.on('click', ()=> {
-      console.log('im getting called')
-      console.log(ytplayers)
-        $.each(ytplayers, function(e) {
+        $.each(this.ytplayers, function() {
             if (this.getPlayerState() == YT.PlayerState.PLAYING) {
                 this.pauseVideo();
             }
