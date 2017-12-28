@@ -35,8 +35,12 @@ export default {
         this.msgs[tab].append(div);
         let player;
         let players = this.ytplayers;
+        let autoplay = this.autoplay;
 		function onYouTubeIframeAPIReady(divid, videoid) {
 			player = new YT.Player(divid, {
+				playerVars: { 
+					'autoplay': autoplay
+				},
 				videoId: videoid,
 				height: `250px`,
 				width: `350px`,
