@@ -49,19 +49,14 @@ export default function(e, blob){
             pan: {       
                 element: $(`<div class='icondisplay'>🤚</div>`),
                 behavior: ()=>{
-                    let options = {
-                        color: 'white', 
-                        outline: 'black', 
-                        size: '24'
-                    };
                     this.drawingcontainer
-                        .awesomeCursor('hand-stop-o', options)
                         .addClass('dragscroll')
+                        .css('cursor', '-webkit-grab')
                         .mousedown(()=>{
-                            this.drawingcontainer.awesomeCursor('hand-rock-o', options);
+                            this.drawingcontainer.css('cursor', '-webkit-grabbing');
                         })
                         .mouseup(()=>{
-                            this.drawingcontainer.awesomeCursor('hand-stop-o', options);
+                            this.drawingcontainer.css('cursor', '-webkit-grab');
                         });
                     dragscroll.reset();
                 }
@@ -126,7 +121,7 @@ export default function(e, blob){
                         size: '24'
                     };
                     this.drawingcontainer
-                        .awesomeCursor('pencil', options)
+                        .addClass('pencil')
                         .mousedown((e)=>{
                         })
                         .mouseup((e)=>{

@@ -164,6 +164,9 @@ body {
     bottom: 48px;
     border: 1px solid black;
 }
+.pencil{
+    cursor: url('../icons/pencil.png'), auto;
+}
 
 .blob{
     cursor: pointer;
