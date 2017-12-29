@@ -1,7 +1,7 @@
 export default function(e, blob){
     if (this.drawing)
         return;
-    this.drawing = $(`<div id='${blob.size}' class='chat'>`);
+    this.drawing = $(`<div id='${blob.size}' class='chat' style='z-index:5;'>`);
     this.drawing.appendTo($('body'));
     this.drawingcontainer = $(`<div style="overflow: scroll;"></div>`);
     this.boxshad = [Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50]
@@ -22,6 +22,13 @@ export default function(e, blob){
             this.drawingcontainer.css('width', this.drawing.width());
         });
     });
+    this.maximized = false;
+    this.olddimensions = {
+        top: null,
+        left: null,
+        width: null,
+        height: null
+    };
     this.canvas = $('<canvas/>');
     this.ctx = this.canvas[0].getContext('2d');
     this.img = new Image();
@@ -135,6 +142,45 @@ export default function(e, blob){
                         })
                         .mouseup((e)=>{
                         });
+                }
+            },
+            maximize: {
+                element: $(`<div class='icondisplay iconmaximize'>🗖</div>`),
+                behavior: ()=>{
+                    if (!this.maximized){
+                        this.olddimensions = {
+                            top: this.drawing.css('top'),
+                            left: this.drawing.css('left'),
+                            width: this.drawing.css('width'),
+                            height: this.drawing.css('height'),
+                        }
+                        //animate both the container and the canvas container but not the canvas
+                        this.drawing.animate({
+                            top: 0,
+                            left: 0,
+                            height: `${window.innerHeight}px`,
+                            width: `${window.innerWidth}px`,
+                        });
+                        this.drawingcontainer.animate({
+                            height: `${window.innerHeight}px`,
+                            width: `${window.innerWidth}px`,
+                        });
+                        this.maximized = true;
+                    } else {
+                        this.drawing
+                            .draggable('enable')
+                            .animate({
+                                top: this.olddimensions.top,
+                                left: this.olddimensions.left,
+                                height: this.olddimensions.height,
+                                width: this.olddimensions.width,
+                            });
+                        this.drawingcontainer.animate({
+                            height: this.olddimensions.height,
+                            width: this.olddimensions.width     
+                        });
+                        this.maximized = false;
+                    }
                 }
             },
             close: {

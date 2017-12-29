@@ -3,7 +3,9 @@ export default function(socket){
     this.socket = socket;
     this.ytplayers = [];
     this.chat = $(`<div id='chat' class='chat'>`);
-    this.tools = $(`<div class='tools'>`);
+    this.tools = $(`<div class='tools' style='background-color: rgba(0, 0, 0, 0);'>`);
+    this.maximizer = $(`<div class='icondisplay iconmaximize'>🗖</div>`);
+    this.maximizer.appendTo(this.tools);
     this.tools.appendTo(this.chat);
     this.chat.draggable({
         containment: 'body',
@@ -74,7 +76,34 @@ export default function(socket){
             }
         });
     });
-    
+    this.chatmaximized = false;
+    this.maximizer.on('click', ()=>{
+        if (!this.chatmaximized){
+            this.chatolddimensions = {
+                top: this.chat.css('top'),
+                left: this.chat.css('left'),
+                width: this.chat.css('width'),
+                height: this.chat.css('height'),
+            }
+            //animate both the container and the canvas container but not the canvas
+            this.chat.animate({
+                top: 0,
+                left: 0,
+                height: `${window.innerHeight}px`,
+                width: `${window.innerWidth}px`,
+            });
+            this.chatmaximized = true;
+        } else {
+            this.chat.animate({
+                top: this.chatolddimensions.top,
+                left: this.chatolddimensions.left,
+                height: this.chatolddimensions.height,
+                width: this.chatolddimensions.width,
+            });
+            this.chatmaximized = false;
+        }
+    })
+
     //apply self to body and apply any after effects or transitions
     this.chat.appendTo($('body'));
     this.randomizedstartinganimation(0, 0);
