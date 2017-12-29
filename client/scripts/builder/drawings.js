@@ -39,8 +39,106 @@ export default function(e, blob){
         this.container = $(`<div class='tools'>`);
         this.container.appendTo(this.drawing);
         this.tools = {
-            drawingX: {
-                element: $(`<div id='drawingX' class='tabX'>X</div>`),
+            pan: {       
+                element: $(`<div class='icondisplay'>🤚</div>`),
+                behavior: ()=>{
+                    let options = {
+                        color: 'white', 
+                        outline: 'black', 
+                        size: '24'
+                    };
+                    this.drawingcontainer
+                        .awesomeCursor('hand-stop-o', options)
+                        .addClass('dragscroll')
+                        .mousedown(()=>{
+                            this.drawingcontainer.awesomeCursor('hand-rock-o', options);
+                        })
+                        .mouseup(()=>{
+                            this.drawingcontainer.awesomeCursor('hand-stop-o', options);
+                        });
+                    dragscroll.reset();
+                }
+            },
+            move: {
+                element: $(`<div class='icondisplay iconmove'>⇱</div>`),
+                behavior: ()=>{
+                    this.drawing.draggable('enable');
+                }
+            },
+            selection: {
+                element: $(`<div class='icondisplay'>⬚</div>`),
+                behavior: ()=>{
+                    this.drawingcontainer
+                        .css('cursor', 'crosshair')
+                        .mousedown((e)=>{
+                        })
+                        .mouseup((e)=>{
+                        });
+                }
+            },
+            line: {       
+                element: $(`<div class='icondisplay iconline'>╲</div>`),
+                behavior: ()=>{
+                    this.drawingcontainer
+                        .css('cursor', 'crosshair')
+                        .mousedown((e)=>{
+                        })
+                        .mouseup((e)=>{
+                        });
+                }
+            },
+            square: {
+                element: $(`<div class='icondisplay iconsquare'>◻</div>`),
+                behavior: ()=>{
+                    this.drawingcontainer
+                        .css('cursor', 'crosshair')
+                        .mousedown((e)=>{
+                        })
+                        .mouseup((e)=>{
+                        });
+
+                }
+            },
+            circle: {
+                element: $(`<div class='icondisplay'>⬤</div>`),
+                behavior: ()=>{
+                    this.drawingcontainer
+                        .css('cursor', 'crosshair')
+                        .mousedown((e)=>{
+                        })
+                        .mouseup((e)=>{
+                        });
+                }
+            },
+            pencil: {     
+                element: $(`<div class='icondisplay'>✎</div>`),
+                behavior: ()=>{
+                    let options = {
+                        color: 'black', 
+                        outline: 'white', 
+                        size: '24'
+                    };
+                    this.drawingcontainer
+                        .awesomeCursor('pencil', options)
+                        .mousedown((e)=>{
+                        })
+                        .mouseup((e)=>{
+                        });
+                }
+            },
+            save: {
+                element: $(`<div class='icondisplay'>💾</div>`),
+                behavior: ()=>{
+                    this.drawingcontainer
+                        .css('cursor', 'auto')
+                        .mousedown((e)=>{
+                        })
+                        .mouseup((e)=>{
+                        });
+                }
+            },
+            close: {
+                element: $(`<div class='tabX'>X</div>`),
                 behavior: ()=>{
                     this.drawing.animate({
                         //e is from the initial invocation of drawings() aka the mini global e
@@ -55,63 +153,18 @@ export default function(e, blob){
                     });
                 }
             },
-            drawingselection: {
-                element: $(`<div id='drawingselection' class='icondisplay'>⬚</div>`),
-                behavior: ()=>{
-
-                }
-            },
-            drawingsquare: {
-                element: $(`<div id='drawingsquare' class='icondisplay'>◻</div>`),
-                behavior: ()=>{
-
-                }
-            },
-            drawingsquare: {       
-                element: $(`<div id='drawingline' class='icondisplay iconline'>╲</div>`),
-                behavior: ()=>{
-
-                }
-            },
-            drawingcircle: {
-                element: $(`<div id='drawingcircle' class='icondisplay'>⬤</div>`),
-                behavior: ()=>{
-
-                }
-            },
-            drawingpencil: {     
-                element: $(`<div id='drawingpencil' class='icondisplay'>✎</div>`),
-                behavior: ()=>{
-
-                }
-            },
-            drawingmove: {       
-                element: $(`<div id='drawingmove' class='icondisplay iconmove'>✣</div>`),
-                behavior: ()=>{
-                    
-                }
-            },
-            drawingsave: {
-                element: $(`<div id='drawingsave' class='icondisplay'>💾</div>`),
-                behavior: ()=>{
-
-                }
-            },
         };
         //for each tool, append it to toolcontainer and when each is clicked, remove any class they had
         //and stop the window from dragging, and start up their associated behavior.
         for (let i in this.tools){
             this.tools[i].element.appendTo(this.container);
             this.tools[i].element.on('click', ()=>{
-                this.drawingcontainer.removeClass();
-                if (this.drawing.data('uiDraggable').options.disabled) {
-                    this.drawing.draggable('enable');
-                    dragscroll.reset();
-                } else {
-                    this.drawing.draggable('disable');
-                    this.drawingcontainer.addClass('dragscroll');
-                    dragscroll.reset();
-                }
+                this.drawing.draggable('disable');
+                this.drawingcontainer
+                    .off()
+                    .removeClass()
+                    .css('cursor', '');
+                dragscroll.reset();
                 this.tools[i].behavior();
             });
         }
@@ -124,10 +177,10 @@ export default function(e, blob){
         alsoResize: this.drawingcontainer,
         handles: 'all'
     })
-    $('body')[0].onresize = (e)=>{
+    $('body').resize(()=>{
         if (!this.drawing)
             return;
         this.drawingcontainer.css('width', this.drawing.css('width'));
         this.drawingcontainer.css('height', this.drawing.css('height'));
-    }
+    });
 }
