@@ -22,69 +22,6 @@ export default function(e, blob){
             this.drawingcontainer.css('width', this.drawing.width());
         });
     });
-    this.drawingtools = $(`<div class='tools'>`);
-    this.drawingtools.appendTo(this.drawing);
-    this.drawingX = $(`<div id='drawingX' class='tabX'>X</div>`);
-    this.drawingX.appendTo(this.drawingtools);
-    this.drawingX.on('click', (e2)=>{
-        this.drawing.animate({
-            //e is from the initial invocation of drawings() aka the mini global e
-            top: e.clientY,
-            left: e.clientX,
-            width: `0%`,
-            height: `0%`,
-            opacity: `0`
-        }, ()=>{
-            this.drawing.remove()
-            delete this.drawing;
-        });
-    });
-    //insert new icons here
-    this.drawingselection= $(`<div id='drawingselection' class='icondisplay'>⬚</div>`);
-    this.drawingselection.appendTo(this.drawingtools);
-    this.drawingselection.on('click', (e2)=>{
-        console.log('selecting');
-    });
-    this.drawingsquare= $(`<div id='drawingsquare' class='icondisplay'>◻</div>`);
-    this.drawingsquare.appendTo(this.drawingtools);
-    this.drawingsquare.on('click', (e2)=>{
-        console.log('square');
-    });
-    this.drawingline = $(`<div id='drawingline' class='icondisplay iconline'>╲</div>`);
-    this.drawingline.appendTo(this.drawingtools);
-    this.drawingline.on('click', (e2)=>{
-        console.log('line');
-    });
-    this.drawingcircle = $(`<div id='drawingcircle' class='icondisplay'>⬤</div>`);
-    this.drawingcircle.appendTo(this.drawingtools);
-    this.drawingcircle.on('click', (e2)=>{
-        console.log('circling');
-    });
-    this.drawingpencil = $(`<div id='drawingpencil' class='icondisplay'>✎</div>`);
-    this.drawingpencil.appendTo(this.drawingtools);
-    this.drawingpencil.on('click', (e2)=>{
-        this.canvas.addEventListener('mousedown', ev_canvas, false);
-        this.canvas.addEventListener('mousemove', ev_canvas, false);
-        this.canvas.addEventListener('mouseup',   ev_canvas, false);
-    });
-    this.drawingmove = $(`<div id='drawingmove' class='icondisplay iconmove'>✣</div>`);
-    this.drawingmove.appendTo(this.drawingtools);
-    this.drawingmove.on('click', (e2)=>{
-        this.drawingcontainer.removeClass();
-        if (this.drawing.data('uiDraggable').options.disabled) {
-            this.drawing.draggable('enable');
-            dragscroll.reset();
-        } else {
-            this.drawing.draggable('disable');
-            this.drawingcontainer.addClass('dragscroll');
-            dragscroll.reset();
-        }
-    });
-    this.drawingsave = $(`<div id='drawingsave' class='icondisplay'>💾</div>`);
-    this.drawingsave.appendTo(this.drawingtools);
-    this.drawingsave.on('click', (e2)=>{
-        console.log('saving');
-    });
     this.canvas = $('<canvas/>');
     this.ctx = this.canvas[0].getContext('2d');
     this.img = new Image();
@@ -97,6 +34,89 @@ export default function(e, blob){
         this.canvas[0].height = this.img.height;
         this.ctx.drawImage(this.img, 0, 0);
     };
+    this.tools = {};
+    this.buildtools = () =>{
+        this.container = $(`<div class='tools'>`);
+        this.container.appendTo(this.drawing);
+        this.tools = {
+            drawingX: {
+                element: $(`<div id='drawingX' class='tabX'>X</div>`),
+                behavior: ()=>{
+                    this.drawing.animate({
+                        //e is from the initial invocation of drawings() aka the mini global e
+                        top: e.clientY,
+                        left: e.clientX,
+                        width: `0%`,
+                        height: `0%`,
+                        opacity: `0`
+                    }, ()=>{
+                        this.drawing.remove()
+                        delete this.drawing;
+                    });
+                }
+            },
+            drawingselection: {
+                element: $(`<div id='drawingselection' class='icondisplay'>⬚</div>`),
+                behavior: ()=>{
+
+                }
+            },
+            drawingsquare: {
+                element: $(`<div id='drawingsquare' class='icondisplay'>◻</div>`),
+                behavior: ()=>{
+
+                }
+            },
+            drawingsquare: {       
+                element: $(`<div id='drawingline' class='icondisplay iconline'>╲</div>`),
+                behavior: ()=>{
+
+                }
+            },
+            drawingcircle: {
+                element: $(`<div id='drawingcircle' class='icondisplay'>⬤</div>`),
+                behavior: ()=>{
+
+                }
+            },
+            drawingpencil: {     
+                element: $(`<div id='drawingpencil' class='icondisplay'>✎</div>`),
+                behavior: ()=>{
+
+                }
+            },
+            drawingmove: {       
+                element: $(`<div id='drawingmove' class='icondisplay iconmove'>✣</div>`),
+                behavior: ()=>{
+                    
+                }
+            },
+            drawingsave: {
+                element: $(`<div id='drawingsave' class='icondisplay'>💾</div>`),
+                behavior: ()=>{
+
+                }
+            },
+        };
+        //for each tool, append it to toolcontainer and when each is clicked, remove any class they had
+        //and stop the window from dragging, and start up their associated behavior.
+        for (let i in this.tools){
+            this.tools[i].element.appendTo(this.container);
+            this.tools[i].element.on('click', ()=>{
+                this.drawingcontainer.removeClass();
+                if (this.drawing.data('uiDraggable').options.disabled) {
+                    this.drawing.draggable('enable');
+                    dragscroll.reset();
+                } else {
+                    this.drawing.draggable('disable');
+                    this.drawingcontainer.addClass('dragscroll');
+                    dragscroll.reset();
+                }
+                this.tools[i].behavior();
+            });
+        }
+    };
+    this.buildtools();
     this.drawing.draggable({
         containment: 'body'
     });

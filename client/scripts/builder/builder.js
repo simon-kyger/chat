@@ -74,6 +74,9 @@ export default function(socket){
             }
         });
     });
-    //body instances
+    
+    //apply self to body and apply any after effects or transitions
     this.chat.appendTo($('body'));
+    this.randomizedstartinganimation(0, 0);
+    this.redheader();
 }

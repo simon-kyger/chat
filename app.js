@@ -469,14 +469,13 @@ function youtuberequest(socket, mod, curtab, shenanigans){
         socket.emit('addToChat', send);
         return;
     }
-    let link=`https://www.googleapis.com/youtube/v3/search/?q=${mod}&maxResults=1&part=snippet&videoEmbeddable=true&videoSyndicated=true&type=video&key=${keys.youtube}`
+    let link=`https://www.googleapis.com/youtube/v3/search/?q=${mod}&maxResults=1&part=snippet&videoEmbeddable=true&type=video&key=${keys.youtube}`
     request.get(link, function(error, response, body){
         if(error){
             console.log(error);
             return;
         }
         body = JSON.parse(body);
-        console.log(body);
         if (body.items[0] && body.items[0].id.videoId){
             send = {
                 chatmessages: [{

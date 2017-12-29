@@ -11,3 +11,4 @@ export {default as getTheme} from './getTheme';
 export {default as randomizedstartinganimation} from './randomizedstartinganimation';
 export {default as render} from './render';
 export {default as submitmsg} from './submitmsg';
+export {default as redheader} from './redheader';
