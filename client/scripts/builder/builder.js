@@ -86,7 +86,7 @@ export default function(socket){
                 height: this.chat.css('height'),
             }
             //animate both the container and the canvas container but not the canvas
-            this.chat.animate({
+            this.chat.stop().animate({
                 top: 0,
                 left: 0,
                 height: `${window.innerHeight}px`,
@@ -94,7 +94,7 @@ export default function(socket){
             });
             this.chatmaximized = true;
         } else {
-            this.chat.animate({
+            this.chat.stop().animate({
                 top: this.chatolddimensions.top,
                 left: this.chatolddimensions.left,
                 height: this.chatolddimensions.height,
