@@ -42,6 +42,10 @@ export default function(e, blob){
         this.ctx.drawImage(this.img, 0, 0);
     };
     this.tools = {};
+    let pencil;
+    this.socket.emit('pencil', (e)=>{
+
+    });
     this.buildtools = () =>{
         this.container = $(`<div class='tools'>`);
         this.container.appendTo(this.drawing);
@@ -70,11 +74,27 @@ export default function(e, blob){
             selection: {
                 element: $(`<div class='icondisplay'>⬚</div>`),
                 behavior: ()=>{
-                    this.drawingcontainer
+                    let clicking = false;
+                    let rect = {};
+                    this.canvas
                         .css('cursor', 'crosshair')
                         .mousedown((e)=>{
+                            clicking = true;
+                            rect.startX = e.clientX - this.canvas.offset().left;
+                            rect.startY = e.clientY - this.canvas.offset().top;
+                        })
+                        .mousemove((e)=>{
+                            if (!clicking) return;
+                            rect.w = e.clientX - this.canvas.offset().left - rect.startX;
+                            rect.h = e.clientY - this.canvas.offset().top - rect.startY;
+                            let ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
+                            this.ctx
+                                .clearRect(0, 0, this.canvas.width(), this.canvas.height())
+                                .drawImage(ref, 0, 0)
+                                .strokeRect(rect.startX, rect.startY, rect.w, rect.h);
                         })
                         .mouseup((e)=>{
+                            clicking = false;
                         });
                 }
             },

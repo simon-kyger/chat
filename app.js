@@ -26,13 +26,9 @@ let keys = {};
         .catch(err => console.log(err))
 });
 
-if(process.env.NODE_ENV=== 'simon'){
-  app.use('/', express.static(path.join(__dirname, 'client')));
-} else{
-  app.use(logger('dev'));
-  app.use('/dist', express.static('dist'));
-  app.get('/', (req, res) =>  res.sendFile(path.join(__dirname,"./dist/index.html")))
-}
+app.use(logger('dev'));
+app.use('/dist', express.static('dist'));
+app.get('/', (req, res) =>  res.sendFile(path.join(__dirname,"./dist/index.html")))
 
 server.listen(port);
 console.log(`Listening on port: ${port}`);
@@ -63,8 +59,9 @@ function init(socket){
             action: 'renderText',
             date:  `[${moment().format("HH:mm:ss")}]`,
             name: ``,
-            msg:  `[${socket.name}] has connected.`,
-            color: socket.color
+            msg:  `${socket.name} has connected.`,
+            color: socket.color,
+            textshadow: `2px 2px 5px black`
         }],
         curtab: 'Main'
     };
@@ -89,8 +86,9 @@ function disconnects(socket){
             action: 'renderText',
             date:  `[${moment().format("HH:mm:ss")}]`,
             name: ``,
-            msg:  `[${socket.name}] has disconnected.`,
-            color: socket.color
+            msg:  `${socket.name} has disconnected.`,
+            color: socket.color,
+            textshadow: `2px 2px 5px black`
         }],
         curtab: 'Main'
     };
@@ -140,7 +138,7 @@ function chatMsg(socket, msg){
         chatmessages: [{
             action: `renderText`,
             date:  `[${moment().format("HH:mm:ss")}]`,
-            name: `[${socket.name}]:`,
+            name: `${socket.name}:`,
             msg:  msg.msg,
             color: socket.color,
         }],
@@ -277,7 +275,7 @@ function command(socket, msg, curtab){
             chatmessages: [{
                 action: 'renderText',
                 date:  `[${moment().format("HH:mm:ss")}]`,
-                name: `[${socket.name}]:`,
+                name: `${socket.name}:`,
                 msg:  `Unknown command: ${command}`,
                 color: `red`,
             }],
@@ -294,7 +292,8 @@ function ignoreuser(socket, mod, curtab){
             date:  `[${moment().format("HH:mm:ss")}]`,
             name: ``,
             msg:  `You are now ignoring `,
-            color: `red`
+            color: `red`,
+            textshadow: `2px 2px 5px black`
         }],
         curtab: curtab
     };
@@ -351,7 +350,7 @@ function codeblock(socket, mod, curtab){
         chatmessages: [{
             action: 'renderCodeBlock',
             date:  `[${moment().format("HH:mm:ss")}]`,
-            name: `[${socket.name}]:`,
+            name: `${socket.name}:`,
             msg:  mod,
             color: socket.color
         }],
@@ -388,7 +387,8 @@ function changecolor(socket, mod, curtab){
             date:  `[${moment().format("HH:mm:ss")}]`,
             name: ``,
             msg:  `${socket.name}'s color is now: <span style="color: ${mod};">${mod}</span>.`,
-            color: `red`
+            color: `red`,
+            textshadow: `2px 2px 5px black`
         }],
         curtab: curtab
     }
@@ -414,7 +414,7 @@ function price(socket, mod, curtab, shenanigans){
         chatmessages: [{
             action: 'renderText',
             date:  `[${moment().format("HH:mm:ss")}]`,
-            name: `[${socket.name}]:`,
+            name: `${socket.name}:`,
         }],
         curtab: curtab
     };
@@ -460,7 +460,7 @@ function youtuberequest(socket, mod, curtab, shenanigans){
             chatmessages: [{
                 action: 'renderText',
                 date:  `[${moment().format("HH:mm:ss")}]`,
-                name: `[${socket.name}]:`,
+                name: `${socket.name}:`,
                 msg:  `Server not configured for that command.`,
                 color: `red`
             }],
@@ -481,7 +481,7 @@ function youtuberequest(socket, mod, curtab, shenanigans){
                 chatmessages: [{
                     action: 'renderVideo',
                     date:  `[${moment().format("HH:mm:ss")}]`,
-                    name: `[${socket.name}]:`,
+                    name: `${socket.name}:`,
                     msg:  body.items[0].id.videoId,
                 }],
                 curtab: curtab
@@ -493,19 +493,22 @@ function youtuberequest(socket, mod, curtab, shenanigans){
                     date:  `[${moment().format("HH:mm:ss")}]`,
                     name: ``,
                     msg:  `Youtube failed. This can happen easily if you match a channel owner's name.`,
-                    color: `red`
+                    color: `red`,
+                    textshadow: `2px 2px 5px black`
                 },{
                     action: 'renderText',
                     date:  `[${moment().format("HH:mm:ss")}]`,
                     name: ``,
                     msg:  `Search query->'${mod}'.`,
-                    color: `red`
+                    color: `red`,
+                    textshadow: `2px 2px 5px black`
                 },{
                     action: 'renderText',
                     date:  `[${moment().format("HH:mm:ss")}]`,
                     name: ``,
                     msg:  `Try refining your search pattern with more text.`,
-                    color: `red`
+                    color: `red`,
+                    textshadow: `2px 2px 5px black`
                 }],
                 curtab: curtab
             };
@@ -548,7 +551,8 @@ function changename(socket, mod, curtab){
                     date:  `[${moment().format("HH:mm:ss")}]`,
                     name: ``,
                     msg:  `Name '${mod}' is already in use.`,
-                    color: 'red'
+                    color: 'red',
+                    textshadow: `2px 2px 5px black`
                 }],
                 curtab: curtab
             };
@@ -563,7 +567,8 @@ function changename(socket, mod, curtab){
                 date:  `[${moment().format("HH:mm:ss")}]`,
                 name: ``,
                 msg:  `Use 1-20 characters for your name plz`,
-                color: `red`
+                color: `red`,
+                textshadow: `2px 2px 5px black`
             }],
             curtab: curtab
         };
@@ -577,8 +582,9 @@ function changename(socket, mod, curtab){
                 action: 'renderText',
                 date:  `[${moment().format("HH:mm:ss")}]`,
                 name: ``,
-                msg:  `<b>[${oldname}]</b> is now known as: <b>[${socket.name}]</b>`,
-                color: `red`
+                msg:  `<b>${oldname}</b> is now known as: <b>${socket.name}</b>`,
+                color: `red`,
+                textshadow: `2px 2px 5px black`
             }],
             curtab: curtab
         };
@@ -611,7 +617,7 @@ function giphyrequest(socket, mod, curtab, shenanigans){
             chatmessages: [{
                 action: 'renderText',
                 date:  `[${moment().format("HH:mm:ss")}]`,
-                name: `[${socket.name}]:`,
+                name: `${socket.name}:`,
                 msg:  `Server not configured for that command.`,
                 color: `red`
             }],
@@ -628,13 +634,15 @@ function giphyrequest(socket, mod, curtab, shenanigans){
                     date:  `[${moment().format("HH:mm:ss")}]`,
                     name: ``,
                     msg:  `Giphy does not allow one to query with hashtags.`,
-                    color: `red`
+                    color: `red`,
+                    textshadow: `2px 2px 5px black`
                 },{
                     action: 'renderText',
                     date:  `[${moment().format("HH:mm:ss")}]`,
                     name: ``,
                     msg:  `Search query-> ${mod}`,
-                    color: `red`
+                    color: `red`,
+                    textshadow: `2px 2px 5px black`
                 },{
                     action: 'renderStaticImage',
                     date:   ``,
@@ -658,13 +666,15 @@ function giphyrequest(socket, mod, curtab, shenanigans){
                     date:  `[${moment().format("HH:mm:ss")}]`,
                     name: ``,
                     msg:  `Giphy is having issues or is down apparently.`,
-                    color: `red`
+                    color: `red`,
+                    textshadow: `2px 2px 5px black`
                 },{
                     action: 'renderText',
                     date:  `[${moment().format("HH:mm:ss")}]`,
                     name: ``,
                     msg:  `Try again later.`,
-                    color: `red`
+                    color: `red`,
+                    textshadow: `2px 2px 5px black`
                 }],
                 curtab: curtab
             };
@@ -686,19 +696,22 @@ function giphyrequest(socket, mod, curtab, shenanigans){
                         date:  `[${moment().format("HH:mm:ss")}]`,
                         name: ``,
                         msg:  `Giphy failed to return anything!`,
-                        color: `red`
+                        color: `red`,
+                        textshadow: `2px 2px 5px black`
                     },{
                         action: 'renderText',
                         date:  `[${moment().format("HH:mm:ss")}]`,
                         name: ``,
                         msg:  `Search query->'${mod}'`,
-                        color: `red`
+                        color: `red`,
+                        textshadow: `2px 2px 5px black`
                     },{
                         action: 'renderText',
                         date:  `[${moment().format("HH:mm:ss")}]`,
                         name: ``,
                         msg:  `Sorry about that, here's a sad puppy instead:`,
-                        color: `red`
+                        color: `red`,
+                        textshadow: `2px 2px 5px black`
                     },{
                         action: 'renderStaticImage',
                         date:   ``,
@@ -715,7 +728,7 @@ function giphyrequest(socket, mod, curtab, shenanigans){
                 chatmessages: [{
                     action: 'renderImage',
                     date:  `[${moment().format("HH:mm:ss")}]`,
-                    name: `[${socket.name}]:`,
+                    name: `${socket.name}:`,
                     msg:  ret,
                 }],
                 curtab: curtab

@@ -20,6 +20,9 @@ import {
     redheader,
 }  from './builder';
 
+//import net events
+import {events} from './net'
+
 //apply prototypes to constructor
 builder.prototype.drawings                      = drawings;
 builder.prototype.imagetoggler                  = imagetoggler;
@@ -39,6 +42,5 @@ builder.prototype.redheader                     = redheader;
 let socket = io();
 let chat = new builder(socket);
 
-//import net events
-import {events} from './net'
+//apply net events
 events(socket, chat);

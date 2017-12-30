@@ -1,6 +1,6 @@
 export default {
     renderText: function(tab, args){
-        let div = `<div class='msg' style='background-color:${args.bgcolor}; text-shadow: ${args.textshadow};'>${args.date} <span style='color:${args.color};'>${args.name} ${args.msg}</span></div>`;
+        let div = `<div class='msg' style='background-color:${args.bgcolor}; text-shadow: ${args.textshadow};'>${args.date} <span style='color:${args.color}; text-shadow: 2px 2px 5px black;'>${args.name} </span><span style='color: ${args.color};'>${args.msg}</span></div>`;
         this.msgs[tab].append(div);
     },
     renderImage: function(tab, args){
@@ -64,7 +64,7 @@ export default {
     renderBlob: function(tab, args){
         let URLObj = window.URL || window.webkitURL;
         let blob = new Blob([args.blob], {type: "image/png"});
-        let img = `<img class='blob' style='max-width: ${this.msgs[tab].width()}px;' src='${URLObj.createObjectURL(blob)}'/>`;
+        let img = `<img class='blob' style='max-width: ${this.msgs[tab].width()}px; max-height: 250px;' src='${URLObj.createObjectURL(blob)}'/>`;
         let div = `<div class='msg'>${args.date} <span style='${args.color}'>${args.name} ${args.msg}</span><br>${img}</div>`;
         this.msgs[tab].append(div);
         $(div).resizable();
