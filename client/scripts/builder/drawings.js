@@ -76,6 +76,7 @@ export default function(e, blob){
                 behavior: ()=>{
                     let clicking = false;
                     let rect = {};
+                    let ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
                     this.canvas
                         .css('cursor', 'crosshair')
                         .mousedown((e)=>{
@@ -87,11 +88,9 @@ export default function(e, blob){
                             if (!clicking) return;
                             rect.w = e.clientX - this.canvas.offset().left - rect.startX;
                             rect.h = e.clientY - this.canvas.offset().top - rect.startY;
-                            let ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
-                            this.ctx
-                                .clearRect(0, 0, this.canvas.width(), this.canvas.height())
-                                .drawImage(ref, 0, 0)
-                                .strokeRect(rect.startX, rect.startY, rect.w, rect.h);
+                            this.ctx.clearRect(0, 0, this.canvas.width(), this.canvas.height());
+                            this.ctx.putImageData(ref, 0, 0)
+                            this.ctx.strokeRect(rect.startX, rect.startY, rect.w, rect.h);
                         })
                         .mouseup((e)=>{
                             clicking = false;
@@ -215,13 +214,25 @@ export default function(e, blob){
                 }
             },
         };
+        
+        //original state of image
+        //const oimg = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
+
         //for each tool, append it to toolcontainer and when each is clicked, remove any class they had
         //and stop the window from dragging, and start up their associated behavior.
         for (let i in this.tools){
             this.tools[i].element.appendTo(this.container);
-            this.tools[i].element.on('click', ()=>{
+            this.tools[i].element.on('click', (e)=>{
+                //remove selection if another tool is clicked
+                if (e.id !== 'selection'){
+                    this.ctx.drawImage(this.img, 0, 0);
+                }
                 this.drawing.draggable('disable');
                 this.drawingcontainer
+                    .off()
+                    .removeClass()
+                    .css('cursor', '');
+                this.canvas
                     .off()
                     .removeClass()
                     .css('cursor', '');
