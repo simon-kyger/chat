@@ -1,7 +1,7 @@
 export default function(e, blob){
     if (this.drawing)
         return;
-    this.drawing = $(`<div id='${blob.size}' class='chat' style='z-index:5;'>`);
+    this.drawing = $(`<div id='${blob.size}' class='chat' style='z-index:5; outline: 0px solid transparent;' tabindex='1'>`);
     this.drawing.appendTo($('body'));
     this.drawingcontainer = $(`<div style="overflow: scroll;"></div>`);
     this.boxshad = [Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50]
@@ -10,16 +10,20 @@ export default function(e, blob){
         left: e.clientX,
         width: `0%`,
         height: `0%`,
+        opacity: `0`
     }, 0, null, ()=>{
         this.drawing.stop().animate({
             top: `25%`,
             left: `25%`,
             width: `50%`,
             height: `50%`,
+            opacity: `1`,
             boxShadow: `1 1 1000px 100px rgb(${this.boxshad[0]}, ${this.boxshad[1]}, ${this.boxshad[2]})`
         }, 750, null, ()=>{
-            this.drawingcontainer.css('height', this.drawing.height());
-            this.drawingcontainer.css('width', this.drawing.width());
+            this.drawingcontainer.stop().animate({
+                height: `100%`,
+                width: `100%`
+            });
         });
     });
     this.maximized = false;
@@ -207,7 +211,7 @@ export default function(e, blob){
                         width: `0%`,
                         height: `0%`,
                         opacity: `0`
-                    }, ()=>{
+                    },100, null, ()=>{
                         this.drawing.remove()
                         delete this.drawing;
                     });
@@ -242,6 +246,14 @@ export default function(e, blob){
         }
     };
     this.buildtools();
+    
+    //hotkeys for drawing container
+    this.drawing.focus();
+    this.drawing.on('blur', (e)=>{this.drawing.focus()});
+    this.drawing.on('keydown', (e)=>{
+        if (e.which==27)
+            this.tools.close.behavior();
+    });
     this.drawing.draggable({
         containment: 'body'
     });
@@ -249,7 +261,7 @@ export default function(e, blob){
         alsoResize: this.drawingcontainer,
         handles: 'all'
     })
-    $('body').resize(()=>{
+    $(window).resize(()=>{
         if (!this.drawing)
             return;
         this.drawingcontainer.css('width', this.drawing.css('width'));
