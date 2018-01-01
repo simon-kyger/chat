@@ -85,16 +85,18 @@ export default function(e, blob){
                         .css('cursor', 'crosshair')
                         .mousedown((e)=>{
                             clicking = true;
-                            rect.startX = e.clientX - this.canvas.offset().left;
-                            rect.startY = e.clientY - this.canvas.offset().top;
+                            //redraw if using this tool
+                            this.ctx.drawImage(this.img, 0, 0);
+                            rect.startx = e.clientX - this.canvas.offset().left;
+                            rect.starty = e.clientY - this.canvas.offset().top;
                         })
                         .mousemove((e)=>{
                             if (!clicking) return;
-                            rect.w = e.clientX - this.canvas.offset().left - rect.startX;
-                            rect.h = e.clientY - this.canvas.offset().top - rect.startY;
+                            rect.w = e.clientX - this.canvas.offset().left - rect.startx;
+                            rect.h = e.clientY - this.canvas.offset().top - rect.starty;
                             this.ctx.clearRect(0, 0, this.canvas.width(), this.canvas.height());
                             this.ctx.putImageData(ref, 0, 0)
-                            this.ctx.strokeRect(rect.startX, rect.startY, rect.w, rect.h);
+                            this.ctx.strokeRect(rect.startx, rect.starty, rect.w, rect.h);
                         })
                         .mouseup((e)=>{
                             clicking = false;
@@ -104,11 +106,34 @@ export default function(e, blob){
             line: {       
                 element: $(`<div class='icondisplay iconline'>╲</div>`),
                 behavior: ()=>{
+                    let clicking = false;
+                    let line = {};
+                    let ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
                     this.drawingcontainer
                         .css('cursor', 'crosshair')
                         .mousedown((e)=>{
+                            clicking=true;
+                            line.startx = e.clientX - this.canvas.offset().left;
+                            line.starty = e.clientY - this.canvas.offset().top;
+                        })
+                        .mousemove((e)=>{
+                            if (!clicking) return;
+                            line.x = e.clientX - this.canvas.offset().left;
+                            line.y = e.clientY - this.canvas.offset().top;
+                            this.ctx.clearRect(0, 0, this.canvas.width(), this.canvas.height());
+                            this.ctx.putImageData(ref, 0, 0);
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(line.startx, line.starty);
+                            this.ctx.lineTo(line.x, line.y);
+                            this.ctx.stroke();
                         })
                         .mouseup((e)=>{
+                            clicking = false;
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(line.startx, line.starty);
+                            this.ctx.lineTo(line.x, line.y);
+                            this.ctx.stroke();
+                            ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
                         });
                 }
             },
@@ -227,10 +252,6 @@ export default function(e, blob){
         for (let i in this.tools){
             this.tools[i].element.appendTo(this.container);
             this.tools[i].element.on('click', (e)=>{
-                //remove selection if another tool is clicked
-                if (e.id !== 'selection'){
-                    this.ctx.drawImage(this.img, 0, 0);
-                }
                 this.drawing.draggable('disable');
                 this.drawingcontainer
                     .off()
