@@ -78,7 +78,7 @@ export default function(e, blob){
             //there is a bug with this
             //if tool is changed from this, old selection remains.  needs to be fixed.
             selection: {
-                element: $(`<div id='selection' class='icondisplay'>⬚</div>`),
+                element: $(`<div class='icondisplay'>⬚</div>`),
                 behavior: ()=>{
                     let clicking = false;
                     let rect = {};
@@ -103,6 +103,7 @@ export default function(e, blob){
                             rect.h = e.clientY - this.selected.offset().top - rect.starty;
                             this.selectedctx.clearRect(0, 0, this.selected.width(), this.selected.height());
                             this.selectedctx.putImageData(ref, 0, 0)
+                            this.ctx.lineWidth = 2;
                             this.selectedctx.strokeRect(rect.startx, rect.starty, rect.w, rect.h);
                         })
                         .mouseup((e)=>{
@@ -132,6 +133,7 @@ export default function(e, blob){
                             this.ctx.beginPath();
                             this.ctx.moveTo(line.startx, line.starty);
                             this.ctx.lineTo(line.x, line.y);
+                            this.ctx.lineWidth = 2;
                             this.ctx.stroke();
                         })
                         .mouseup((e)=>{
@@ -159,6 +161,7 @@ export default function(e, blob){
                             rect.h = e.clientY - this.canvas.offset().top - rect.starty;
                             this.ctx.clearRect(0, 0, this.canvas.width(), this.canvas.height());
                             this.ctx.putImageData(ref, 0, 0)
+                            this.ctx.lineWidth = 2;
                             this.ctx.strokeRect(rect.startx, rect.starty, rect.w, rect.h);
                         })
                         .mouseup((e)=>{
@@ -189,7 +192,7 @@ export default function(e, blob){
                             this.ctx.putImageData(ref, 0, 0)
                             this.ctx.beginPath();
                             this.ctx.ellipse(circle.startx, circle.starty,  Math.abs(circle.startx - circle.w), Math.abs(circle.starty - circle.h), Math.PI/180, 0, 2 * Math.PI);
-                            this.ctx.lineWidth = 3;
+                            this.ctx.lineWidth = 2;
                             this.ctx.strokeStyle = 'black';
                             this.ctx.stroke();
                         })
@@ -219,6 +222,7 @@ export default function(e, blob){
                             dot.x = e.clientX - this.canvas.offset().left + 2;
                             dot.y = e.clientY - this.canvas.offset().top + 28; 
                             this.ctx.lineTo(dot.x, dot.y);
+                            this.ctx.lineWidth = 2;
                             this.ctx.stroke();
                         })
                         .mouseup((e)=>{
