@@ -1,7 +1,7 @@
 export default function(e, blob){
     if (this.drawing)
         return;
-    this.drawing = $(`<div id='${blob.size}' class='chat' style='z-index:5; outline: 0px solid transparent;' tabindex='1'>`);
+    this.drawing = $(`<div id='${blob.size}' class='chat' style='z-index:5;'>`);
     this.drawing.appendTo($('body'));
     this.drawingcontainer = $(`<div style="overflow: scroll;"></div>`);
     this.boxshad = [Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50]
@@ -248,12 +248,14 @@ export default function(e, blob){
     this.buildtools();
     
     //hotkeys for drawing container
-    this.drawing.focus();
-    this.drawing.on('blur', (e)=>{this.drawing.focus()});
-    this.drawing.on('keydown', (e)=>{
-        if (e.which==27)
-            this.tools.close.behavior();
-    });
+    $(window).on('keydown', escape);
+    let reftools = this.tools;
+    function escape(e, ref){
+        if (e.which==27){
+            reftools.close.behavior();
+            $(window).off('keydown', escape);
+        }
+    }
     this.drawing.draggable({
         containment: 'body'
     });
