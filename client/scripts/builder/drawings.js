@@ -140,13 +140,31 @@ export default function(e, blob){
             square: {
                 element: $(`<div class='icondisplay iconsquare'>◻</div>`),
                 behavior: ()=>{
-                    this.drawingcontainer
+                    let clicking = false;
+                    let rect = {};
+                    let ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
+                    this.canvas
                         .css('cursor', 'crosshair')
                         .mousedown((e)=>{
+                            clicking = true;
+                            //redraw if using this tool
+                            this.ctx.drawImage(this.img, 0, 0);
+                            rect.startx = e.clientX - this.canvas.offset().left;
+                            rect.starty = e.clientY - this.canvas.offset().top;
+                        })
+                        .mousemove((e)=>{
+                            if (!clicking) return;
+                            rect.w = e.clientX - this.canvas.offset().left - rect.startx;
+                            rect.h = e.clientY - this.canvas.offset().top - rect.starty;
+                            this.ctx.clearRect(0, 0, this.canvas.width(), this.canvas.height());
+                            this.ctx.putImageData(ref, 0, 0)
+                            this.ctx.strokeRect(rect.startx, rect.starty, rect.w, rect.h);
                         })
                         .mouseup((e)=>{
+                            clicking = false;
+                            this.ctx.strokeRect(rect.startx, rect.starty, rect.w, rect.h);
+                            ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
                         });
-
                 }
             },
             circle: {
