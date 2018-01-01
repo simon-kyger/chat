@@ -75,6 +75,8 @@ export default function(e, blob){
                     this.drawing.draggable('enable');
                 }
             },
+            //there is a bug with this
+            //if tool is changed from this, old selection remains.  needs to be fixed.
             selection: {
                 element: $(`<div class='icondisplay'>⬚</div>`),
                 behavior: ()=>{
@@ -85,8 +87,6 @@ export default function(e, blob){
                         .css('cursor', 'crosshair')
                         .mousedown((e)=>{
                             clicking = true;
-                            //redraw if using this tool
-                            this.ctx.drawImage(this.img, 0, 0);
                             rect.startx = e.clientX - this.canvas.offset().left;
                             rect.starty = e.clientY - this.canvas.offset().top;
                         })
@@ -147,8 +147,6 @@ export default function(e, blob){
                         .css('cursor', 'crosshair')
                         .mousedown((e)=>{
                             clicking = true;
-                            //redraw if using this tool
-                            this.ctx.drawImage(this.img, 0, 0);
                             rect.startx = e.clientX - this.canvas.offset().left;
                             rect.starty = e.clientY - this.canvas.offset().top;
                         })
@@ -181,16 +179,27 @@ export default function(e, blob){
             pencil: {     
                 element: $(`<div class='icondisplay'>✎</div>`),
                 behavior: ()=>{
-                    let options = {
-                        color: 'black', 
-                        outline: 'white', 
-                        size: '24'
-                    };
+                    let dot = {};
+                    let clicking = false;
                     this.drawingcontainer
                         .addClass('pencil')
                         .mousedown((e)=>{
+                            clicking = true;
+                            dot.x = e.clientX - this.canvas.offset().left + 2;
+                            dot.y = e.clientY - this.canvas.offset().top + 28; 
+                            this.ctx.beginPath();
+                            this.ctx.lineTo(dot.x, dot.y);
+                            this.ctx.stroke();
+                        })
+                        .mousemove((e)=>{
+                            if (!clicking) return;
+                            dot.x = e.clientX - this.canvas.offset().left + 2;
+                            dot.y = e.clientY - this.canvas.offset().top + 28; 
+                            this.ctx.lineTo(dot.x, dot.y);
+                            this.ctx.stroke();
                         })
                         .mouseup((e)=>{
+                            clicking = false;
                         });
                 }
             },
@@ -261,9 +270,6 @@ export default function(e, blob){
                 }
             },
         };
-        
-        //original state of image
-        //const oimg = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
 
         //for each tool, append it to toolcontainer and when each is clicked, remove any class they had
         //and stop the window from dragging, and start up their associated behavior.
