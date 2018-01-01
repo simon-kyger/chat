@@ -45,11 +45,6 @@ export default function(e, blob){
         this.canvas[0].height = this.img.height;
         this.ctx.drawImage(this.img, 0, 0);
     };
-    this.tools = {};
-    let pencil;
-    this.socket.emit('pencil', (e)=>{
-
-    });
     this.buildtools = () =>{
         this.container = $(`<div class='tools'>`);
         this.container.appendTo(this.drawing);
