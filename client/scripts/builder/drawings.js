@@ -3,7 +3,7 @@ export default function(e, blob){
         return;
     this.drawing = $(`<div id='${blob.size}' class='chat' style='z-index:5;'>`);
     this.drawing.appendTo($('body'));
-    this.drawingcontainer = $(`<div style="overflow: scroll;"></div>`);
+    this.drawingcontainer = $(`<div style="overflow: scroll; position: relative;"></div>`);
     this.boxshad = [Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50]
     this.drawing.stop().animate({
         top: e.clientY,
@@ -78,30 +78,37 @@ export default function(e, blob){
             //there is a bug with this
             //if tool is changed from this, old selection remains.  needs to be fixed.
             selection: {
-                element: $(`<div class='icondisplay'>⬚</div>`),
+                element: $(`<div id='selection' class='icondisplay'>⬚</div>`),
                 behavior: ()=>{
                     let clicking = false;
                     let rect = {};
-                    let ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
-                    this.canvas
-                        .css('cursor', 'crosshair')
+                    this.selected = $(`<canvas id='selection' style='position: absolute; z-index=99999;'>`).appendTo(this.drawingcontainer);
+                    this.selected
+                        .css('top', this.canvas.position().top)
+                        .css('left', this.canvas.position().left)
+                        .css('cursor', 'crosshair');
+                    this.selected[0].width = this.canvas[0].width;
+                    this.selected[0].height = this.canvas[0].height;
+                    this.selectedctx = this.selected[0].getContext('2d');
+                    let ref = this.selectedctx.getImageData(0, 0, this.selected.width(), this.selected.height());
+                    this.selected
                         .mousedown((e)=>{
                             clicking = true;
-                            rect.startx = e.clientX - this.canvas.offset().left;
-                            rect.starty = e.clientY - this.canvas.offset().top;
+                            rect.startx = e.clientX - this.selected.offset().left;
+                            rect.starty = e.clientY - this.selected.offset().top;
                         })
                         .mousemove((e)=>{
                             if (!clicking) return;
-                            rect.w = e.clientX - this.canvas.offset().left - rect.startx;
-                            rect.h = e.clientY - this.canvas.offset().top - rect.starty;
-                            this.ctx.clearRect(0, 0, this.canvas.width(), this.canvas.height());
-                            this.ctx.putImageData(ref, 0, 0)
-                            this.ctx.strokeRect(rect.startx, rect.starty, rect.w, rect.h);
+                            rect.w = e.clientX - this.selected.offset().left - rect.startx;
+                            rect.h = e.clientY - this.selected.offset().top - rect.starty;
+                            this.selectedctx.clearRect(0, 0, this.selected.width(), this.selected.height());
+                            this.selectedctx.putImageData(ref, 0, 0)
+                            this.selectedctx.strokeRect(rect.startx, rect.starty, rect.w, rect.h);
                         })
                         .mouseup((e)=>{
                             clicking = false;
                         });
-                }
+                },
             },
             line: {       
                 element: $(`<div class='icondisplay iconline'>╲</div>`),
@@ -129,10 +136,6 @@ export default function(e, blob){
                         })
                         .mouseup((e)=>{
                             clicking = false;
-                            this.ctx.beginPath();
-                            this.ctx.moveTo(line.startx, line.starty);
-                            this.ctx.lineTo(line.x, line.y);
-                            this.ctx.stroke();
                             ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
                         });
                 }
@@ -160,7 +163,6 @@ export default function(e, blob){
                         })
                         .mouseup((e)=>{
                             clicking = false;
-                            this.ctx.strokeRect(rect.startx, rect.starty, rect.w, rect.h);
                             ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
                         });
                 }
@@ -297,6 +299,8 @@ export default function(e, blob){
         for (let i in this.tools){
             this.tools[i].element.appendTo(this.container);
             this.tools[i].element.on('click', (e)=>{
+                if (this.selected)
+                    this.selected.remove();
                 this.drawing.draggable('disable');
                 this.drawingcontainer
                     .off()
