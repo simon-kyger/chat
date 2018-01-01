@@ -19,7 +19,7 @@ export default function(e, blob){
             height: `50%`,
             opacity: `1`,
             boxShadow: `1 1 1000px 100px rgb(${this.boxshad[0]}, ${this.boxshad[1]}, ${this.boxshad[2]})`
-        }, 750, null, ()=>{
+        }, 500, null, ()=>{
             this.drawingcontainer.stop().animate({
                 height: `100%`,
                 width: `100%`
@@ -75,8 +75,6 @@ export default function(e, blob){
                     this.drawing.draggable('enable');
                 }
             },
-            //there is a bug with this
-            //if tool is changed from this, old selection remains.  needs to be fixed.
             selection: {
                 element: $(`<div class='icondisplay'>⬚</div>`),
                 behavior: ()=>{
@@ -251,7 +249,6 @@ export default function(e, blob){
                             width: this.drawing.css('width'),
                             height: this.drawing.css('height'),
                         }
-                        //animate both the container and the canvas container but not the canvas
                         this.drawing.animate({
                             top: 0,
                             left: 0,
@@ -290,7 +287,7 @@ export default function(e, blob){
                         width: `0%`,
                         height: `0%`,
                         opacity: `0`
-                    },100, null, ()=>{
+                    },350, null, ()=>{
                         this.drawing.remove()
                         delete this.drawing;
                     });
@@ -324,7 +321,7 @@ export default function(e, blob){
     //hotkeys for drawing container
     $(window).on('keydown', escape);
     let reftools = this.tools;
-    function escape(e, ref){
+    function escape(e){
         if (e.which==27){
             reftools.close.behavior();
             $(window).off('keydown', escape);
