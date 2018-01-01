@@ -168,11 +168,32 @@ export default function(e, blob){
             circle: {
                 element: $(`<div class='icondisplay'>⬤</div>`),
                 behavior: ()=>{
-                    this.drawingcontainer
+                    let clicking = false;
+                    let circle = {};
+                    let ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
+                    this.canvas
                         .css('cursor', 'crosshair')
                         .mousedown((e)=>{
+                            clicking = true;
+                            circle.startx = e.clientX - this.canvas.offset().left;
+                            circle.starty = e.clientY - this.canvas.offset().top;
+
+                        })
+                        .mousemove((e)=>{
+                            if (!clicking) return;
+                            circle.w = e.clientX - this.canvas.offset().left;
+                            circle.h = e.clientY - this.canvas.offset().top;
+                            this.ctx.clearRect(0, 0, this.canvas.width(), this.canvas.height());
+                            this.ctx.putImageData(ref, 0, 0)
+                            this.ctx.beginPath();
+                            this.ctx.ellipse(circle.startx, circle.starty,  Math.abs(circle.startx - circle.w), Math.abs(circle.starty - circle.h), Math.PI/180, 0, 2 * Math.PI);
+                            this.ctx.lineWidth = 3;
+                            this.ctx.strokeStyle = 'black';
+                            this.ctx.stroke();
                         })
                         .mouseup((e)=>{
+                            clicking = false;
+                            ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
                         });
                 }
             },
