@@ -234,8 +234,14 @@ export default function(e, blob){
                 element: $(`<a class='icondisplay'>💾</div>`),
                 behavior: (ev)=>{
                     this.canvas[0].toBlob((blob)=>{
-                        // from <script src="https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.min.js"></script>
-                        saveAs(blob, "untitled.png");
+                        //jquery let me down.  only way i can get this to work is vanilla js -_-
+                        let URLObj = window.URL || window.webkitURL;
+                        let a = document.createElement("a");  
+                        a.href = URLObj.createObjectURL(blob);
+                        a.download = "untitled.png";
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
                     });
                 }
             },
