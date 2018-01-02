@@ -223,7 +223,6 @@ export default function(e, blob){
                         });
                 }
             },
-            //this is buggy, only works after user clicks it twice? wtf
             save: {
                 element: $(`<a class='icondisplay'>💾</div>`),
                 behavior: (ev)=>{
