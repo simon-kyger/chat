@@ -223,15 +223,15 @@ export default function(e, blob){
                         });
                 }
             },
+            //this is buggy, only works after user clicks it twice? wtf
             save: {
-                element: $(`<div class='icondisplay'>💾</div>`),
-                behavior: ()=>{
-                    this.drawingcontainer
-                        .css('cursor', 'auto')
-                        .mousedown((e)=>{
-                        })
-                        .mouseup((e)=>{
-                        });
+                element: $(`<a class='icondisplay'>💾</div>`),
+                behavior: (ev)=>{
+                    this.canvas[0].toBlob((blob)=>{
+                        let URLObj = window.URL || window.webkitURL;
+                        ev.target.href = URLObj.createObjectURL(blob)
+                        ev.target.download = "untitled.png";
+                    });
                 }
             },
             maximize: {
@@ -294,7 +294,7 @@ export default function(e, blob){
         //and stop the window from dragging, and start up their associated behavior.
         for (let i in this.tools){
             this.tools[i].element.appendTo(this.container);
-            this.tools[i].element.on('click', (e)=>{
+            this.tools[i].element.on('click', (ev)=>{
                 if (this.selected)
                     this.selected.remove();
                 this.drawing.draggable('disable');
@@ -307,7 +307,7 @@ export default function(e, blob){
                     .removeClass()
                     .css('cursor', '');
                 dragscroll.reset();
-                this.tools[i].behavior();
+                this.tools[i].behavior(ev);
             });
         }
     };
