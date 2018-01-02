@@ -106,7 +106,8 @@ export default function(e, blob){
                             this.canvas[0].height = rect.h;
                             this.ctx.putImageData(cropped, 0, 0);
                             this.selected.remove();
-                            this.tools.selection.behavior();
+                            //the reason for this is to also allow users to copy their current canvas to a blob and then paste it back into the chat.
+                            this.tools.move.behavior();
                         });
                 },
             },
