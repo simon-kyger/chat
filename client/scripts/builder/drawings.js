@@ -228,9 +228,8 @@ export default function(e, blob){
                 element: $(`<a class='icondisplay'>💾</div>`),
                 behavior: (ev)=>{
                     this.canvas[0].toBlob((blob)=>{
-                        let URLObj = window.URL || window.webkitURL;
-                        ev.target.href = URLObj.createObjectURL(blob)
-                        ev.target.download = "untitled.png";
+                        // from <script src="https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.min.js"></script>
+                        saveAs(blob, "untitled.png");
                     });
                 }
             },
