@@ -107,7 +107,7 @@ export default function(e, blob){
                             this.ctx.putImageData(cropped, 0, 0);
                             this.selected.remove();
                             //the reason for this is to also allow users to copy their current canvas to a blob and then paste it back into the chat.
-                            this.tools.move.behavior();
+                            this.tools.move.element.click();
                         });
                 },
             },
@@ -275,6 +275,7 @@ export default function(e, blob){
                         });
                         this.maximized = false;
                     }
+                    this.tools.pan.element.click();
                 }
             },
             close: {
