@@ -147,14 +147,10 @@ body {
 }
 .tabX{
     cursor: pointer;
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     font-size: 24px;
-    background-color: #333333;
-    border: 1px solid #000000;
     display: inline-block;
-    color: white;
-    background-color: black;
     text-align: -webkit-center;
     float: right;
 }
@@ -206,7 +202,7 @@ pre{
 .iconmaximize{
     font-size: 38px;
     width: 32px;
-    line-height: .6;
+    line-height: .8;
 }
 .ui-resizable-handle {
 

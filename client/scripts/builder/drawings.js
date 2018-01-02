@@ -3,7 +3,7 @@ export default function(e, blob){
         return;
     this.drawing = $(`<div id='${blob.size}' class='chat' style='z-index:5;'>`);
     this.drawing.appendTo($('body'));
-    this.drawingcontainer = $(`<div style="overflow: scroll; position: relative;"></div>`);
+    this.drawingcontainer = $(`<div style="overflow: scroll;"></div>`);
     this.boxshad = [Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50]
     this.drawing.stop().animate({
         top: e.clientY,
@@ -33,7 +33,7 @@ export default function(e, blob){
         width: null,
         height: null
     };
-    this.canvas = $('<canvas/>');
+    this.canvas = $(`<canvas id='drawing'>`);
     this.ctx = this.canvas[0].getContext('2d');
     this.img = new Image();
     this.URLObj = window.URL || window.webkitURL;
@@ -101,6 +101,12 @@ export default function(e, blob){
                         })
                         .mouseup((e)=>{
                             clicking = false;
+                            let cropped = this.ctx.getImageData(rect.startx, rect.starty, rect.w, rect.h)
+                            this.canvas[0].width = rect.w;
+                            this.canvas[0].height = rect.h;
+                            this.ctx.putImageData(cropped, 0, 0);
+                            this.selected.remove();
+                            this.tools.selection.behavior();
                         });
                 },
             },
@@ -293,6 +299,10 @@ export default function(e, blob){
         for (let i in this.tools){
             this.tools[i].element.appendTo(this.container);
             this.tools[i].element.on('click', (ev)=>{
+                for (let j in this.tools){
+                    this.tools[j].element.css('background-color', 'gray');
+                }
+                this.tools[i].element.css('background-color', 'white');
                 if (this.selected)
                     this.selected.remove();
                 this.drawing.draggable('disable');
