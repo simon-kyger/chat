@@ -185,12 +185,22 @@ export default function(e, blob){
                         })
                         .mousemove((e)=>{
                             if (!clicking) return;
-                            rect.w = e.clientX - this.canvas.offset().left - rect.startx;
-                            rect.h = e.clientY - this.canvas.offset().top - rect.starty;
+                            rect.w = e.clientX - this.canvas.offset().left;
+                            rect.h = e.clientY - this.canvas.offset().top;
                             this.ctx.clearRect(0, 0, this.canvas.width(), this.canvas.height());
                             this.ctx.putImageData(ref, 0, 0)
                             this.ctx.lineWidth = 2;
-                            this.ctx.strokeRect(rect.startx, rect.starty, rect.w, rect.h);
+                            // dont even ask.....
+                            if (e.altKey){
+                                if (rect.w < rect.startx && rect.h > rect.starty)
+                                    this.ctx.strokeRect(rect.startx, rect.starty, (rect.w - rect.startx), Math.abs(rect.w-rect.startx));
+                                else if (rect.w > rect.startx && rect.h < rect.starty)
+                                    this.ctx.strokeRect(rect.startx, rect.starty, Math.abs(rect.w - rect.startx), -(rect.w-rect.startx));
+                                else
+                                    this.ctx.strokeRect(rect.startx, rect.starty, rect.w - rect.startx, rect.w-rect.startx);
+                            } else{
+                                this.ctx.strokeRect(rect.startx, rect.starty, rect.w - rect.startx, rect.h - rect.starty);
+                            }
                         })
                         .mouseup((e)=>{
                             clicking = false;
@@ -219,7 +229,11 @@ export default function(e, blob){
                             this.ctx.clearRect(0, 0, this.canvas.width(), this.canvas.height());
                             this.ctx.putImageData(ref, 0, 0)
                             this.ctx.beginPath();
-                            this.ctx.ellipse(circle.startx, circle.starty,  Math.abs(circle.startx - circle.w), Math.abs(circle.starty - circle.h), Math.PI/180, 0, 2 * Math.PI);
+                            if (e.altKey){
+                                this.ctx.arc(circle.startx, circle.starty, Math.abs(circle.startx-circle.w), 0, 2*Math.PI);
+                            } else{
+                                this.ctx.ellipse(circle.startx, circle.starty,  Math.abs(circle.startx - circle.w), Math.abs(circle.starty - circle.h), Math.PI/180, 0, 2 * Math.PI);
+                            }
                             this.ctx.lineWidth = 2;
                             this.ctx.strokeStyle = 'black';
                             this.ctx.stroke();
