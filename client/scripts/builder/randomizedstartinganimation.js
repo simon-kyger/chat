@@ -40,12 +40,14 @@ export default function(args, start) {
                     },2000);
                     //for some reason using stop on msgs here gets squirley with above stylesheet changes
                     //leave this in without .stop()
-                    $('.msgs').animate({
-                        color: args.text,
-                        backgroundColor: args.bgformatted
-                        //doesn't work shamefully
-                        //textShadow: args.shadow
-                    },2000);
+                    for (let i in this.msgs){
+                        this.msgs[i].stop().animate({
+                            color: args.text,
+                            backgroundColor: args.bgformatted
+                            //doesn't work shamefully
+                            //textShadow: args.shadow
+                        },2000);
+                    }
                     this.cgroup.stop().animate({
                         backgroundColor: args.shadow,
                     });
@@ -72,6 +74,18 @@ export default function(args, start) {
                         color: args.text,
                         backgroundColor: args.bgformatted
                     });
+                    this.tools.stop().animate({
+                        opacity: 1,
+                        backgroundColor: args.shadow,
+                        color: args.text
+                    });
+                    if (this.drawing){
+                        this.drawingtoolscontainer.animate({
+                            opacity: 1,
+                            backgroundColor: args.shadow,
+                            color: args.text
+                        })
+                    }
                 });
                 this.textarea.stop().animate({
                     backgroundColor: 'white'

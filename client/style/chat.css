@@ -168,11 +168,10 @@ body {
     cursor: pointer;
 }
 .tools{
-    position: absolute;
     top: 0;
     right: 0;
     z-index: 2;
-    background-color: white;
+    height: 30px;
 }
 
 pre{
@@ -185,6 +184,7 @@ pre{
     float: left;
     width: 24px;
     height: 30px;
+    float:right;
 }
 .iconline{
     line-height: 1.9;

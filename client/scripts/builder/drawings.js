@@ -33,41 +33,79 @@ export default function(e, blob){
         width: null,
         height: null
     };
-    this.canvas = $(`<canvas id='drawing'>`);
-    this.ctx = this.canvas[0].getContext('2d');
-    this.img = new Image();
-    this.URLObj = window.URL || window.webkitURL;
-    this.img.src = this.URLObj.createObjectURL(blob);
-    this.drawingcontainer.append(this.canvas);
-    this.drawing.append(this.drawingcontainer);
-    this.img.onload = (e) =>{
-        this.canvas[0].width = this.img.width;
-        this.canvas[0].height = this.img.height;
-        this.ctx.drawImage(this.img, 0, 0);
-    };
     this.buildtools = () =>{
-        this.container = $(`<div class='tools'>`);
-        this.container.appendTo(this.drawing);
-        this.tools = {
-            pan: {       
-                element: $(`<div class='icondisplay'>🤚</div>`),
+        this.drawingtoolscontainer = $(`<div class='tools'>`);
+        this.drawingtoolscontainer.appendTo(this.drawing);
+        this.drawingtoolscontainer.css('background-color', this.inputcontainer.css('background-color'));
+        this.drawingtools = {
+            close: {
+                element: $(`<div class='tabX'>X</div>`),
                 behavior: ()=>{
-                    this.drawingcontainer
-                        .addClass('dragscroll')
-                        .css('cursor', '-webkit-grab')
-                        .mousedown(()=>{
-                            this.drawingcontainer.css('cursor', '-webkit-grabbing');
-                        })
-                        .mouseup(()=>{
-                            this.drawingcontainer.css('cursor', '-webkit-grab');
-                        });
-                    dragscroll.reset();
+                    this.drawing.animate({
+                        //e is from the initial invocation of drawings() aka the mini global e
+                        top: e.clientY,
+                        left: e.clientX,
+                        width: `0%`,
+                        height: `0%`,
+                        opacity: `0`
+                    },350, null, ()=>{
+                        this.drawing.remove()
+                        delete this.drawing;
+                    });
                 }
             },
-            move: {
-                element: $(`<div class='icondisplay iconmove'>⇱</div>`),
+            maximize: {
+                element: $(`<div class='icondisplay iconmaximize'>🗖</div>`),
                 behavior: ()=>{
-                    this.drawing.draggable('enable');
+                    if (!this.maximized){
+                        this.olddimensions = {
+                            top: this.drawing.css('top'),
+                            left: this.drawing.css('left'),
+                            width: this.drawing.css('width'),
+                            height: this.drawing.css('height'),
+                        }
+                        this.drawing.animate({
+                            top: 0,
+                            left: 0,
+                            height: `${window.innerHeight}px`,
+                            width: `${window.innerWidth}px`,
+                        });
+                        this.drawingcontainer.animate({
+                            height: `${window.innerHeight}px`,
+                            width: `${window.innerWidth}px`,
+                        });
+                        this.maximized = true;
+                    } else {
+                        this.drawing
+                            .draggable('enable')
+                            .animate({
+                                top: this.olddimensions.top,
+                                left: this.olddimensions.left,
+                                height: this.olddimensions.height,
+                                width: this.olddimensions.width,
+                            });
+                        this.drawingcontainer.animate({
+                            height: this.olddimensions.height,
+                            width: this.olddimensions.width     
+                        });
+                        this.maximized = false;
+                    }
+                    this.drawingtools.pan.element.click();
+                }
+            },
+            save: {
+                element: $(`<a class='icondisplay'>💾</div>`),
+                behavior: (ev)=>{
+                    this.canvas[0].toBlob((blob)=>{
+                        //jquery let me down.  only way i can get this to work is vanilla js -_-
+                        let URLObj = window.URL || window.webkitURL;
+                        let a = document.createElement("a");  
+                        a.href = URLObj.createObjectURL(blob);
+                        a.download = "untitled.png";
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    });
                 }
             },
             selection: {
@@ -107,7 +145,7 @@ export default function(e, blob){
                             this.ctx.putImageData(cropped, 0, 0);
                             this.selected.remove();
                             //the reason for this is to also allow users to copy their current canvas to a blob and then paste it back into the chat.
-                            this.tools.move.element.click();
+                            this.drawingtools.move.element.click();
                         });
                 },
             },
@@ -230,87 +268,38 @@ export default function(e, blob){
                         });
                 }
             },
-            save: {
-                element: $(`<a class='icondisplay'>💾</div>`),
-                behavior: (ev)=>{
-                    this.canvas[0].toBlob((blob)=>{
-                        //jquery let me down.  only way i can get this to work is vanilla js -_-
-                        let URLObj = window.URL || window.webkitURL;
-                        let a = document.createElement("a");  
-                        a.href = URLObj.createObjectURL(blob);
-                        a.download = "untitled.png";
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                    });
+            pan: {       
+                element: $(`<div class='icondisplay'>🤚</div>`),
+                behavior: ()=>{
+                    this.drawingcontainer
+                        .addClass('dragscroll')
+                        .css('cursor', '-webkit-grab')
+                        .mousedown(()=>{
+                            this.drawingcontainer.css('cursor', '-webkit-grabbing');
+                        })
+                        .mouseup(()=>{
+                            this.drawingcontainer.css('cursor', '-webkit-grab');
+                        });
+                    dragscroll.reset();
                 }
             },
-            maximize: {
-                element: $(`<div class='icondisplay iconmaximize'>🗖</div>`),
+            move: {
+                element: $(`<div class='icondisplay iconmove'>⇱</div>`),
                 behavior: ()=>{
-                    if (!this.maximized){
-                        this.olddimensions = {
-                            top: this.drawing.css('top'),
-                            left: this.drawing.css('left'),
-                            width: this.drawing.css('width'),
-                            height: this.drawing.css('height'),
-                        }
-                        this.drawing.animate({
-                            top: 0,
-                            left: 0,
-                            height: `${window.innerHeight}px`,
-                            width: `${window.innerWidth}px`,
-                        });
-                        this.drawingcontainer.animate({
-                            height: `${window.innerHeight}px`,
-                            width: `${window.innerWidth}px`,
-                        });
-                        this.maximized = true;
-                    } else {
-                        this.drawing
-                            .draggable('enable')
-                            .animate({
-                                top: this.olddimensions.top,
-                                left: this.olddimensions.left,
-                                height: this.olddimensions.height,
-                                width: this.olddimensions.width,
-                            });
-                        this.drawingcontainer.animate({
-                            height: this.olddimensions.height,
-                            width: this.olddimensions.width     
-                        });
-                        this.maximized = false;
-                    }
-                    this.tools.pan.element.click();
-                }
-            },
-            close: {
-                element: $(`<div class='tabX'>X</div>`),
-                behavior: ()=>{
-                    this.drawing.animate({
-                        //e is from the initial invocation of drawings() aka the mini global e
-                        top: e.clientY,
-                        left: e.clientX,
-                        width: `0%`,
-                        height: `0%`,
-                        opacity: `0`
-                    },350, null, ()=>{
-                        this.drawing.remove()
-                        delete this.drawing;
-                    });
+                    this.drawing.draggable('enable');
                 }
             },
         };
 
         //for each tool, append it to toolcontainer and when each is clicked, remove any class they had
         //and stop the window from dragging, and start up their associated behavior.
-        for (let i in this.tools){
-            this.tools[i].element.appendTo(this.container);
-            this.tools[i].element.on('click', (ev)=>{
-                for (let j in this.tools){
-                    this.tools[j].element.css('background-color', 'gray');
+        for (let i in this.drawingtools){
+            this.drawingtools[i].element.appendTo(this.drawingtoolscontainer);
+            this.drawingtools[i].element.on('click', (ev)=>{
+                for (let j in this.drawingtools){
+                    this.drawingtools[j].element.css('background-color', 'gray');
                 }
-                this.tools[i].element.css('background-color', 'white');
+                this.drawingtools[i].element.css('background-color', 'white');
                 if (this.selected)
                     this.selected.remove();
                 this.drawing.draggable('disable');
@@ -323,15 +312,26 @@ export default function(e, blob){
                     .removeClass()
                     .css('cursor', '');
                 dragscroll.reset();
-                this.tools[i].behavior(ev);
+                this.drawingtools[i].behavior(ev);
             });
         }
     };
     this.buildtools();
-    
+    this.canvas = $(`<canvas id='drawing'>`);
+    this.ctx = this.canvas[0].getContext('2d');
+    this.img = new Image();
+    this.URLObj = window.URL || window.webkitURL;
+    this.img.src = this.URLObj.createObjectURL(blob);
+    this.drawingcontainer.append(this.canvas);
+    this.drawing.append(this.drawingcontainer);
+    this.img.onload = (e) =>{
+        this.canvas[0].width = this.img.width;
+        this.canvas[0].height = this.img.height;
+        this.ctx.drawImage(this.img, 0, 0);
+    };
     //hotkeys for drawing container
     $(window).on('keydown', escape);
-    let reftools = this.tools;
+    let reftools = this.drawingtools;
     function escape(e){
         if (e.which==27){
             reftools.close.behavior();
