@@ -124,8 +124,14 @@ export default function(e, blob){
                             let cropped = this.ctx.getImageData(rect.startx, rect.starty, rect.w, rect.h)
                             this.canvas[0].width = Math.abs(rect.w);
                             this.canvas[0].height = Math.abs(rect.h);
-                            this.drawingcontainer[0].width = Math.abs(rect.w);
-                            this.drawingcontainer[0].height = Math.abs(rect.h);
+                            this.drawing.animate({
+                                width: this.canvas.width(),
+                                height: this.canvas.height() + this.drawingtoolscontainer.height()
+                            });
+                            this.drawingcontainer.animate({
+                                width: this.canvas.width(),
+                                height: this.canvas.height()
+                            });
                             this.ctx.putImageData(cropped, 0, 0);
                             this.selected.remove();
                             //the reason for this is to also allow users to copy their current canvas to a blob and then paste it back into the chat.

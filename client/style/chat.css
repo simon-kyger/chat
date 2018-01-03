@@ -172,6 +172,7 @@ body {
     right: 0;
     z-index: 2;
     height: 30px;
+    overflow: hidden;
 }
 
 pre{
