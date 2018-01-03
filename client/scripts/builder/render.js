@@ -9,7 +9,7 @@ export default {
     },
     renderImage: function(tab, args){
         let img =   `<a href='${args.msg}' target='_blank'>
-                        <img class='imgs' src='${args.msg}' target='_blank' style='width: auto; max-width: 350px; max-height: 250px; border-radius: 10px;'></img>
+                        <img class='imgs' src='${args.msg}' target='_blank' style='width: auto; max-width: 350px; min-width: 350px; max-height: 250px; min-height:250px; border-radius: 10px;'></img>
                     </a>`;
         let link = `<a href='${args.msg}' target='_blank'>${args.msg}</a>`;
         let div =   `<div class='msg' style='background-color:${args.bgcolor};'>
@@ -24,7 +24,7 @@ export default {
         //lolfun $('.imgs').draggable({containment: $('.msgs')});
     },
     renderStaticImage: function(tab, args){
-        let img =   `<img class='imgs' src='data:image/png;base64,${args.image}' style='width: auto; max-width: 350px; max-height: 250px; border-radius: 10px;'></img>`;
+        let img =   `<img class='imgs' src='data:image/png;base64,${args.image}' style='width: auto; max-width: 350px; min-width: 350px; max-height: 250px; min-height:250px; border-radius: 10px;'></img>`;
         let div =   `<div class='msg' style='background-color:${args.bgcolor}';>
                         <span style='text-shadow: 2px 2px 5px black;'>${args.date}</span>
                         <span style='text-shadow: 2px 2px 5px black; color:${args.color};'>${args.name}</span>
@@ -93,7 +93,7 @@ export default {
     renderBlob: function(tab, args){
         let URLObj = window.URL || window.webkitURL;
         let blob = new Blob([args.blob], {type: "image/png"});
-        let img = `<img class='blob imgs' style='max-width: ${this.msgs[tab].width()}px; max-height: 250px;' src='${URLObj.createObjectURL(blob)}'/>`;
+        let img = `<img class='blob imgs' style='max-width: ${this.msgs[tab].width()}px; min-width: 350px; max-height: 250px; min-height:250px;' src='${URLObj.createObjectURL(blob)}'/>`;
         let div =   `<div class='msg' style='background-color:${args.bgcolor};'>
                         <span style='text-shadow: 2px 2px 5px black;'>${args.date}</span>
                         <span style='text-shadow: 2px 2px 5px black; color:${args.color};'>${args.name}</span>

@@ -801,6 +801,8 @@ function commandlist(socket, mod, curtab){
         }
     }
 
+    ret = `<div style='text-shadow: 2px 2px 5px black; color: ${socket.color};'>${ret}</div>`;
+
     let send = {
         chatmessages: [{
             action: 'renderText',
