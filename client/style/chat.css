@@ -161,7 +161,7 @@ body {
     border: 1px solid black;
 }
 .pencil{
-    cursor: url('../icons/pencil.png') 2 28, auto;
+    cursor: url('../icons/pencil.png') 4 25, auto;
 }
 
 .blob{
@@ -173,6 +173,7 @@ body {
     z-index: 2;
     height: 30px;
     overflow: hidden;
+    user-select: none;
 }
 
 pre{
