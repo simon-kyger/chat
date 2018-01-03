@@ -11,7 +11,7 @@ export default function(e){
     e.target.parentElement.remove();
     for (let msgsgrp in this.msgs){
         if(msgsgrp == e.target.id.substr(4)){
-            chat.msgs[msgsgrp].remove();
+            this.msgs[msgsgrp].remove();
             delete this.msgs[msgsgrp];
         }
     }
