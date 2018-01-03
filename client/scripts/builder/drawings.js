@@ -239,16 +239,16 @@ export default function(e, blob){
                         .addClass('pencil')
                         .mousedown((e)=>{
                             clicking = true;
-                            dot.x = e.clientX - this.canvas.offset().left + 2;
-                            dot.y = e.clientY - this.canvas.offset().top + 28; 
+                            dot.x = e.clientX - this.canvas.offset().left;
+                            dot.y = e.clientY - this.canvas.offset().top; 
                             this.ctx.beginPath();
                             this.ctx.lineTo(dot.x, dot.y);
                             this.ctx.stroke();
                         })
                         .mousemove((e)=>{
                             if (!clicking) return;
-                            dot.x = e.clientX - this.canvas.offset().left + 2;
-                            dot.y = e.clientY - this.canvas.offset().top + 28; 
+                            dot.x = e.clientX - this.canvas.offset().left;
+                            dot.y = e.clientY - this.canvas.offset().top; 
                             this.ctx.lineTo(dot.x, dot.y);
                             this.ctx.lineWidth = 2;
                             this.ctx.stroke();
