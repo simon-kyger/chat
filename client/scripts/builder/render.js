@@ -93,7 +93,7 @@ export default {
     renderBlob: function(tab, args){
         let URLObj = window.URL || window.webkitURL;
         let blob = new Blob([args.blob], {type: "image/png"});
-        let img = `<img class='blob imgs' style='max-width: ${this.msgs[tab].width()}px; min-width: 350px; max-height: 250px; min-height:250px;' src='${URLObj.createObjectURL(blob)}'/>`;
+        let img = `<img class='blob imgs' style='max-width: ${this.msgs[tab].width()}px; min-width: 32px; max-height: 250px; min-height:32px;' src='${URLObj.createObjectURL(blob)}'/>`;
         let div =   `<div class='msg' style='background-color:${args.bgcolor};'>
                         <span style='text-shadow: 2px 2px 5px black;'>${args.date}</span>
                         <span style='text-shadow: 2px 2px 5px black; color:${args.color};'>${args.name}</span>

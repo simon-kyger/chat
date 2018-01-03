@@ -25,9 +25,16 @@ export default function(socket){
     this.onlineusers.appendTo(this.chat);
     this.welcome = $(`<div class='redshadow'>Welcome to the proper lunch chat channel!</br></div>`);
     this.welcome.appendTo(this.msgs[this.curtab]);
-    this.githublink = $(`<div>&nbsp; &nbsp; github --> <a href='https://github.com/simon-kyger/chat' target='_blank'>https://github.com/simon-kyger/chat</a></br></div>`)
+    this.githublink = $(`<div>
+                            <span style='text-shadow: 2px 2px 5px black;'>github --> </span>
+                            <a href='https://github.com/simon-kyger/chat' target='_blank'>https://github.com/simon-kyger/chat</a>
+                            </br>
+                        </div>`)
     this.githublink.appendTo(this.msgs[this.curtab]);
-    this.commandlist = $(`<div>&nbsp; &nbsp; <i>Commandlist: /? or /help</i></br></div>`);
+    this.commandlist = $(`<div>
+                            <span style='text-shadow: 2px 2px 5px black;'><i>Commandlist: /? or /help</i></span>
+                            </br>
+                        </div>`);
     this.commandlist.appendTo(this.msgs[this.curtab]);
     this.imagepreview = $(`<div id='imagepreview' class='imagepreview'>`)
     this.imagepreview.appendTo(this.chat);
