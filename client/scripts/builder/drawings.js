@@ -5,27 +5,6 @@ export default function(e, blob){
     this.drawing.appendTo($('body'));
     this.drawingcontainer = $(`<div style="overflow: scroll;"></div>`);
     this.boxshad = [Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50]
-    this.drawing.stop().animate({
-        top: e.clientY,
-        left: e.clientX,
-        width: `0%`,
-        height: `0%`,
-        opacity: `0`
-    }, 0, null, ()=>{
-        this.drawing.stop().animate({
-            top: `25%`,
-            left: `25%`,
-            width: `50%`,
-            height: `50%`,
-            opacity: `1`,
-            boxShadow: `1 1 1000px 100px rgb(${this.boxshad[0]}, ${this.boxshad[1]}, ${this.boxshad[2]})`
-        }, 500, null, ()=>{
-            this.drawingcontainer.stop().animate({
-                height: `100%`,
-                width: `100%`
-            });
-        });
-    });
     this.maximized = false;
     this.olddimensions = {
         top: null,
@@ -67,13 +46,15 @@ export default function(e, blob){
                         this.drawing.animate({
                             top: 0,
                             left: 0,
-                            height: `${window.innerHeight}px`,
-                            width: `${window.innerWidth}px`,
+                            height: window.innerHeight,
+                            width: window.innerWidth,
+                        }, 500, null,()=>{
+                            this.drawingcontainer.animate({
+                                height: this.drawing.height() - this.drawingtoolscontainer.height(),
+                                width: `100%`,
+                            });
                         });
-                        this.drawingcontainer.animate({
-                            height: `${window.innerHeight}px`,
-                            width: `${window.innerWidth}px`,
-                        });
+
                         this.maximized = true;
                     } else {
                         this.drawing
@@ -83,11 +64,12 @@ export default function(e, blob){
                                 left: this.olddimensions.left,
                                 height: this.olddimensions.height,
                                 width: this.olddimensions.width,
+                            }, 500, null, ()=>{
+                                this.drawingcontainer.animate({
+                                    height: this.drawing.height() - this.drawingtoolscontainer.height(),
+                                    width: `100%`,
+                                });
                             });
-                        this.drawingcontainer.animate({
-                            height: this.olddimensions.height,
-                            width: this.olddimensions.width     
-                        });
                         this.maximized = false;
                     }
                     this.drawingtools.pan.element.click();
@@ -140,8 +122,10 @@ export default function(e, blob){
                         .mouseup((e)=>{
                             clicking = false;
                             let cropped = this.ctx.getImageData(rect.startx, rect.starty, rect.w, rect.h)
-                            this.canvas[0].width = rect.w;
-                            this.canvas[0].height = rect.h;
+                            this.canvas[0].width = Math.abs(rect.w);
+                            this.canvas[0].height = Math.abs(rect.h);
+                            this.drawingcontainer[0].width = Math.abs(rect.w);
+                            this.drawingcontainer[0].height = Math.abs(rect.h);
                             this.ctx.putImageData(cropped, 0, 0);
                             this.selected.remove();
                             //the reason for this is to also allow users to copy their current canvas to a blob and then paste it back into the chat.
@@ -324,10 +308,35 @@ export default function(e, blob){
     this.img.src = this.URLObj.createObjectURL(blob);
     this.drawingcontainer.append(this.canvas);
     this.drawing.append(this.drawingcontainer);
-    this.img.onload = (e) =>{
+    this.img.onload = () =>{
         this.canvas[0].width = this.img.width;
         this.canvas[0].height = this.img.height;
         this.ctx.drawImage(this.img, 0, 0);
+        let x,y;
+        this.img.width > $(window).width()/2 ? x = '50%' : x = this.img.width;
+        this.img.height > $(window).height()/2 ? y = '50%' : y = this.img.height;
+        this.drawing.stop().animate({
+            // e is from global e within this file (where the image was originally clicked)
+            top: e.clientY,
+            left: e.clientX,
+            width: `0%`,
+            height: `0%`,
+            opacity: `0`
+        }, 0, null, ()=>{
+            this.drawing.stop().animate({
+                top: `25%`,
+                left: `25%`,
+                width: x,
+                height: y,
+                opacity: `1`,
+                boxShadow: `1 1 1000px 100px rgb(${this.boxshad[0]}, ${this.boxshad[1]}, ${this.boxshad[2]})`
+            }, 500, null, ()=>{
+                this.drawingcontainer.stop().animate({
+                    width: `100%`,
+                    height: this.drawing.height() - this.drawingtoolscontainer.height()
+                });
+            });
+        });
     };
     //hotkeys for drawing container
     $(window).on('keydown', escape);
@@ -345,10 +354,4 @@ export default function(e, blob){
         alsoResize: this.drawingcontainer,
         handles: 'all'
     })
-    $(window).resize(()=>{
-        if (!this.drawing)
-            return;
-        this.drawingcontainer.css('width', this.drawing.css('width'));
-        this.drawingcontainer.css('height', this.drawing.css('height'));
-    });
 }

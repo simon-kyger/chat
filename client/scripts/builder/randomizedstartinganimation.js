@@ -79,13 +79,6 @@ export default function(args, start) {
                         backgroundColor: args.shadow,
                         color: args.text
                     });
-                    if (this.drawing){
-                        this.drawingtoolscontainer.animate({
-                            opacity: 1,
-                            backgroundColor: args.shadow,
-                            color: args.text
-                        })
-                    }
                 });
                 this.textarea.stop().animate({
                     backgroundColor: 'white'
@@ -114,4 +107,35 @@ export default function(args, start) {
             });
         });
     });
+    if (this.drawing){
+        let t = this.drawing.position().top;
+        let l = this.drawing.position().left;
+        let w = this.drawing.width();
+        let h = this.drawing.height();
+        this.drawing.stop().animate({
+            top: `${Math.floor(Math.random()*99)}%`,
+            left: `${Math.floor(Math.random()*99)}%`,
+            width: '15px',
+            height: '15px',
+            opacity: '1.0',
+        }, start, null, ()=> {
+            this.drawing.stop().animate({
+                top: `${Math.floor(Math.random()*99)}%`,
+                left: `${Math.floor(Math.random()*99)}%`,
+                backgroundColor: args.bgformatted,
+            }, 1000, null, ()=> {
+                this.drawing.stop().animate({
+                    top: t,
+                    left: l,
+                    height: h,
+                    width: w,
+                }, 1000);
+                this.drawingtoolscontainer.animate({
+                    opacity: 1,
+                    backgroundColor: args.shadow,
+                    color: args.text
+                }, 3000);
+            });
+        });
+    }
 }
