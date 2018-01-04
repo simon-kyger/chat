@@ -1,7 +1,7 @@
 export default function(e, blob){
     if (this.drawing)
         return;
-    this.drawing = $(`<div id='${blob.size}' class='chat' style='z-index:5;'>`);
+    this.drawing = $(`<div id='${blob.size}' class='chat' style='z-index:5; user-select: none;'>`);
     this.drawing.appendTo($('body'));
     this.drawingcontainer = $(`<div style="overflow: scroll;"></div>`);
     this.boxshad = [Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50]
@@ -109,6 +109,12 @@ export default function(e, blob){
                             clicking = true;
                             rect.startx = e.clientX - this.selected.offset().left;
                             rect.starty = e.clientY - this.selected.offset().top;
+                            rect.w, rect.h = 0;
+                        })
+                        .mouseleave((e)=>{
+                            this.selected.remove();
+                            this.drawingtools.selection.element.click();
+                            return;
                         })
                         .mousemove((e)=>{
                             if (!clicking) return;
@@ -121,6 +127,13 @@ export default function(e, blob){
                         })
                         .mouseup((e)=>{
                             clicking = false;
+                            rect.w = Math.abs(rect.w);
+                            rect.h = Math.abs(rect.h);
+                            if ((rect.w < 32 ||  isNaN(rect.w)) || rect.y < 32 || isNaN(rect.h)){
+                                this.selected.remove();
+                                this.drawingtools.selection.element.click();
+                                return;
+                            }
                             let cropped = this.ctx.getImageData(rect.startx, rect.starty, rect.w, rect.h)
                             this.canvas[0].width = Math.abs(rect.w);
                             this.canvas[0].height = Math.abs(rect.h);
