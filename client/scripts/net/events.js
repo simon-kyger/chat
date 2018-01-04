@@ -124,16 +124,24 @@ export default function(socket, chat){
 	//data expects string
 	socket.on('changeTheme', (data) => {
 	    if (data == 'off'){
-	        chat.chat.stop().animate({
-	            boxShadow: `0 0 10px 1000px rgb(255,255,255)`,
+	        $('body').stop().animate({
 	            backgroundColor: 'white',
 	        });
+	        if ($('#drawing').length){
+	        	$('#drawingtoolscontainer').animate({
+	        		backgroundColor: 'black'
+	        	})
+	        }
 	        for (let elem in chat.msgs){
 	            chat.msgs[elem].stop().animate({
 	                color: 'black',
 	                backgroundColor: 'white'
 	            });
 	        }
+	        $(chat.tools).stop().animate({
+	        	color: 'black',
+	        	backgroundColor: 'white'
+	        })
 	        $(chat.textarea).stop().animate({
 	            color: 'white',
 	            backgroundColor: 'black'

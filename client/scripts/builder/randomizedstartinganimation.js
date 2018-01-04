@@ -29,14 +29,14 @@ export default function(args, start) {
                 height: '75%',
                 width: '75%',
             }, 1000, null, ()=> { // see above comment about modifying this 1000 time limit.
-                this.msgs[this.curtab].stop().animate({
-                    boxShadow: `1 1 1000px 100px 'silver'`
+                $('body').stop().animate({
+                    backgroundColor: `1 1 1000px 100px 'silver'`
                 },400, null, ()=>{
                     //scrollbar crap
                     document.styleSheets[0].cssRules[0].style.background = args.bgformatted;
                     document.styleSheets[0].cssRules[1].style.background = args.cinput;
-                    this.chat.stop().animate({
-                        boxShadow: args.shadow
+                    $('body').stop().animate({
+                        backgroundColor: args.shadow
                     },2000);
                     //for some reason using stop on msgs here gets squirley with above stylesheet changes
                     //leave this in without .stop()

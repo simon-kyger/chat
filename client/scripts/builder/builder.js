@@ -9,6 +9,7 @@ export default function(socket){
     this.tools.appendTo(this.chat);
     this.chat.draggable({
         containment: 'body',
+        stack: ".chat"
     });
     this.chat.resizable({
         handles: 'all'

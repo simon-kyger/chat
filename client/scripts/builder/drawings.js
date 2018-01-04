@@ -1,10 +1,9 @@
 export default function(e, blob){
     if (this.drawing)
         return;
-    this.drawing = $(`<div id='${blob.size}' class='chat' style='z-index:5; user-select: none;'>`);
+    this.drawing = $(`<div id='drawing' class='chat' style='z-index:5; user-select: none;'>`);
     this.drawing.appendTo($('body'));
     this.drawingcontainer = $(`<div style="overflow: scroll;"></div>`);
-    this.boxshad = [Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50, Math.floor(Math.random()*50)+50]
     this.maximized = false;
     this.olddimensions = {
         top: null,
@@ -13,7 +12,7 @@ export default function(e, blob){
         height: null
     };
     this.buildtools = () =>{
-        this.drawingtoolscontainer = $(`<div class='tools'>`);
+        this.drawingtoolscontainer = $(`<div id='drawingtoolscontainer' class='tools'>`);
         this.drawingtoolscontainer.appendTo(this.drawing);
         this.drawingtoolscontainer.css('background-color', this.inputcontainer.css('background-color'));
         this.drawingtools = {
@@ -58,7 +57,7 @@ export default function(e, blob){
                         this.maximized = true;
                     } else {
                         this.drawing
-                            .draggable('enable')
+                            .draggable('enable', {stack: '.chat'})
                             .animate({
                                 top: this.olddimensions.top,
                                 left: this.olddimensions.left,
@@ -301,7 +300,7 @@ export default function(e, blob){
             move: {
                 element: $(`<div class='icondisplay iconmove'>⇱</div>`),
                 behavior: ()=>{
-                    this.drawing.draggable('enable');
+                    this.drawing.draggable('enable', {stack: '.chat'});
                 }
             },
         };
@@ -360,7 +359,6 @@ export default function(e, blob){
                 width: x,
                 height: y,
                 opacity: `1`,
-                boxShadow: `1 1 1000px 100px rgb(${this.boxshad[0]}, ${this.boxshad[1]}, ${this.boxshad[2]})`
             }, 500, null, ()=>{
                 this.drawingcontainer.stop().animate({
                     width: `100%`,
@@ -379,7 +377,8 @@ export default function(e, blob){
         }
     }
     this.drawing.draggable({
-        containment: 'body'
+        containment: 'body',
+        stack: ".chat"
     });
     this.drawing.resizable({
         alsoResize: this.drawingcontainer,
