@@ -127,9 +127,7 @@ export default function(e, blob){
                         })
                         .mouseup((e)=>{
                             clicking = false;
-                            rect.w = Math.abs(rect.w);
-                            rect.h = Math.abs(rect.h);
-                            if ((rect.w < 32 ||  isNaN(rect.w)) || rect.y < 32 || isNaN(rect.h)){
+                            if (Math.abs(rect.w) < 32 || isNaN(Math.abs(rect.w)) || Math.abs(rect.y) < 32 || isNaN(Math.abs(rect.h))){
                                 this.selected.remove();
                                 this.drawingtools.selection.element.click();
                                 return;
