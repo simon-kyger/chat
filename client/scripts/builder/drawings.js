@@ -311,9 +311,9 @@ export default function(e, blob){
             this.drawingtools[i].element.appendTo(this.drawingtoolscontainer);
             this.drawingtools[i].element.on('click', (ev)=>{
                 for (let j in this.drawingtools){
-                    this.drawingtools[j].element.css('background-color', 'gray');
+                    this.drawingtools[j].element.css('background-color', 'darkgray');
                 }
-                this.drawingtools[i].element.css('background-color', 'white');
+                this.drawingtools[i].element.css('background-color', 'gray');
                 if (this.selected)
                     this.selected.remove();
                 this.drawing.draggable('disable');
