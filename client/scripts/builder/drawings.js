@@ -19,14 +19,35 @@ export default function(e, blob){
             close: {
                 element: $(`<div class='tabX'>X</div>`),
                 behavior: ()=>{
-                    this.drawing.animate({
-                        //e is from the initial invocation of drawings() aka the mini global e
-                        top: e.clientY,
-                        left: e.clientX,
-                        width: `0%`,
-                        height: `0%`,
-                        opacity: `0`
-                    },350, null, ()=>{
+                    let vroomvroom =[
+                        {left: `5000px`},
+                        {left: `-5000px`},
+                        {top: `5000px`},
+                        {top: `-5000px`}
+                    ];
+                    let directionsorta = vroomvroom[Math.floor(Math.random()*vroomvroom.length)];
+                    let adjusttire = this.drawing.width() > this.drawing.height();
+                    if (adjusttire)
+                        adjusttire = {width: this.drawing.height()}
+                    else
+                        adjusttire = {height: this.drawing.width()}
+                    this.drawing.animate(adjusttire, 200);
+                    this.drawing.animate({  
+                        now: '+=45',
+                    },{
+                        step: (now)=>{
+                            this.drawing.css('border-radius', `${now*30}px`);
+                        },
+                        duration: 800,
+                    }).animate({  
+                        now: '+=2160',
+                    },{
+                        step: (now)=>{
+                            this.drawing.css('transform',`rotate(${now}deg)`);
+                        },
+                        duration: 600,
+                    }).animate(directionsorta, 400, null, ()=>{
+                        //what makes this fun is that this method was only meant to really do these two things. lol
                         this.drawing.remove()
                         delete this.drawing;
                     });
