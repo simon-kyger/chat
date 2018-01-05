@@ -451,7 +451,7 @@ function price(socket, mod, curtab, shenanigans){
 
 function wikipediarequest(socket, mod, curtab, shenanigans){
     let send;
-    let link=`https://en.wikipedia.org/w/api.php?action=opensearch&search=${mod}&limit=1&format=json`;
+    let link=`https://en.wikipedia.org/w/api.php?action=opensearch&search=${mod}&limit=2`;
 
     request.get(link, function(error, response, body){
         if(error){
@@ -459,6 +459,7 @@ function wikipediarequest(socket, mod, curtab, shenanigans){
             return;
         }
         body = JSON.parse(body);
+        console.log(body);
         if (body[1][0] && body[2][0] && body[3][0]){
             send = {
                 chatmessages: [{
@@ -471,7 +472,7 @@ function wikipediarequest(socket, mod, curtab, shenanigans){
                     date:  ``,
                     name: ``,
                     // this should be rendered on client but im lazy
-                    msg:  `${body[1][0]}: <br> ${body[2][0]} <br> ${linkifyHtml(body[3][0])}`,
+                    msg:  `${body[1][0]}: <br> ${body[2][0]} <br> ${body[2][1]} <br> ${linkifyHtml(body[3][0])}`,
                 }],
                 curtab: curtab
             };
