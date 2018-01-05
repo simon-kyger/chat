@@ -262,6 +262,9 @@ function command(socket, msg, curtab){
     case '/video':
         youtuberequest(socket, mod, curtab);
         break;
+    case '/wiki':
+        wikipediarequest(socket, mod, curtab);
+        break;
     case '/youtube':
         youtuberequest(socket, mod, curtab);
         break;
@@ -440,6 +443,77 @@ function price(socket, mod, curtab, shenanigans){
             }
         }
 
+        for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
+            SOCKET_CONNECTIONS[i].emit('addToChat', send);
+        }
+    });
+}
+
+function wikipediarequest(socket, mod, curtab, shenanigans){
+    let send;
+    let link=`https://en.wikipedia.org/w/api.php?action=opensearch&search=${mod}&limit=1&format=json`;
+
+    request.get(link, function(error, response, body){
+        if(error){
+            console.log(error);
+            return;
+        }
+        body = JSON.parse(body);
+        if (body[1][0] && body[2][0] && body[3][0]){
+            send = {
+                chatmessages: [{
+                    action: 'renderText',
+                    date:  `[${moment().format("HH:mm:ss")}]`,
+                    name: `${socket.name}:`,
+                    msg:  `<span class='redshadow'>WIKISEARCH-></span>${mod}`,
+                },{
+                    action: 'renderText',
+                    date:  ``,
+                    name: ``,
+                    // this should be rendered on client but im lazy
+                    msg:  `${body[1][0]}: <br> ${body[2][0]} <br> ${linkifyHtml(body[3][0])}`,
+                }],
+                curtab: curtab
+            };
+        } else {
+            send = {
+                chatmessages: [{
+                    action: 'renderText',
+                    date:  `[${moment().format("HH:mm:ss")}]`,
+                    name: ``,
+                    msg:  `Wikipedia failed. Sorry about that.`,
+                    color: `red`,
+                },{
+                    action: 'renderText',
+                    date:  `[${moment().format("HH:mm:ss")}]`,
+                    name: ``,
+                    msg:  `Search query->'${mod}'.`,
+                    color: `red`,
+                },{
+                    action: 'renderText',
+                    date:  `[${moment().format("HH:mm:ss")}]`,
+                    name: ``,
+                    msg:  `Try refining your search pattern with more text.`,
+                    color: `red`,
+                }],
+                curtab: curtab
+            };
+            socket.emit('addToChat', send);
+            return;
+        }
+        if (curtab !== 'Main'){
+            for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
+                if (SOCKET_CONNECTIONS[i].name == curtab){
+                    send.curtab = socket.name;
+                    SOCKET_CONNECTIONS[i].emit('addToChat', send);
+                    send.curtab = curtab;
+                    socket.emit('addToChat', send);
+                    return;
+                }
+            }
+        }
+        if (shenanigans){
+        }
         for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
             SOCKET_CONNECTIONS[i].emit('addToChat', send);
         }
