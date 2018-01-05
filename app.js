@@ -459,7 +459,6 @@ function wikipediarequest(socket, mod, curtab, shenanigans){
             return;
         }
         body = JSON.parse(body);
-        console.log(body);
         if (body[1][0] && body[2][0] && body[3][0]){
             send = {
                 chatmessages: [{
