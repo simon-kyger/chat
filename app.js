@@ -844,8 +844,7 @@ function getNames(arg){
 //description: part of the command lib that retrieves all commands from the current build
 function commandlist(socket, mod, curtab){
     //if i had a db, it woudln't be this way, but since i don't want that added layer of bs, this will suffice
-    let ret = `<br><b>COMMANDS:</b><br>`;
-    ret += `<br>Optional Arguments are in brackets []<br>`;
+    let ret = `<br><b>COMMANDS:</b> <i>Optional Arguments are in brackets []</i><br>`;
     let commanddescriptions = {
         arrowkeys:  `<b>&uarr; &darr;</b>                       -> Cycles through past posted messages.`,
         code:       `<i>codeblock</i>                           -> Wraps <i>codeblock</i> in a codeblock.`,
@@ -875,7 +874,7 @@ function commandlist(socket, mod, curtab){
         }
     }
 
-    ret = `<div style='text-shadow: 2px 2px 5px black; color: ${socket.color};'>${ret}<br></div>`;
+    ret = `<div style='text-shadow: 2px 2px 10px white; color: black;'>${ret}</div><br>`;
 
     let send = {
         chatmessages: [{
