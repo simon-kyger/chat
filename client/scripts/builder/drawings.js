@@ -1,7 +1,7 @@
 export default function(e, blob){
     if (this.drawing)
         return;
-    this.drawing = $(`<div id='drawing' class='chat' style='z-index:5; user-select: none;'>`);
+    this.drawing = $(`<div id='drawing' class='chat' style='z-index: 1; user-select: none;'>`);
     this.drawing.appendTo($('body'));
     this.drawingcontainer = $(`<div style="overflow: scroll;"></div>`);
     this.maximized = false;
@@ -14,7 +14,7 @@ export default function(e, blob){
     this.buildtools = () =>{
         this.drawingtoolscontainer = $(`<div id='drawingtoolscontainer' class='tools'>`);
         this.drawingtoolscontainer.appendTo(this.drawing);
-        this.drawingtoolscontainer.css('background-color', this.inputcontainer.css('background-color'));
+        this.drawingtoolscontainer.css('background-color', this.textarea.css('background-color'));
         this.drawingtools = {
             close: {
                 element: $(`<div class='tabX'>X</div>`),
@@ -388,6 +388,9 @@ export default function(e, blob){
             });
         });
     };
+    if (this.drawing.css('z-index') < this.chat.css('z-index')){
+        this.drawing.css('z-index', this.chat.css('z-index') + 1);
+    }
     //hotkeys for drawing container
     $(window).on('keydown', escape);
     let reftools = this.drawingtools;
