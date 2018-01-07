@@ -266,7 +266,6 @@ export default function(e, blob){
                                 this.ctx.ellipse(circle.startx, circle.starty,  Math.abs(circle.startx - circle.w), Math.abs(circle.starty - circle.h), Math.PI/180, 0, 2 * Math.PI);
                             }
                             this.ctx.lineWidth = 2;
-                            this.ctx.strokeStyle = 'black';
                             this.ctx.stroke();
                         })
                         .mouseup((e)=>{
@@ -301,6 +300,12 @@ export default function(e, blob){
                         .mouseup((e)=>{
                             clicking = false;
                         });
+                }
+            },
+            colorpicker: {
+                element: $(`<input type="color" class='icondisplay' style='width: 50px;'>`),
+                behavior: ()=>{
+
                 }
             },
             pan: {       
@@ -347,6 +352,7 @@ export default function(e, blob){
                     .removeClass()
                     .css('cursor', '');
                 dragscroll.reset();
+                this.ctx.strokeStyle = this.drawingtools.colorpicker.element[0].value;
                 this.drawingtools[i].behavior(ev);
             });
         }
