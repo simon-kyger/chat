@@ -856,6 +856,7 @@ function commandlist(socket, mod, curtab){
         name:       `<i>identity</i>                            -> Changes your current identity to <i>identity</i>.`,
         price:      `<i>coinid</i>                              -> Retrieves cryptocoin price in USDollars of <i>coinid</i>.`,
         theme:      `[<i>dark | light | off |</i>]              -> Various theme options. Arguments are optional (will gen randomly).`,
+        wiki:       `<i>search</i>                              -> Retrieves the first hit term on wikipedia and then a second article in case search was ambiguous.`,
         yt:         `<b>/vid /video /youtube</b> <i>search</i>  -> Retrieves first result from a youtube <i>search</i>.`
     }
     if (mod){
@@ -874,7 +875,7 @@ function commandlist(socket, mod, curtab){
         }
     }
 
-    ret = `<div style='text-shadow: 2px 2px 5px black; color: ${socket.color};'>${ret}</div>`;
+    ret = `<div style='text-shadow: 2px 2px 5px black; color: ${socket.color};'>${ret}<br></div>`;
 
     let send = {
         chatmessages: [{
