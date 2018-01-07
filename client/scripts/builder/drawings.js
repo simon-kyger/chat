@@ -168,8 +168,7 @@ export default function(e, blob){
                             });
                             this.ctx.putImageData(cropped, 0, 0);
                             this.selected.remove();
-                            //the reason for this is to also allow users to copy their current canvas to a blob and then paste it back into the chat.
-                            this.drawingtools.move.element.click();
+                            this.ctx.strokeStyle = this.drawingtools.colorpicker.element[0].value;
                         });
                 },
             },
@@ -342,7 +341,7 @@ export default function(e, blob){
 
         //for each tool, append it to toolcontainer and when each is clicked, remove any class they had
         //and stop the window from dragging, and start up their associated behavior.
-        this.drawingtools.colorpicker.element.on("change", (ev)=>{
+        this.drawingtools.colorpicker.element.on("change", ()=>{
             this.ctx.strokeStyle = this.drawingtools.colorpicker.element[0].value;
         });
         for (let i in this.drawingtools){
