@@ -167,7 +167,7 @@ span{
 .imagepreview{
     position: absolute;
     z-index: 5;
-    bottom: 48px;
+    bottom: 15%;
     border: 1px solid black;
 }
 .pencil{
