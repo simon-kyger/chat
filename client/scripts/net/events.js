@@ -82,11 +82,6 @@ export default function(socket, chat){
 	});
 
 	//data expects string
-	socket.on('changeInputFontColor', (data) => {
-	    chat.textarea.css('color', data);
-	});
-
-	//data expects string
 	//this is buggy because we don't necessarily want to close the window when someone logs out
 	socket.on('removeTab', (data) =>{
 	    for (let msgsgrp in chat.msgs){

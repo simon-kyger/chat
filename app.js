@@ -405,7 +405,6 @@ function changecolor(socket, mod, curtab){
     for (let i = 0; i<SOCKET_CONNECTIONS.length; i++){
         SOCKET_CONNECTIONS[i].emit('addToChat', send);
     }
-    socket.emit('changeInputFontColor', socket.color);
 }
 
 function price(socket, mod, curtab, shenanigans){
