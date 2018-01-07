@@ -15,6 +15,7 @@ export default function(e, blob){
         this.drawingtoolscontainer = $(`<div id='drawingtoolscontainer' class='tools'>`);
         this.drawingtoolscontainer.appendTo(this.drawing);
         this.drawingtoolscontainer.css('background-color', this.textarea.css('background-color'));
+        this.lasttoolused = {};
         this.drawingtools = {
             close: {
                 element: $(`<div class='tabX'>X</div>`),
@@ -92,7 +93,7 @@ export default function(e, blob){
                             });
                         this.maximized = false;
                     }
-                    this.drawingtools.pan.element.click();
+                    this.lasttoolused.click();
                 }
             },
             save: {
@@ -107,12 +108,14 @@ export default function(e, blob){
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);
+                        this.lasttoolused.click();
                     });
                 }
             },
             selection: {
                 element: $(`<div class='icondisplay'>⬚</div>`),
                 behavior: ()=>{
+                    this.lasttoolused = this.drawingtools.selection.element;
                     let clicking = false;
                     let rect = {};
                     this.selected = $(`<canvas id='selection' style='position: absolute; z-index=99999;'>`).appendTo(this.drawingcontainer);
@@ -173,6 +176,7 @@ export default function(e, blob){
             line: {       
                 element: $(`<div class='icondisplay iconline'>╲</div>`),
                 behavior: ()=>{
+                    this.lasttoolused = this.drawingtools.line.element;
                     let clicking = false;
                     let line = {};
                     let ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
@@ -204,6 +208,7 @@ export default function(e, blob){
             square: {
                 element: $(`<div class='icondisplay iconsquare'>◻</div>`),
                 behavior: ()=>{
+                    this.lasttoolused = this.drawingtools.square.element;
                     let clicking = false;
                     let rect = {};
                     let ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
@@ -242,6 +247,7 @@ export default function(e, blob){
             circle: {
                 element: $(`<div class='icondisplay'>⬤</div>`),
                 behavior: ()=>{
+                    this.lasttoolused = this.drawingtools.circle.element;
                     let clicking = false;
                     let circle = {};
                     let ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
@@ -274,9 +280,10 @@ export default function(e, blob){
                         });
                 }
             },
-            pencil: {     
+            pencil: {
                 element: $(`<div class='icondisplay'>✎</div>`),
                 behavior: ()=>{
+                    this.lasttoolused = this.drawingtools.pencil.element;
                     let dot = {};
                     let clicking = false;
                     this.drawingcontainer
@@ -303,14 +310,15 @@ export default function(e, blob){
                 }
             },
             colorpicker: {
-                element: $(`<input type="color" class='icondisplay' style='width: 50px;'>`),
+                element: $(`<input type="color" class='icondisplay' style='width: 50px; padding:0; border: 0px;'>`),
                 behavior: ()=>{
-
+                    this.lasttoolused.click();
                 }
             },
             pan: {       
                 element: $(`<div class='icondisplay'>🤚</div>`),
                 behavior: ()=>{
+                    this.lasttoolused = this.drawingtools.pan.element;
                     this.drawingcontainer
                         .addClass('dragscroll')
                         .css('cursor', '-webkit-grab')
@@ -326,6 +334,7 @@ export default function(e, blob){
             move: {
                 element: $(`<div class='icondisplay iconmove'>⇱</div>`),
                 behavior: ()=>{
+                    this.lasttoolused = this.drawingtools.move.element;
                     this.drawing.draggable('enable', {stack: '.chat'});
                 }
             },
@@ -333,6 +342,9 @@ export default function(e, blob){
 
         //for each tool, append it to toolcontainer and when each is clicked, remove any class they had
         //and stop the window from dragging, and start up their associated behavior.
+        this.drawingtools.colorpicker.element.on("change", (ev)=>{
+            this.ctx.strokeStyle = this.drawingtools.colorpicker.element[0].value;
+        });
         for (let i in this.drawingtools){
             this.drawingtools[i].element.appendTo(this.drawingtoolscontainer);
             this.drawingtools[i].element.on('click', (ev)=>{
@@ -352,7 +364,6 @@ export default function(e, blob){
                     .removeClass()
                     .css('cursor', '');
                 dragscroll.reset();
-                this.ctx.strokeStyle = this.drawingtools.colorpicker.element[0].value;
                 this.drawingtools[i].behavior(ev);
             });
         }
@@ -413,5 +424,6 @@ export default function(e, blob){
     this.drawing.resizable({
         alsoResize: this.drawingcontainer,
         handles: 'all'
-    })
+    });
+    this.drawingtools.move.element.click();
 }
