@@ -7,9 +7,7 @@
     "config": "^1.29.0",
     "delivery": "0.0.6",
     "express": "^4.16.2",
-    "fs": "0.0.1-security",
     "googleapis": "^23.0.0",
-    "http": "0.0.0",
     "is-image": "^2.0.0",
     "jquery": "^3.2.1",
     "jquery-awesome-cursor": "^0.3.1",
@@ -19,7 +17,7 @@
     "moment": "^2.20.1",
     "morgan": "^1.9.0",
     "npm-install-all": "^1.1.21",
-    "request": "^2.83.0",
+    "request-promise-native": "^1.0.5",
     "socket.io": "^2.0.4",
     "uuid": "^3.1.0",
     "xmlhttprequest": "^1.8.0"
