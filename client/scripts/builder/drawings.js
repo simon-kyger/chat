@@ -40,23 +40,24 @@ export default function(e, blob){
                         adjusttire = {width: this.drawing.height()}
                     else
                         adjusttire = {height: this.drawing.width()}
-                    this.drawing.animate(adjusttire, 200);
+                    this.drawing.animate(adjusttire, 300);
                     this.drawing.animate({  
                         now: '+=45',
                     },{
                         step: (now)=>{
                             this.drawing.css('border-radius', `${now*30}px`);
                         },
-                        duration: 800,
+                        duration: 300,
                     }).animate({  
                         now: '+=2160',
                     },{
                         step: (now)=>{
                             this.drawing.css('transform',`rotate(${now}deg)`);
                         },
-                        duration: 600,
-                    }).animate(directionsorta, 400, null, ()=>{
+                        duration: 300,
+                    }).animate(directionsorta, 300, null, ()=>{
                         //what makes this fun is that this method was only meant to really do these two things. lol
+                        $(window).off('keydown', this.drawinghotkeys);
                         this.drawing.remove()
                         delete this.drawing;
                     });
@@ -415,19 +416,17 @@ export default function(e, blob){
         this.drawing.css('z-index', this.chat.css('z-index') + 1);
     }
     //hotkeys for drawing container
-    $(window).on('keydown', (e) => this.drawinghotkeys(e));
-    this.keythrottle = true;
+    this.drawing.keythrottle = true;
     this.drawinghotkeys = function(e){
-        if (!this.keythrottle)
+        if (!this.drawing.keythrottle)
             return;
         if (e.which==27){
             this.drawingtools.close.behavior();
-            $(window).off('keydown', this.drawinghotkeys);
         }
-        if (e.keyCode == 90 && e.ctrlKey && this.keythrottle){
-            this.keythrottle = false;
+        if (e.keyCode == 90 && e.ctrlKey && this.drawing.keythrottle){
+            this.drawing.keythrottle = false;
             window.setTimeout(()=>{
-                this.keythrottle = true;
+                this.drawing.keythrottle = true;
             }, 50);
             if (this.drawing.history.length>1){
                 this.drawing.history.pop();
@@ -436,6 +435,8 @@ export default function(e, blob){
             }
         }
     }
+    this.drawinghotkeys = this.drawinghotkeys.bind(this);
+    $(window).on('keydown', this.drawinghotkeys);
     this.drawing.draggable({
         containment: 'body',
         stack: ".chat"
