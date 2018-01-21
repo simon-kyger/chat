@@ -11,14 +11,14 @@ export default function(e, blob){
         width: null,
         height: null
     };
-    this.canvas = $(`<canvas id='drawing'>`);
+    this.canvas = $(`<canvas id='drawingcanvas'>`);
     this.ctx = this.canvas[0].getContext('2d');
     this.img = new Image();
     this.URLObj = window.URL || window.webkitURL;
     this.img.src = this.URLObj.createObjectURL(blob);
     this.drawingcontainer.append(this.canvas);
     this.drawing.append(this.drawingcontainer);
-    this.drawinghistory = [];
+    this.drawing.history = [];
     this.buildtools = () =>{
         this.drawingtoolscontainer = $(`<div id='drawingtoolscontainer' class='tools'>`);
         this.drawing.prepend(this.drawingtoolscontainer);
@@ -209,7 +209,7 @@ export default function(e, blob){
                         .mouseup((e)=>{
                             clicking = false;
                             ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
-                            this.drawinghistory.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
+                            this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                         });
                 }
             },
@@ -249,7 +249,7 @@ export default function(e, blob){
                         .mouseup((e)=>{
                             clicking = false;
                             ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
-                            this.drawinghistory.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
+                            this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                         });
                 }
             },
@@ -286,7 +286,7 @@ export default function(e, blob){
                         .mouseup((e)=>{
                             clicking = false;
                             ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
-                            this.drawinghistory.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
+                            this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                         });
                 }
             },
@@ -316,7 +316,7 @@ export default function(e, blob){
                         })
                         .mouseup((e)=>{
                             clicking = false;
-                            this.drawinghistory.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
+                            this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                         });
                 }
             },
@@ -406,7 +406,7 @@ export default function(e, blob){
                     width: `100%`,
                     height: this.drawing.height() - this.drawingtoolscontainer.height()
                 }, ()=>{
-                    this.drawinghistory.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
+                    this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                 });
             });
         });
@@ -416,15 +416,22 @@ export default function(e, blob){
     }
     //hotkeys for drawing container
     $(window).on('keydown', (e) => this.drawinghotkeys(e));
+    this.keythrottle = true;
     this.drawinghotkeys = function(e){
+        if (!this.keythrottle)
+            return;
         if (e.which==27){
             this.drawingtools.close.behavior();
             $(window).off('keydown', this.drawinghotkeys);
         }
-        if (e.keyCode == 90 && e.ctrlKey){
-            if (this.drawinghistory.length>1){
-                this.drawinghistory.pop();
-                this.ctx.putImageData(this.drawinghistory[this.drawinghistory.length-1], 0, 0);
+        if (e.keyCode == 90 && e.ctrlKey && this.keythrottle){
+            this.keythrottle = false;
+            window.setTimeout(()=>{
+                this.keythrottle = true;
+            }, 50);
+            if (this.drawing.history.length>1){
+                this.drawing.history.pop();
+                this.ctx.putImageData(this.drawing.history[this.drawing.history.length-1], 0, 0);
                 this.lasttoolused.click();
             }
         }
