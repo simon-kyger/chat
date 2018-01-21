@@ -211,6 +211,7 @@ export default function(e, blob){
                             clicking = false;
                             ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
                             this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
+                            this.drawing.history.counter++;
                         });
                 }
             },
@@ -251,6 +252,7 @@ export default function(e, blob){
                             clicking = false;
                             ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
                             this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
+                            this.drawing.history.counter++;
                         });
                 }
             },
@@ -288,6 +290,7 @@ export default function(e, blob){
                             clicking = false;
                             ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
                             this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
+                            this.drawing.history.counter++;
                         });
                 }
             },
@@ -318,6 +321,7 @@ export default function(e, blob){
                         .mouseup((e)=>{
                             clicking = false;
                             this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
+                            this.drawing.history.counter++;
                         });
                 }
             },
@@ -417,20 +421,35 @@ export default function(e, blob){
     }
     //hotkeys for drawing container
     this.drawing.keythrottle = true;
+    this.drawing.history.counter = 0;
     this.drawinghotkeys = function(e){
         if (!this.drawing.keythrottle)
             return;
+        //escape
         if (e.which==27){
             this.drawingtools.close.behavior();
         }
-        if (e.keyCode == 90 && e.ctrlKey && this.drawing.keythrottle){
+        //ctrl + z
+        if (e.which == 90 && e.ctrlKey && this.drawing.keythrottle){
             this.drawing.keythrottle = false;
             window.setTimeout(()=>{
                 this.drawing.keythrottle = true;
             }, 50);
-            if (this.drawing.history.length>1){
-                this.drawing.history.pop();
-                this.ctx.putImageData(this.drawing.history[this.drawing.history.length-1], 0, 0);
+            if (this.drawing.history.counter > 0){
+                this.drawing.history.counter--;
+                this.ctx.putImageData(this.drawing.history[this.drawing.history.counter], 0, 0);
+                this.lasttoolused.click();
+            }
+        }
+        //ctrl + y
+        if (e.keyCode == 89 && e.ctrlKey && this.drawing.keythrottle){
+            this.drawing.keythrottle = false;
+            window.setTimeout(()=>{
+                this.drawing.keythrottle = true;
+            }, 50);
+            if (this.drawing.history.counter < this.drawing.history.length-1){
+                this.drawing.history.counter++;
+                this.ctx.putImageData(this.drawing.history[this.drawing.history.counter], 0, 0);
                 this.lasttoolused.click();
             }
         }
