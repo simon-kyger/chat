@@ -11,9 +11,17 @@ export default function(e, blob){
         width: null,
         height: null
     };
+    this.canvas = $(`<canvas id='drawing'>`);
+    this.ctx = this.canvas[0].getContext('2d');
+    this.img = new Image();
+    this.URLObj = window.URL || window.webkitURL;
+    this.img.src = this.URLObj.createObjectURL(blob);
+    this.drawingcontainer.append(this.canvas);
+    this.drawing.append(this.drawingcontainer);
+    this.drawinghistory = [];
     this.buildtools = () =>{
         this.drawingtoolscontainer = $(`<div id='drawingtoolscontainer' class='tools'>`);
-        this.drawingtoolscontainer.appendTo(this.drawing);
+        this.drawing.prepend(this.drawingtoolscontainer);
         this.drawingtoolscontainer.css('background-color', this.textarea.css('background-color'));
         this.lasttoolused = {};
         this.drawingtools = {
@@ -201,6 +209,7 @@ export default function(e, blob){
                         .mouseup((e)=>{
                             clicking = false;
                             ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
+                            this.drawinghistory.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                         });
                 }
             },
@@ -240,6 +249,7 @@ export default function(e, blob){
                         .mouseup((e)=>{
                             clicking = false;
                             ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
+                            this.drawinghistory.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                         });
                 }
             },
@@ -276,6 +286,7 @@ export default function(e, blob){
                         .mouseup((e)=>{
                             clicking = false;
                             ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
+                            this.drawinghistory.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                         });
                 }
             },
@@ -305,6 +316,7 @@ export default function(e, blob){
                         })
                         .mouseup((e)=>{
                             clicking = false;
+                            this.drawinghistory.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                         });
                 }
             },
@@ -368,13 +380,6 @@ export default function(e, blob){
         }
     };
     this.buildtools();
-    this.canvas = $(`<canvas id='drawing'>`);
-    this.ctx = this.canvas[0].getContext('2d');
-    this.img = new Image();
-    this.URLObj = window.URL || window.webkitURL;
-    this.img.src = this.URLObj.createObjectURL(blob);
-    this.drawingcontainer.append(this.canvas);
-    this.drawing.append(this.drawingcontainer);
     this.img.onload = () =>{
         this.canvas[0].width = this.img.width;
         this.canvas[0].height = this.img.height;
@@ -400,6 +405,8 @@ export default function(e, blob){
                 this.drawingcontainer.stop().animate({
                     width: `100%`,
                     height: this.drawing.height() - this.drawingtoolscontainer.height()
+                }, ()=>{
+                    this.drawinghistory.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                 });
             });
         });
@@ -408,12 +415,18 @@ export default function(e, blob){
         this.drawing.css('z-index', this.chat.css('z-index') + 1);
     }
     //hotkeys for drawing container
-    $(window).on('keydown', escape);
-    let reftools = this.drawingtools;
-    function escape(e){
+    $(window).on('keydown', (e) => this.drawinghotkeys(e));
+    this.drawinghotkeys = function(e){
         if (e.which==27){
-            reftools.close.behavior();
-            $(window).off('keydown', escape);
+            this.drawingtools.close.behavior();
+            $(window).off('keydown', this.drawinghotkeys);
+        }
+        if (e.keyCode == 90 && e.ctrlKey){
+            if (this.drawinghistory.length>1){
+                this.drawinghistory.pop();
+                this.ctx.putImageData(this.drawinghistory[this.drawinghistory.length-1], 0, 0);
+                this.lasttoolused.click();
+            }
         }
     }
     this.drawing.draggable({
