@@ -210,8 +210,9 @@ export default function(e, blob){
                         .mouseup((e)=>{
                             clicking = false;
                             ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
-                            this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                             this.drawing.history.counter++;
+                            this.drawing.history.splice(this.drawing.history.counter);
+                            this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                         });
                 }
             },
@@ -251,8 +252,9 @@ export default function(e, blob){
                         .mouseup((e)=>{
                             clicking = false;
                             ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
-                            this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                             this.drawing.history.counter++;
+                            this.drawing.history.splice(this.drawing.history.counter);
+                            this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                         });
                 }
             },
@@ -289,8 +291,9 @@ export default function(e, blob){
                         .mouseup((e)=>{
                             clicking = false;
                             ref = this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height());
-                            this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                             this.drawing.history.counter++;
+                            this.drawing.history.splice(this.drawing.history.counter);
+                            this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                         });
                 }
             },
@@ -320,8 +323,9 @@ export default function(e, blob){
                         })
                         .mouseup((e)=>{
                             clicking = false;
-                            this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                             this.drawing.history.counter++;
+                            this.drawing.history.splice(this.drawing.history.counter);
+                            this.drawing.history.push(this.ctx.getImageData(0, 0, this.canvas.width(), this.canvas.height()));
                         });
                 }
             },
