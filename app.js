@@ -221,76 +221,47 @@ function command(socket, msg, curtab) {
     let command = msg.split(/[\n\r\s]+/g)[0];
     //get first char after command
     let mod = msg.substr(command.length + 1).trim();
-    let send;
-    switch (command) {
-        case "/code":
-            codeblock(socket, mod, curtab);
-            break;
-        case "/color":
-            changecolor(socket, mod, curtab);
-            break;
-        case "/gif":
-            giphyrequest(socket, mod, curtab);
-            break;
-        case "/giphy":
-            giphyrequest(socket, mod, curtab);
-            break;
-        case "/help":
-            commandlist(socket, mod, curtab);
-            break;
-        case "/?":
-            commandlist(socket, mod, curtab);
-            break;
-        case "/ignore":
-            ignoreuser(socket, mod, curtab);
-            break;
-        case "/name":
-            changename(socket, mod, curtab);
-            break;
-        case "/price":
-            price(socket, mod, curtab);
-            break;
-        case "/reddit":
-            redditrequest(socket, mod, curtab);
-            break;
-        case "/theme":
+
+    const router = {
+        '/code': () => codeblock(socket, mod, curtab),
+        '/color': () => changecolor(socket, mod, curtab),
+        '/gif': () => giphyrequest(socket, mod, curtab),
+        '/giphy': () => giphyrequest(socket, mod, curtab),
+        '/help': () => commandlist(socket, mod, curtab),
+        '/?': () => commandlist(socket, mod, curtab),
+        '/ignore': () => ignoreuser(socket, mod, curtab),
+        '/name': () => changename(socket, mod, curtab),
+        '/price': () => price(socket, mod, curtab),
+        '/reddit': () => redditrequest(socket, mod, curtab),
+        '/vid': () => youtuberequest(socket, mod, curtab),
+        '/video': () => youtuberequest(socket, mod, curtab),
+        '/yt': () => youtuberequest(socket, mod, curtab),
+        '/theme': () => {
             if (mod == "dark") mod = -100;
             else if (mod == "light") mod = 100;
             else if (mod == "off") mod = "off";
             else mod = 0;
             socket.theme = mod;
             socket.emit("changeTheme", socket.theme);
-            break;
-        case "/vid":
-            youtuberequest(socket, mod, curtab);
-            break;
-        case "/video":
-            youtuberequest(socket, mod, curtab);
-            break;
-        case "/wiki":
-            wikipediarequest(socket, mod, curtab);
-            break;
-        case "/youtube":
-            youtuberequest(socket, mod, curtab);
-            break;
-        case "/yt":
-            youtuberequest(socket, mod, curtab);
-            break;
-        default:
-        send = {
-            chatmessages: [
-                {
-                    action: "renderText",
-                    date: `[${moment().format("HH:mm:ss")}]`,
-                    name: `${socket.name}:`,
-                    msg: `Unknown command: ${command}`,
-                    color: `red`
-                }
-            ],
-            curtab: curtab
-        };
-        socket.emit("addToChat", send);
-    }
+        },
+        'default': () => {
+            const payload = {
+                'chatmessages': [
+                    {
+                        'action': "renderText",
+                        'date': `[${moment().format("HH:mm:ss")}]`,
+                        'name': `${socket.name}:`,
+                        'msg': `Unknown command: ${command}`,
+                        'color': `red`
+                    }
+                ],
+                curtab
+            };
+            socket.emit("addToChat", payload)
+        }
+    };
+
+    return router[command] || router['default'];
 }
 
 function ignoreuser(socket, mod, curtab) {
