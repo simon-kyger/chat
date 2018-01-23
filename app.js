@@ -261,7 +261,7 @@ function command(socket, msg, curtab) {
         }
     };
 
-    return router[command] || router['default'];
+    return (router[command] || router['default'])();
 }
 
 function ignoreuser(socket, mod, curtab) {
