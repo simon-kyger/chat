@@ -16,9 +16,9 @@ export default function(e){
         ctx.clearRect(0, 0, this.imagepreviewcvs[0].width, this.imagepreviewcvs[0].height);
 		let img = new Image();
 		img.onload = (e) => {
-			this.imagepreview[0].width = Math.sqrt(img.width)*5;
-			this.imagepreview[0].height = Math.sqrt(img.height)*5;
-			ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, Math.sqrt(img.width)*5, Math.sqrt(img.height)*5);
+			this.imagepreview[0].width = 350;
+			this.imagepreview[0].height = 250;
+			ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, this.imagepreview[0].width, this.imagepreview[0].height);
 		};
 		let URLObj = window.URL || window.webkitURL;
 		img.src = URLObj.createObjectURL(blob);
