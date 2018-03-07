@@ -233,6 +233,7 @@ function command(socket, msg, curtab) {
         '/name': () => changename(socket, mod, curtab),
         '/price': () => price(socket, mod, curtab),
         '/reddit': () => redditrequest(socket, mod, curtab),
+        '/wiki': () => wikipediarequest(socket, mod, curtab),
         '/vid': () => youtuberequest(socket, mod, curtab),
         '/video': () => youtuberequest(socket, mod, curtab),
         '/yt': () => youtuberequest(socket, mod, curtab),
