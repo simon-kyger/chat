@@ -14,6 +14,11 @@ const apiKeys = require("./apiKeys");
 const logger = require("morgan");
 const ytsongs = require("./devplaylists/ytsongs.json");
 
+const mongo = require(`mongodb`).MongoClient;
+const dbport = process.env.DBPORT || 27017;
+const dbname = process.env.DBNAME || `skygernet`;
+const dburl = process.env.MONGODB_URI || `mongodb://localhost:${dbport}`;
+
 let keys = {};
 
 // should really store api keys in .env.
@@ -37,20 +42,27 @@ console.log(`Listening on port: ${port}`);
 
 let SOCKET_CONNECTIONS = [];
 let gnameincrementer = 0;
-//socket: object
-//description: consider this as a looping system, since sockets are persistant,
-//the contents inside are always being evaluated.  this is the main loop of the program.
-io.sockets.on("connection", socket => {
-    init(socket);
-    socket.on("disconnect", () => disconnects(socket));
-    socket.on("chatMsg", msg => chatMsg(socket, msg));
-    socket.on("istyping", bools => istyping(socket, bools));
-});
+
+mongo.connect(dburl, (err, database)=>{
+    if (err) throw err;
+
+    console.log(`mongodb listening`);
+
+    let db = database.db(dbname);
+
+    io.sockets.on("connection", socket => {
+        init(socket, db);
+        socket.on("disconnect", () => disconnects(socket));
+        socket.on("chatMsg", msg => chatMsg(socket, msg));
+        socket.on("istyping", bools => istyping(socket, bools));
+    });
+})
+
 
 //socket: object
 //returns: void
 //description: static method that only occurs once per connection to server is establish
-function init(socket) {
+function init(socket, db) {
     SOCKET_CONNECTIONS.push(socket);
     socket.name = gnameincrementer;
     socket.ignore = [];

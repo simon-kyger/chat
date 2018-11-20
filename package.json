@@ -15,6 +15,7 @@
     "linkifyjs": "^2.1.5",
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
+    "mongodb": "^3.1.10",
     "morgan": "^1.9.0",
     "npm-install-all": "^1.1.21",
     "request-promise-native": "^1.0.5",
