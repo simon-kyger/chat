@@ -42,29 +42,27 @@ console.log(`Listening on port: ${port}`);
 
 let SOCKET_CONNECTIONS = [];
 let gnameincrementer = 0;
+let db = null;
 
 mongo.connect(dburl, (err, database)=>{
     if (err) throw err;
 
     console.log(`mongodb listening`);
 
-    let db = database.db(dbname);
+    db = database.db(dbname);
 
     io.sockets.on("connection", socket => {
-        init(socket, db);
+        SOCKET_CONNECTIONS.push(socket);
+        socket.emit('getusernamec');
+        socket.on("getusernames", data => getusernames(socket, data));
         socket.on("disconnect", () => disconnects(socket));
         socket.on("chatMsg", msg => chatMsg(socket, msg));
         socket.on("istyping", bools => istyping(socket, bools));
     });
 })
 
-
-//socket: object
-//returns: void
-//description: static method that only occurs once per connection to server is establish
-function init(socket, db) {
-    SOCKET_CONNECTIONS.push(socket);
-    socket.name = gnameincrementer;
+function getusernames(socket, data){
+    data ? socket.name = data : socket.name = gnameincrementer;
     socket.ignore = [];
     gnameincrementer++;
     console.log(`${socket.request.connection.remoteAddress} has connected.`);
@@ -652,25 +650,6 @@ function youtuberequest(socket, mod, curtab, shenanigans) {
 //description: part of command lib that will allow a user to change their name
 function changename(socket, mod, curtab) {
     let send;
-    let allnames = getNames(SOCKET_CONNECTIONS);
-    for (let i = 0; i < allnames.length; i++) {
-        if (allnames[i] == mod) {
-            send = {
-                chatmessages: [
-                    {
-                        action: "renderText",
-                        date: `[${moment().format("HH:mm:ss")}]`,
-                        name: ``,
-                        msg: `Name '${mod}' is already in use.`,
-                        color: "red"
-                    }
-                ],
-                curtab: curtab
-            };
-            socket.emit("addToChat", send);
-            return;
-        }
-    }
     if (mod.length > 20 || mod.length < 1) {
         send = {
             chatmessages: [
@@ -686,7 +665,61 @@ function changename(socket, mod, curtab) {
         };
         socket.emit("addToChat", send);
         return;
-    } else {
+    }
+    let users = db.collection('users');
+    users.findOne({ username: mod }).then(res=>{
+        if (res){
+            send = {
+                chatmessages: [
+                    {
+                        action: "renderText",
+                        date: `[${moment().format("HH:mm:ss")}]`,
+                        name: ``,
+                        msg: `Name '${mod}' is already in use.`,
+                        color: "red"
+                    }
+                ],
+                curtab: curtab
+            };
+            socket.emit("addToChat", send);
+            return;
+        } else {
+            adduser(socket, mod, curtab) 
+        }
+    })
+}
+
+function adduser(socket, mod, curtab){
+    let users = db.collection('users');
+    users.insert({ username: mod }, (err, user) => {
+        if (err) {
+            send = {
+                chatmessages: [
+                    {
+                        action: "renderText",
+                        date: `[${moment().format("HH:mm:ss")}]`,
+                        name: ``,
+                        msg: `ERROR IN DB.`,
+                        color: "red"
+                    }
+                ],
+                curtab: curtab
+            };
+            socket.emit("addToChat", send);
+            return;
+        }
+        send = {
+            chatmessages: [
+                {
+                    action: "renderText",
+                    date: `[${moment().format("HH:mm:ss")}]`,
+                    name: ``,
+                    msg: `User saved!`,
+                    color: "red"
+                }
+            ],
+            curtab: curtab
+        };
         let oldname = socket.name;
         socket.name = mod;
         send = {
@@ -712,12 +745,13 @@ function changename(socket, mod, curtab) {
                 }
             }
         }
+        socket.emit('setusername', mod);
         send.curtab = "Main";
         for (let i = 0; i < SOCKET_CONNECTIONS.length; i++) {
             SOCKET_CONNECTIONS[i].emit("addToChat", send);
             SOCKET_CONNECTIONS[i].emit("updateUsers", getNames(SOCKET_CONNECTIONS));
         }
-    }
+    });
 }
 
 //socket: object

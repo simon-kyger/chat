@@ -31,7 +31,8 @@
   "scripts": {
     "start": "nodemon app.js",
     "dev": "concurrently \"parcel watch client/index.html\" \"npm run start\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dbstart": "mongod --dbpath ./data"
   },
   "repository": {
     "type": "git",

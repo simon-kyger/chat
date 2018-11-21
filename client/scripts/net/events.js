@@ -1,4 +1,13 @@
 export default function(socket, chat){
+	socket.on('getusernamec', ()=>{
+		const data = window.localStorage.getItem('username');
+		socket.emit('getusernames', data);
+		console.log('ran getusername client');
+	})
+
+	socket.on('setusername', data => {
+		localStorage.setItem('username', data)
+	})
 	//data expects data.chatmessages[].properties
 	socket.on('addToChat', (data) => {
 	    if(data.curtab == undefined)
