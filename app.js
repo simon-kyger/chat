@@ -246,6 +246,7 @@ function command(socket, msg, curtab) {
         '/wiki': () => wikipediarequest(socket, mod, curtab),
         '/vid': () => youtuberequest(socket, mod, curtab),
         '/video': () => youtuberequest(socket, mod, curtab),
+        '/youtube': () => youtuberequest(socket, mod, curtab),
         '/yt': () => youtuberequest(socket, mod, curtab),
         '/theme': () => {
             if (mod == "dark") mod = -100;
