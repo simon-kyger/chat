@@ -51,7 +51,7 @@ export default {
     renderVideo: function(tab, args){
         let url = `https://www.youtube.com/watch?v=${args.msg}`;
         let embed = `https://www.youtube.com/embed/${args.msg}`;
-        let link = `<a href='${url}'>${url}</a>`;
+        let link = `<a href='${url}' target='_blank'>${url}</a>`;
         let id = Math.random().toString(36).substring(2, 15)+(new Date()).getTime().toString(36);
         let converted = `<div id='${id}'></div>`;
         let div =   `<div class='msg'>

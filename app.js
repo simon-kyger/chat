@@ -173,7 +173,10 @@ function chatMsg(socket, msg) {
         send.chatmessages[0].blob = msg.blob;
     } else {
         send.chatmessages[0].msg = linkifyHtml(msg.msg, {
-            defaultProtocol: `https`
+            defaultProtocol: `https`,
+            target: {
+                url: '_blank'
+            },
         });
     }
 
